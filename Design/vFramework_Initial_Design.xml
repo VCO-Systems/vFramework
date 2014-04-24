@@ -1,0 +1,189 @@
+<!--
+CLASSES
+
+Application
+	fields (array)
+	actions (array)
+	screens (array)
+	
+Field
+-----
+	id  (Alphanumeric) Unique name that other controls can use to reference this field
+	allowEmpty (Boolean) Can this field allow empty values? Default is true
+	editable   (Boolean) Are controls that display this field editable?  Default is false.
+	password (Boolean) To enable a field to mask the values this attribute should be set to true. Default is false.
+	mask 	
+		A - Alphabets
+		N - Numeric
+		Z - Alphabets + Numeric
+		C - Any character
+		* - Optional --> needs further discussion
+	
+Actions
+-------
+	conditions  Set of <and>, <or> tags that form the conditions under which this action will be fired
+	and         Returns true if all the conditions listed are true
+	or          Returns true if any conditions listed are true
+	allScreenControlsValid Returns true if all controls on this screen are in a Valid state. This looks only at the "UI Valid" state, and does not trigger a server-side validation by default.
+	isValid     Condition that checks whether a specific UI control is in a Valid state.  By default, this does not trigger a server-side validation.
+	exit		Exit the application.  Optionally, at the screen level, at attribute can be set to prompt the user to save unsaved changes before exiting.
+	back		Navigate to the previous screen in the navigation history.  On the first screen in the application, this exits the application.  (note: popup screens are not included in the navigation history)
+
+Other
+-----
+Screen
+	- promptBeforeExit (Boolean)  On CTRL-X, ask the user if they are sure they want to exit the application.
+	- isPopup		   (Boolean)  This screen is a popup.  Popups are not included in navigation history.
+	- startScreen (Boolean) This attribute denotes if a screen is the start screen for the application. Default is false
+		
+
+		
+Controls
+---------
+DateInput - Used to input/render date/time values 
+				Date format - [Default] mm/dd/yyyy 
+							  mm/dd/yyyy hh:mm
+				
+TextInput - Used to input/render text
+
+-->
+
+<Application>
+
+	<fields>
+		<field id="caseNumber" allowEmpty="false" maxLength="10" serverMethod="Project1.validateCaseNumberForVASScreen"  />
+		<field id="caseQty" mask="NNN" maxLength="3" serverMethod="Project1.validateCaseQtyForVASScreen" />	
+		<field id="caseExpirationDate" maxLength="8" />
+		<field id="countryOfOrigin" maxLength="3" />
+		<field id="vas" maxlength="3" serverMethod="Project1.validateVASAction" />
+		<field id="SKU" maxlength="10" serverMethod="Project1.validateSKU" />
+		<field id="skuQty" mask="NNN" maxLength="3" serverMethod="Project1.validateSKUQtyForVASScreen" />	
+	</fields>
+	
+	<screenset>
+		<screens>
+			<screen name="VASSelectionScreen" >
+				<keys>
+					<field name="vas" />
+				</keys>
+			</screen>
+			<screen name="SKUQtyScreen" />
+		</screens>		
+		<screenset>
+			<screens>
+				<screen name="SKUQtyScreen">
+					<keys>
+						<field name="SKU" />
+				</screen>
+			</screens>
+		</screenset>
+	</screenset>
+	
+	<actions>
+		<action>
+			<conditions>
+				<and>
+					<KeyBinding key="CTRL+W" />	
+				</and>
+			</conditions>
+			<do>
+				<Back >
+			</do>
+		</action>
+		
+		<action>
+			<conditions>
+				<and>
+					<KeyBinding key="CTRL+X" />	
+				</and>
+			</conditions>
+			<do>
+				<Exit >
+			</do>
+		</action>
+	</action>
+	
+	<screens>
+		<screen id="caseSelectionScreen" startScreen="true">
+			<screenControls>
+				<TextInput id="txtCaseNumber" field="caseNumber" label="Case Number" />
+			</screenControls>
+			
+			<actions>
+				<action>
+					<conditions>
+						<and>
+							<or>
+								<KeyBinding key="ENTER" />
+								<KeyBinding key="CTRL+C" />
+							</or>
+							<and>
+								<allScreenControlsValid />
+							</and>
+						</and>
+					</conditions>
+					<do>
+						<ScreenDestination dest="VASSelectionScreen">
+					</do>
+				</action>
+			</actions>
+				
+		</screen>
+		
+		<screen id="VASSelectionScreen">
+			<screenControls>
+				<TextInput id="txtCaseNumber" field="caseNumber" label="Case Number" editable="false" />
+				<TextInput id="txtCaseQty" field="caseQty" label="Qty" editable="false"  />
+				<DateInput id="txtCaseExpirationDate" field="caseExpirationDate" label="Exp Date" editable="false"  />
+				<TextInput id="txtCountryOfOrigin" field="countryOfOrigin" label="Country of Origin" editable="false" />
+				<TextInput id="txtVas" field="vas" label="VAS" editable="true" />
+			</screenControls>
+			
+			<actions>
+				<action>
+					<conditions>
+						<and>
+							<or>
+								<KeyBinding key="ENTER" />
+							</or>
+							<and>
+								<allScreenControlsValid />
+							</and>
+						</and>
+					</conditions>
+					<do>
+						<ScreenDestination dest="SKUQtyScreen">
+					</do>
+				</action>
+			</actions>
+
+		</screen>
+		
+		<screen id="SKUQtyScreen" >
+			<screenControls>
+				<TextInput id="txtCaseNumber" field="caseNumber" label="Case Number" editable="false" />
+				<TextInput id="txtSKU" field="SKU" label="SKU" editable="true"  />
+				<TextInput id="txtSKUQty" field="skuQty" label="Qty" editable="true"  />
+			</screenControls>
+			
+			<actions>
+				<action>
+					<conditions>
+						<and>
+							<or>
+								<KeyBinding key="ENTER" />
+							</or>
+							<and>
+								<allScreenControlsValid />
+							</and>
+						</and>
+					</conditions>
+					<do>
+						<ScreenDestination dest="VASSelectionScreen">
+					</do>
+				</action>
+			</actions>
+		</screen>
+		
+	</screens>
+</Application>
