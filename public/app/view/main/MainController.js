@@ -5,6 +5,7 @@
  *
  * TODO - Replace this content of this view to suite the needs of your application.
  */
+
 Ext.define('vfw.view.main.MainController', {
     extend: 'Ext.app.ViewController',
 
@@ -17,6 +18,17 @@ Ext.define('vfw.view.main.MainController', {
     refs: [{
         mainTabs: '#mainTabs'
     }],
+    
+    init: function() {
+    	this.control({
+    		'tabpanel[cls=mainTabPanel]': {
+    			tabchange: function(tabPanel,newTab,oldTab,eOpts) {
+    				// When focus changes to the 'List tab, update the grid's data
+    				
+    			}
+    		}
+    	});
+    },
 
     showList: function () {
     	var barcode=this.lookupReference('fldBarcode').getValue();
@@ -29,11 +41,19 @@ Ext.define('vfw.view.main.MainController', {
     	}
     	console.log(barcode,desc);
     	// Ext.Msg.confirm('Confirm', 'Are you sure?', 'onConfirm', this);
+    	
+    	// Tell the grid to load its data
+    	var st = this.lookupReference('mainGrid').getStore();
+    	//st.load({params: {limit: 10}});
+    	st.loadPage(1);
     },
 
     onConfirm: function (choice) {
         if (choice === 'yes') {
             //
         }
+    },
+    getItems: function() {
+    	alert('[Controller] getItems()');
     }
 });

@@ -5,6 +5,8 @@
  *
  * TODO - Replace this content of this view to suite the needs of your application.
  */
+
+
 Ext.define('vfw.view.main.Main', {
     extend: 'Ext.container.Container',
 
@@ -63,6 +65,7 @@ Ext.define('vfw.view.main.Main', {
         region: 'center',
         xtype: 'tabpanel',
         reference: 'mainTabs',
+        cls: 'mainTabPanel',
         items:[{
             title: 'Criteria',
             html: '',
@@ -101,46 +104,35 @@ Ext.define('vfw.view.main.Main', {
         {
             title: 'List',
             //layout: 'fit',
-            items: [{
+            items: [ {// Ext.create('Ext.grid.Panel',{
                 xtype: 'grid',
+                maxHeight: 450,
                 title: 'SKU',
+                reference: 'mainGrid',
                 selType: 'checkboxmodel',
                 selModel: {
                 	checkOnly: true,
                 	injectCheckbox: 0
                 },
-                store: {
-                    fields:['descr', 'barcode', 'si1','si2','si3','si4','si5','si6'],
-                    data:[
-                        { descr: 'Lisa',  barcode: "AJFOFJ2K13",
-                          si1: "555-111-1224"  },
-                        { descr: 'Bart',  barcode: "O3I1IJJJFO",
-                          si1: "555-222-1234" },
-                        { descr: 'Homer', barcode: "FJWOFJ2JR2",
-                          si1: "555-222-1244"  },
-                        { descr: 'Marge', barcode: "948JAJOF2J",
-                          si1: "555-222-1254"  }
-                    ],
-                    proxy: {
-                        type: 'memory'
-                    }
-                },
+                store: 'CartonHdrStore',
                 columns: [
-                    { text: 'Style Descr',  dataIndex: 'descr' },
-                    { text: 'Barcode', dataIndex: 'barcode', flex: 1},
-                    { text: 'Special Instr 1', dataIndex: 'si1' },
-                    { text: 'Special Instr 2', dataIndex: 'si2' },
-                    { text: 'Special Instr 3', dataIndex: 'si3' },
-                    { text: 'Special Instr 4', dataIndex: 'si4' },
-                    { text: 'Special Instr 5', dataIndex: 'si5' },
-                    { text: 'Special Instr 6', dataIndex: 'si6' },
+                    { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
+                    { text: 'Pkt Ctrl Nbr', dataIndex: 'pkt_ctrl_nbr'},
+                    { text: 'whse', dataIndex: 'whse' },
+                    { text: 'Seq Rule Prty', dataIndex: 'seq_rule_prty' },
+                    { text: 'stat_code', dataIndex: 'stat_code' },
+                    { text: 'Stage Indic', dataIndex: 'stage_indic' },
+                    { text: 'sngl_sku_flag', dataIndex: 'sngl_sku_flag' },
+                    { text: 'SKU id', dataIndex: 'sku_id' },
                 ],
              // paging bar on the bottom
-                bbar: Ext.create('Ext.PagingToolbar', {
-                    //store: store,
+                bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
+                    xtype: 'pagingtoolbar',
+                	store: 'CartonHdrStore',
+                	pageSize: 10,
                     displayInfo: true,
-                    displayMsg: 'Displaying topics {0} - {1} of {2}',
-                    emptyMsg: "No topics to display",
+                    displayMsg: 'Displaying items {0} - {1} of {2}',
+                    emptyMsg: "No items to display",
                     items:[
                         '-', {
                         text: 'Show Preview',
@@ -151,11 +143,13 @@ Ext.define('vfw.view.main.Main', {
                             preview.toggleExpanded(pressed);
                         }
                     }]
-                }),
+                }
+                
             }
+            ]}
             
-            ]
-        }]
-    }]
-});
+            ] // tabpanel
+        }] // outer panel
+        
+    });
 

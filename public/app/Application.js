@@ -12,15 +12,9 @@ Ext.define('vfw.Application', {
     views: [
         // TODO: add views here
     ],
-
-    controllers: [
-        'Root',
-        // TODO: add controllers here
-    ],
-
-    stores: [
-        // TODO: add stores here
-    ],
+    controllers: ['Root',],
+    stores: ['CartonHdrStore'],
+    models: ['CartonHdr'],
     
     launch: function () {
         // TODO - Launch the application
