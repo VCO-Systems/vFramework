@@ -8,8 +8,8 @@ Ext.define('vfw.store.CartonHdrStore',{
 		url: 'getCartons',
 		reader: {
 			type: 'json',
-			rootProperty: 'items',
-			totalProperty: 'total'
+			rootProperty: 'data',
+			totalProperty: 'totalrows'
 		}
 	},
 	model: 'vfw.model.CartonHdr'

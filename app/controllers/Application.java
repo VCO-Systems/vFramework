@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.CartonHdr;
 import play.*;
@@ -42,21 +44,19 @@ public class Application extends Controller {
     	String page = request().getQueryString("page");
     	
     	// Use the paging params to request a page
-    	List<CartonHdr> page_of_cartons = CartonHdr.find.where()
+    	PagingList<CartonHdr> cartons = CartonHdr.find.where()
     			.orderBy("carton_nbr")
-    			.findPagingList(Integer.parseInt(limit))
+    			.findPagingList(Integer.parseInt(limit));
+    	List<CartonHdr> page_of_cartons = cartons
     			.getPage(Integer.parseInt(page))
     			.getList();
-    	ObjectMapper mapper = new ObjectMapper();
-    	String js="";
     	
-    	try {
-    		js=mapper.writeValueAsString(page_of_cartons);
-			
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return ok(js);
+    	// Construct the return JSON object
+    	ObjectNode retval = play.libs.Json.newObject();
+    	retval.put("success", "true");
+    	retval.put("totalrows", cartons.getTotalRowCount());
+		retval.put("data", play.libs.Json.toJson(page_of_cartons));
+    	
+    	return ok(retval);
     }
 }
