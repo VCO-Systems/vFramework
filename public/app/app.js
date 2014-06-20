@@ -8,7 +8,8 @@ Ext.application({
 
     extend: 'vfw.Application',
     
-    autoCreateViewport: 'vfw.view.main.Main',
+    //autoCreateViewport: 'vfw.view.main.Main',
+    autoCreateViewport: 'vfw.view.carton.CartonInquiry',
     appFolder: '/assets/app',
     
 	

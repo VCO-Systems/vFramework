@@ -39,7 +39,11 @@ Ext.define('vfw.view.main.Main', {
                 items: [{
                         text: 'C_VAS',
                         iconCls: 'edit'
-                    }]                          
+                    },
+                    {
+                    	text: 'Carton Inquiry',
+                    	iconCls: 'cartonInquiry'
+                    }]                         
             }
         },
         {
