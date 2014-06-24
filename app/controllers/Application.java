@@ -154,8 +154,8 @@ public class Application extends Controller {
     		// Example:  {'property':'carton_nbr', 'value': '00000999990005080020'}
     		String prop = filter.get("property").asText();
     		String val  = filter.get("value").asText();
-    		// The UI returns an empty filter if the user removed
-    		// an existing filter value.  For now, ignore these
+    		// In case the UI returns an empty filter if the user removed
+    		// an existing filter value,for now, ignore these
     		// (searching for nulls may come later)
     		if (!val.equals("")){
     			// Add this to the where clause
