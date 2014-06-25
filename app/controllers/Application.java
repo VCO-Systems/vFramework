@@ -43,6 +43,52 @@ public class Application extends Controller {
 		
     }
     
+    public static Boolean evalSearchCriteria(ExpressionList ebean_expression, String prop, Object val) {
+    	Boolean success=true;
+    	String fieldName,fieldType="";
+    	System.out.println("Processing search criteria: " + prop + " = " + val);
+    	// Get the actual field name (ie: strip out from_, to_, etc)
+    	if (prop.startsWith("from_")) {
+    		fieldName = prop.substring(5);
+    	}
+    	else if (prop.startsWith("to_")) {
+    		fieldName = prop.substring(3);
+    	}
+    	else {
+    		fieldName = prop;
+    	}
+    	
+    	// Make sure that field exists on the model,
+    	// and get its type
+    	try {
+			java.lang.reflect.Field fld = CartonHdr.class.getField(fieldName);
+			if (fld != null) {
+				String fqdn = fld.getType().toString().split(" ")[1];
+				String[] fqdn_parts = fqdn.split("\\.");
+				fieldType = fqdn_parts[fqdn_parts.length-1];
+				System.out.println("\tfield type: " + fieldType);
+			}
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	// Handle to/from fields
+    	if (prop.startsWith("from_")) {
+    		ebean_expression.where().gt(fieldName, val);
+    		System.out.println("\tadded expression: " + fieldName + " >= " + val);
+    	}
+    	if (prop.startsWith("to_")) {
+    		ebean_expression.where().lt(fieldName, val);
+    		System.out.println("\tadded expression: " + fieldName + " <= " + val);
+    	}
+    	
+    	return success;
+    }
+
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getCartons() throws JsonParseException, JsonMappingException, IOException {
 
@@ -159,7 +205,8 @@ public class Application extends Controller {
     		// (searching for nulls may come later)
     		if (!val.equals("")){
     			// Add this to the where clause
-    			cartons_expr.where().like(prop, val);
+//    			cartons_expr.where().like(prop, val);
+    			evalSearchCriteria(cartons_expr,prop,val);
     		}
     		
     	}
@@ -209,4 +256,6 @@ public class Application extends Controller {
     	
     	return ok(retval);
     }
+    
+    
 }

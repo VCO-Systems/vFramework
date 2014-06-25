@@ -93,12 +93,12 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 								{ fieldLabel: 'From Carton:',
 								  name: 'txtFromCarton',
 								  allowBlank:true,
-								  reference: 'fldFromCarton'
+								  reference: 'from_carton_nbr'
 								},
 								{ fieldLabel: 'To Carton:',
 								  name: 'txtToCarton',
 								  allowBlank:true,
-								  reference: 'fldToCarton'
+								  reference: 'to_carton_nbr'
 								},
 								{ fieldLabel: 'Carton:',
 								  name: 'txtCarton',

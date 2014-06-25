@@ -38,7 +38,7 @@ public class CartonHdr extends Model{
     private static final long serialVersionUID = 1L;
     
     /**
-     * Generic query helper for entity Company with id Long
+     * Generic query helper for entity CartonHdr with id Long
      */
     public static Model.Finder<Long,CartonHdr> find = new Model.Finder<Long,CartonHdr>(Long.class, CartonHdr.class);
 
