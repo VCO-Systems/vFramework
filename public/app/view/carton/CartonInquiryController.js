@@ -29,9 +29,16 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     			}
     		},
     		'[xtype="form"] field': {
+    			// On field change, call the onFieldChange function
     			change: function(field, newVal, oldVal) {
-    				
     				this.onFieldChange(field,newVal,oldVal);
+    			},
+    			// Pressing ENTER on any criteria field triggers search
+    			specialkey: function(field,e) {
+    				if (e.getKey() == e.ENTER) {
+    					console.log("ENTER");
+    					this.onList();
+    				}
     			}
     		}
     	});
