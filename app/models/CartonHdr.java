@@ -12,10 +12,13 @@ import play.db.ebean.*;
 @Table(name="carton_hdr")
 public class CartonHdr extends Model{
 
+//    @OneToMany(mappedBy="carton_nbr")
+//    public List<CartonDtl> cartonDtls;
     
-    //public Long id;
-    @Id
-    public String carton_nbr;
+	@Id
+	public String carton_nbr;
+	
+	
     public String pkt_ctrl_nbr;
     public String whse;
     public Long seq_rule_prty;

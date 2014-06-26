@@ -23,7 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import models.CartonDtl;
 import models.CartonHdr;
+import models.CartonInquiry;
 import models.FilterCriteria;
 import play.*;
 import play.mvc.*;
@@ -43,51 +45,7 @@ public class Application extends Controller {
 		
     }
     
-    public static Boolean evalSearchCriteria(ExpressionList ebean_expression, String prop, Object val) {
-    	Boolean success=true;
-    	String fieldName,fieldType="";
-    	System.out.println("Processing search criteria: " + prop + " = " + val);
-    	// Get the actual field name (ie: strip out from_, to_, etc)
-    	if (prop.startsWith("from_")) {
-    		fieldName = prop.substring(5);
-    	}
-    	else if (prop.startsWith("to_")) {
-    		fieldName = prop.substring(3);
-    	}
-    	else {
-    		fieldName = prop;
-    	}
-    	
-    	// Make sure that field exists on the model,
-    	// and get its type
-    	try {
-			java.lang.reflect.Field fld = CartonHdr.class.getField(fieldName);
-			if (fld != null) {
-				String fqdn = fld.getType().toString().split(" ")[1];
-				String[] fqdn_parts = fqdn.split("\\.");
-				fieldType = fqdn_parts[fqdn_parts.length-1];
-				System.out.println("\tfield type: " + fieldType);
-			}
-		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	// Handle to/from fields
-    	if (prop.startsWith("from_")) {
-    		ebean_expression.where().gt(fieldName, val);
-    		System.out.println("\tadded expression: " + fieldName + " >= " + val);
-    	}
-    	if (prop.startsWith("to_")) {
-    		ebean_expression.where().lt(fieldName, val);
-    		System.out.println("\tadded expression: " + fieldName + " <= " + val);
-    	}
-    	
-    	return success;
-    }
+    
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getCartons() throws JsonParseException, JsonMappingException, IOException {
@@ -118,65 +76,6 @@ public class Application extends Controller {
     	 * Check for search criteria in "filters" object
     	 */
     	
-//    	JsonNode j = json.get("filters");
-//    	System.out.println("filters as JsonNode: " + j);
-//    	ArrayNode j_arr = (ArrayNode)j;
-//    	List<FilterCriteria> filt_list = new ArrayList<FilterCriteria>();
-//    	Iterator<JsonNode> it = j_arr.iterator();
-//    	
-//    	while (it.hasNext()) {
-//    		JsonNode node = it.next();
-//    		String prop = node.get("property").asText();
-//    		System.out.println(prop);
-//    	}
-    	
-    	// carton_nbr
-//    	ObjectMapper mapper = new ObjectMapper();
-//    	Map<String,String> mp = mapper.readValue(json.findPath("filters").asText(),
-//    			new TypeReference<Map<String,String>>(){});
-//    	System.out.println("Map.tostring: " + mp.toString());
-//    	Iterator<JsonNode> filters = json.findPath("filters").elements();///.findValues("filters");
-//    	System.out.println("filter count: ");
-    	
-//    	FilterCriteria[] lstFilters = new Array<FilterCriteria>();
-//    	try {
-//			lstFilters = mapper.readValue(json.findPath("filters").asText(),FilterCriteria[].class);
-//		} catch (JsonParseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (JsonMappingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//    	
-//    	System.out.println(lstFilters.length);
-    	
-//    	while(filters.hasNext()) {
-//    		
-//    		JsonNode filter = filters.next();
-//    		
-//    		System.out.println(filter.asText());
-//    		String p = filter.findPath("property").toString();
-//			System.out.println(p);
-//    	}
-    	
-    	
-    	
-//    	if (filters.size() >= 0) {
-//    		for (JsonNode filter:filters) {
-//    			
-//    			System.out.println(filter);
-//    			
-////    			ObjectMapper mapper = new ObjectMapper();
-////    			List<FilterCriteria> prop = mapper.readValue(filters.as,mapper.getTypeFactory().constructCollectionType(List.class, FilterCriteria.class));//filter.findValue("property").asText();
-////    			String val = filter.findValue("value").asText();
-////    			System.out.println(prop + " / " + val);
-//    		}
-    		
-//    	}
     	
     	// Build the initial Ebean query expression
     	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find.where();
@@ -208,7 +107,6 @@ public class Application extends Controller {
 //    			cartons_expr.where().like(prop, val);
     			evalSearchCriteria(cartons_expr,prop,val);
     		}
-    		
     	}
     	
     	// Add order by
@@ -225,28 +123,8 @@ public class Application extends Controller {
     			.getPage(Integer.parseInt(page)-1) 
     			.getList();
     	
-//    	System.out.println("Row Count: " + cartons.getTotalRowCount());
-//    	
-//    	List<CartonHdr> page_of_cartons = cartons
-//    			.getPage(Integer.parseInt(page))
-//    			.getList();
-//    	System.out.println("Results on page " + page + ": " + page_of_cartons.size());
-    	
-    	// 2nd approach to querying
-//    	List<CartonHdr> new_cartons = Ebean.find(CartonHdr.class)
-//    			.where()
-//    			.like("carton_nbr", "0000099999000132%")
-//    			.findPagingList(Integer.parseInt(limit))
-//    			.getPage(Integer.parseInt(page))
-//    			.getList();
-    	
-    	// RAW SQL approach to querying
-//    	Query<CartonHdr> query = Ebean.find(CartonHdr.class);
-//    	String sql = "SELECT * from carton_hdr ORDER BY carton_hdr";
-//    	RawSql rawSql = RawSqlBuilder.parse(sql);
-//    	PagingList pl = query.setRawSql(arg0)
-    			
-    	
+    	// Convert these WMOS objects into a CartonInquiry model
+    	convertToCartonInquiry(data);
     	
     	// Construct the return JSON object
     	ObjectNode retval = play.libs.Json.newObject();
@@ -255,6 +133,124 @@ public class Application extends Controller {
     	retval.put("data", play.libs.Json.toJson(data));
     	
     	return ok(retval);
+    }
+    
+    public static Boolean convertToCartonInquiry(List<CartonHdr> carton_hdrs) {
+    	Boolean success=true;
+    	Iterator<CartonHdr> cartons = carton_hdrs.iterator();
+    	while (cartons.hasNext()) {
+    		CartonHdr carton = cartons.next();
+    		System.out.println(carton);
+    	}
+    	return success;
+    }
+    
+    
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result test() throws JsonParseException, JsonMappingException, IOException {
+    	CartonInquiry retval = new CartonInquiry();
+    	JsonNode json = request().body().asJson();
+    	
+    	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
+    			.fetch("cartonHeader")
+    			.where()
+    				.eq("carton_nbr","00000999990001329956")
+    			;
+    	PagingList<CartonDtl> cartons = cartons_expr	
+        		.findPagingList(10);
+    	System.out.println("Total carton_dtl matches found: " + cartons.getTotalRowCount());
+    	List<CartonDtl> data = cartons
+    			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
+    			.getPage(0) 
+    			.getList();
+    	Iterator<CartonDtl> carton_dtls = data.iterator();
+    	
+    	while (carton_dtls.hasNext()) {
+
+    		// Fields from carton_dtl
+    		CartonDtl cd = carton_dtls.next();
+    		retval.carton_nbr     = cd.carton_nbr;
+    		retval.carton_seq_nbr = cd.carton_seq_nbr;
+    		retval.units_pakd     = cd.units_pakd;
+    		retval.pkt_ctrl_nbr   = cd.pkt_ctrl_nbr;
+    		
+    		// fields from carton_hdr
+    		CartonHdr hdr = cd.getCartonHeader();
+    		if (hdr != null) {
+    			retval.whse           = hdr.whse;
+    		}
+    		else {
+    			System.out.println("No carton_hdr found for carton_dtl: " + cd.carton_nbr);
+    		}
+    		
+    		
+    		
+    	}
+    	
+    	
+    	return ok(play.libs.Json.toJson(retval));
+    }
+    /**
+     * Parse and apply a single search criteria (from the user) for an existing Ebean expressionList
+     * 
+     * @param ebean_expression
+     * @param prop
+     * @param val
+     * @return
+     */
+    
+    public static Boolean evalSearchCriteria(ExpressionList ebean_expression, String prop, Object val) {
+    	Boolean success=true;
+    	String fieldName,fieldType="";
+    	System.out.println("Processing search criteria: " + prop + " = " + val);
+    	
+    	// Get the actual field name (ie: strip out from_, to_, etc)
+    	if (prop.startsWith("from_")) {
+    		fieldName = prop.substring(5);
+    	}
+    	else if (prop.startsWith("to_")) {
+    		fieldName = prop.substring(3);
+    	}
+    	else {
+    		fieldName = prop;
+    	}
+    	
+    	// Make sure that field exists on the model,
+    	// and get its type
+    	try {
+			java.lang.reflect.Field fld = CartonHdr.class.getField(fieldName);
+			if (fld != null) {
+				String fqdn = fld.getType().toString().split(" ")[1];
+				String[] fqdn_parts = fqdn.split("\\.");
+				fieldType = fqdn_parts[fqdn_parts.length-1];
+				System.out.println("\tfield type: " + fieldType);
+			}
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			success=false;
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			success=false;
+			e.printStackTrace();
+		}
+    	
+    	// Apply from/to fields to the expression
+    	if (prop.startsWith("from_")) {
+    		ebean_expression.where().gt(fieldName, val);
+    		System.out.println("\tadded expression: " + fieldName + " >= " + val);
+    	}
+    	else if (prop.startsWith("to_")) {
+    		ebean_expression.where().lt(fieldName, val);
+    		System.out.println("\tadded expression: " + fieldName + " <= " + val);
+    	}
+    	// Apply all other fields to the expression
+    	else {
+    		ebean_expression.where().eq(fieldName, val);
+    		System.out.println("\tadded expression: " + fieldName + " <= " + val);
+    	}
+    	
+    	return success;
     }
     
     

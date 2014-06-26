@@ -65,7 +65,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 							listeners: {
 								specialkey: function(field,e) {
 									if (e.getKey() == e.ENTER) {
-										console.debug(field);
+//										console.debug(field);
 									}
 								}
 							},

@@ -11,11 +11,19 @@ import play.db.ebean.*;
 @Entity
 @Table(name="carton_dtl")
 public class CartonDtl extends Model {
-
     
-    //public Long id;
-    @Id
-    public String carton_nbr;
+	public String carton_nbr;
+	
+	private CartonHdr cartonHeader;
+	
+	@OneToOne(cascade=CascadeType.ALL)
+	@JoinColumn(name="carton_nbr")
+	public CartonHdr getCartonHeader() {
+		return cartonHeader;
+	}
+	
+    
+    
     public Long carton_seq_nbr;
     public String pkt_ctrl_nbr;
     public Long pkt_seq_nbr;
