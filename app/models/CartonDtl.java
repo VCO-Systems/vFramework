@@ -1,8 +1,11 @@
 package models;
 
+import java.io.Serializable;
 import java.util.*;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.data.validation.*;
 //import play.db.jpa.*;
@@ -12,19 +15,51 @@ import play.db.ebean.*;
 @Table(name="carton_dtl")
 public class CartonDtl extends Model {
     
-	public String carton_nbr;
 	
-	private CartonHdr cartonHeader;
-	
-	@OneToOne(cascade=CascadeType.ALL)
-	@JoinColumn(name="carton_nbr")
-	public CartonHdr getCartonHeader() {
-		return cartonHeader;
+	@Embeddable
+	public class CartonNbrKey implements Serializable {
+		public String carton_nbr;
+		public String carton_seq_nbr;
+		
+		public int hashCode() {
+	        return (int) carton_nbr.hashCode() + carton_nbr.length();//+ carton_seq_nbr;
+	    }
+
+	    public boolean equals(Object obj) {
+	        if (obj == this) return true;
+	        if (!(obj instanceof CartonNbrKey)) return false;
+	        if (obj == null) return false;
+	        CartonNbrKey pk = (CartonNbrKey) obj;
+	        return pk.carton_seq_nbr == carton_seq_nbr && pk.carton_nbr.equals(carton_nbr);
+	    }
 	}
 	
+	@Id
+	public CartonNbrKey pk;
+	
+//	public String carton_nbr;
+	
+	private CartonHdr cartonHdr;
+	
+	@JsonIgnore
+	@ManyToOne
+    @JoinColumn(name="carton_nbr")
+	public CartonHdr getCartonHdr() {
+		return cartonHdr;
+	}
+	
+	public void setCartonHdr(CartonHdr hdr) {
+		cartonHdr=hdr;
+	}
+	
+	@OneToOne
+	@JoinColumn(name="sku_id")
+	public ItemMaster item;
+	
+	@Column(name="sku_id")
+	public String sku_id;
     
-    
-    public Long carton_seq_nbr;
+//    public Long carton_seq_nbr;
     public String pkt_ctrl_nbr;
     public Long pkt_seq_nbr;
     public Long pack_code;
@@ -39,7 +74,7 @@ public class CartonDtl extends Model {
     public Date create_date_time;
     public Date mod_date_time;
     public String batch_nbr;
-    public String sku_id;
+    
     
     
     private static final long serialVersionUID = 11L;

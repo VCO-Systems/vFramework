@@ -27,6 +27,8 @@ import models.CartonDtl;
 import models.CartonHdr;
 import models.CartonInquiry;
 import models.FilterCriteria;
+import models.ItemMaster;
+import models.OutbdLoad;
 import play.*;
 import play.mvc.*;
 import views.html.*;
@@ -145,48 +147,110 @@ public class Application extends Controller {
     	return success;
     }
     
+    /**
+     * Example code for querying and filtering on One-to-Many,
+     * One-to-One relationships in existing tables that cannot
+     * be modified.
+     * 
+     * @return
+     * @throws JsonParseException
+     * @throws JsonMappingException
+     * @throws IOException
+     */
     
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result test() throws JsonParseException, JsonMappingException, IOException {
+    public static Result testRelationships() throws JsonParseException, JsonMappingException, IOException {
+    	// The return value, using the "display model" CartonInquiry
     	CartonInquiry retval = new CartonInquiry();
+    	// Parse the request body as JSON
     	JsonNode json = request().body().asJson();
     	
-    	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
-    			.fetch("cartonHeader")
+    	// Set up the basic query on carton_hdr
+    	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find
+//    			.fetch("outbdLoads")
     			.where()
-    				.eq("carton_nbr","00000999990001329956")
+//    				.eq("carton_nbr","00000999990001369860")
     			;
-    	PagingList<CartonDtl> cartons = cartons_expr	
-        		.findPagingList(10);
-    	System.out.println("Total carton_dtl matches found: " + cartons.getTotalRowCount());
-    	List<CartonDtl> data = cartons
+    	// Apply paging params
+    	PagingList<CartonHdr> cartons = cartons_expr	
+        		.findPagingList(60);
+    	System.out.println("----");
+    	System.out.println("Carton hdrs found: " + cartons.getTotalRowCount());
+    	List<CartonHdr> data = cartons
     			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
     			.getPage(0) 
     			.getList();
-    	Iterator<CartonDtl> carton_dtls = data.iterator();
     	
-    	while (carton_dtls.hasNext()) {
-
+    	// Set up an iterator on the carton hdrs
+    	Iterator<CartonHdr> carton_hdrs = data.iterator();
+    	while (carton_hdrs.hasNext()) {
+    		
     		// Fields from carton_dtl
-    		CartonDtl cd = carton_dtls.next();
+    		CartonHdr cd = carton_hdrs.next();
+    		System.out.println("Carton nbr: " + cd.carton_nbr);
     		retval.carton_nbr     = cd.carton_nbr;
-    		retval.carton_seq_nbr = cd.carton_seq_nbr;
-    		retval.units_pakd     = cd.units_pakd;
+//    		retval.carton_seq_nbr = cd.carton_seq_nbr;
+//    		retval.units_pakd     = cd.units_pakd;
     		retval.pkt_ctrl_nbr   = cd.pkt_ctrl_nbr;
     		
-    		// fields from carton_hdr
-    		CartonHdr hdr = cd.getCartonHeader();
-    		if (hdr != null) {
-    			retval.whse           = hdr.whse;
-    		}
-    		else {
-    			System.out.println("No carton_hdr found for carton_dtl: " + cd.carton_nbr);
-    		}
+    		// Get carton_dtl records
+    		List<CartonDtl> dtls = cd.getCartonDtls();
+    		retval.carton_dtls    = dtls;
+    		System.out.println("\tCarton dtls: " + dtls.size());
     		
+    		// Get outbd_load records
+    		OutbdLoad ld = cd.load;
+    		System.out.println("\tLoad.load_nbr: " + ld.load_nbr);
+    		retval.outbd_load   = ld;
+    		System.out.println("\tLoad ship_via: " + ld.ship_via);
     		
+    		// Get item_master fields
+//    		retval.season   = ld
     		
     	}
     	
+    	
+    	return ok(play.libs.Json.toJson(retval));
+    }
+    
+    /**
+     * Example of querying items, and using relationships to get cartons, etc
+     * 
+     * @return
+     * @throws JsonParseException
+     * @throws JsonMappingException
+     * @throws IOException
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result testItems() throws JsonParseException, JsonMappingException, IOException {
+    	// The return value, using the "display model" CartonInquiry
+    	CartonInquiry retval = new CartonInquiry();
+    	retval.items = new ArrayList<ItemMaster>();
+    	// Parse the request body as JSON
+    	JsonNode json = request().body().asJson();
+    	
+    	// Set up the basic query on carton_hdr
+    	ExpressionList<ItemMaster> items_expr = ItemMaster.find
+//    			.fetch("outbdLoads")
+    			.where()
+//    				.eq("carton_nbr","00000999990001369860")
+    			;
+    	// Apply paging params
+    	PagingList<ItemMaster> items = items_expr	
+        		.findPagingList(60);
+    	
+    	System.out.println("Items found: " + items.getTotalRowCount());
+    	List<ItemMaster> data = items
+    			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
+    			.getPage(0) 
+    			.getList();
+    	
+    	// Set up an iterator on the carton hdrs
+    	Iterator<ItemMaster> items_iter = data.iterator();
+    	while (items_iter.hasNext()) {
+    		retval.items.add(items_iter.next());
+    		
+    	}
     	
     	return ok(play.libs.Json.toJson(retval));
     }

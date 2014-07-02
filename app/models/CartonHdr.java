@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import play.data.validation.*;
 //import play.db.jpa.*;
 import play.db.ebean.*;
@@ -17,6 +19,30 @@ public class CartonHdr extends Model{
     
 	@Id
 	public String carton_nbr;
+	
+	@OneToMany(mappedBy="cartonHdr")
+	private List<CartonDtl> cartonDtls;
+	public List<CartonDtl> getCartonDtls() {
+		return cartonDtls;
+	}
+	public void setCartonDtls(List<CartonDtl> dtls) {
+		cartonDtls=dtls;
+	}
+	
+//	// Outbound loads
+//	@OneToMany(mappedBy="carton")
+//	private List<OutbdLoad> outbdLoads;
+//	public List<OutbdLoad> getOutbdLoads() {
+//		return outbdLoads;
+//	}
+//	public void setOutbdLoads(List<OutbdLoad> lds) {
+//		outbdLoads=lds;
+//	}
+	
+	@ManyToOne()
+	@JoinColumn(name="load_nbr")
+	public OutbdLoad load;
+	
 	
 	
     public String pkt_ctrl_nbr;
@@ -37,6 +63,8 @@ public class CartonHdr extends Model{
     public String first_zone;
     public String last_zone;
     public Long nbr_of_zones;
+    public String load_nbr;
+    
     
     private static final long serialVersionUID = 1L;
     
