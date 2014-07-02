@@ -5,6 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index()
 POST    /getCartons                 controllers.Application.getCartons()
+POST    /getCartonInquiry           controllers.Application.getCartonInquiry()
 GET     /testRelationships          controllers.Application.testRelationships()
 GET     /testItems                  controllers.Application.testItems()
 

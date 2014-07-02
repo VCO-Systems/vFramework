@@ -137,14 +137,89 @@ public class Application extends Controller {
     	return ok(retval);
     }
     
-    public static Boolean convertToCartonInquiry(List<CartonHdr> carton_hdrs) {
-    	Boolean success=true;
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result getCartonInquiry() throws JsonParseException, JsonMappingException, IOException {
+
+    	// VC: Use this to get params from POST JSON body
+    	JsonNode json = request().body().asJson();
+    	String limit = json.get("pageSize").asText();
+    	String page = json.get("page").asText();
+
+    	/**
+    	 * Check for search criteria in "filters" object
+    	 */
+    	
+    	
+    	// Build the initial Ebean query expression
+    	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find.where();
+    	
+    	// Apply any search criteria (filters) from the UI
+    	List<JsonNode> results = json.findValues("filters");  // Json node called filters
+    	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
+    	ArrayNode filterCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
+    	while (it.hasNext()) {
+    		// VC: For some reason, ExtJs is serializing this JSON array 
+    		// as a string, so instead of getting multiple values here we
+    		// get one string.  So we must take this first element, cast
+    		// it again from string to ArrayNode using Jackson, to get the actual elements.
+    		JsonNode node = it.next();
+    		String node_string = node.asText();
+    		filterCriteriaEntries = (ArrayNode)play.libs.Json.parse(node_string);
+    	}
+    	// Process each of the filter criteria, and apply them to the query expression
+    	// (or not)
+    	for (JsonNode filter:filterCriteriaEntries) {  // Now loop over them as JsonNode
+    		// Example:  {'property':'carton_nbr', 'value': '00000999990005080020'}
+    		String prop = filter.get("property").asText();
+    		String val  = filter.get("value").asText();
+    		// In case the UI returns an empty filter if the user removed
+    		// an existing filter value,for now, ignore these
+    		// (searching for nulls may come later)
+    		if (!val.equals("")){
+    			// Add this to the where clause
+//    			cartons_expr.where().like(prop, val);
+    			evalSearchCriteria(cartons_expr,prop,val);
+    		}
+    	}
+    	
+    	// Add order by
+//    	cartons_expr=cartons_expr.orderBy("carton_nbr");
+    	
+    	// Build the paging list
+    	PagingList<CartonHdr> cartons = cartons_expr	
+    		.findPagingList(Integer.parseInt(limit));
+    	// Get the total row count
+    	int totalRows = cartons.getTotalRowCount();
+    	// Get the requested page
+    	List<CartonHdr> data = cartons
+    			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
+    			.getPage(Integer.parseInt(page)-1) 
+    			.getList();
+    	
+    	// Flatten these WMOS records into a list of CartonInquiry objects for the UI
+    	List<CartonInquiry> cartonInquiryList = convertToCartonInquiry(data);
+    	
+    	// Construct the return JSON object
+    	ObjectNode retval = play.libs.Json.newObject();
+    	retval.put("success", "true");
+    	retval.put("totalrows", totalRows);
+    	retval.put("data", play.libs.Json.toJson(cartonInquiryList));
+    	
+    	return ok(retval);
+    }
+    
+    public static List<CartonInquiry> convertToCartonInquiry(List<CartonHdr> carton_hdrs) {
+    	List<CartonInquiry> retval = new ArrayList<CartonInquiry>();
+    	
+    	// Iterate the carton_hdr records
     	Iterator<CartonHdr> cartons = carton_hdrs.iterator();
     	while (cartons.hasNext()) {
     		CartonHdr carton = cartons.next();
-    		System.out.println(carton);
+    		CartonInquiry inq = new CartonInquiry();
+    		inq.carton_nbr = carton.carton_nbr;
+    		retval.add(inq);
     	}
-    	return success;
+    	return retval;
     }
     
     /**
@@ -174,14 +249,16 @@ public class Application extends Controller {
     	// Apply paging params
     	PagingList<CartonHdr> cartons = cartons_expr	
         		.findPagingList(60);
-    	System.out.println("----");
-    	System.out.println("Carton hdrs found: " + cartons.getTotalRowCount());
     	List<CartonHdr> data = cartons
     			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
     			.getPage(0) 
     			.getList();
     	
-    	// Set up an iterator on the carton hdrs
+    	// Debugging info
+    	System.out.println("----");
+    	System.out.println("Carton hdrs found: " + cartons.getTotalRowCount());
+    	
+    	// Iterate the CARTON_HDR records
     	Iterator<CartonHdr> carton_hdrs = data.iterator();
     	while (carton_hdrs.hasNext()) {
     		
@@ -195,13 +272,13 @@ public class Application extends Controller {
     		
     		// Get carton_dtl records
     		List<CartonDtl> dtls = cd.getCartonDtls();
-    		retval.carton_dtls    = dtls;
+//    		retval.carton_dtls    = dtls;
     		System.out.println("\tCarton dtls: " + dtls.size());
     		
     		// Get outbd_load records
     		OutbdLoad ld = cd.load;
     		System.out.println("\tLoad.load_nbr: " + ld.load_nbr);
-    		retval.outbd_load   = ld;
+//    		retval.outbd_load   = ld;
     		System.out.println("\tLoad ship_via: " + ld.ship_via);
     		
     		// Get item_master fields
@@ -225,7 +302,7 @@ public class Application extends Controller {
     public static Result testItems() throws JsonParseException, JsonMappingException, IOException {
     	// The return value, using the "display model" CartonInquiry
     	CartonInquiry retval = new CartonInquiry();
-    	retval.items = new ArrayList<ItemMaster>();
+    	
     	// Parse the request body as JSON
     	JsonNode json = request().body().asJson();
     	
@@ -247,10 +324,10 @@ public class Application extends Controller {
     	
     	// Set up an iterator on the carton hdrs
     	Iterator<ItemMaster> items_iter = data.iterator();
-    	while (items_iter.hasNext()) {
-    		retval.items.add(items_iter.next());
-    		
-    	}
+//    	while (items_iter.hasNext()) {
+//    		retval.items.add(items_iter.next());
+//    		
+//    	}
     	
     	return ok(play.libs.Json.toJson(retval));
     }

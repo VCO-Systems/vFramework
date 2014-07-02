@@ -12,10 +12,13 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 
     xtype: 'app-main',
     requires: [
-               'vfw.view.carton.CartonInquiryController'],
+               'vfw.view.carton.CartonInquiryController',
+               'vfw.model.CartonInquiry'
+//               'vfw.store.CartonInquiryStore'
+               ],
     controller: 'cartoninquiry',
     viewModel: {
-        type: 'main'
+        type: 'cartoninquiry'
     },
 
     layout: {
@@ -213,21 +216,15 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 	checkOnly: true,
                 	injectCheckbox: 0
                 },
-                store: 'CartonHdrStore',
+                store: 'CartonInquiryStore',
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
-                    { text: 'Pkt Ctrl Nbr', dataIndex: 'pkt_ctrl_nbr'},
-                    { text: 'whse', dataIndex: 'whse' },
-                    { text: 'Seq Rule Prty', dataIndex: 'seq_rule_prty' },
-                    { text: 'stat_code', dataIndex: 'stat_code' },
-                    { text: 'Stage Indic', dataIndex: 'stage_indic' },
-                    { text: 'sngl_sku_flag', dataIndex: 'sngl_sku_flag' },
-                    { text: 'SKU id', dataIndex: 'sku_id' },
+                    
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
                     xtype: 'pagingtoolbar',
-                	store: 'CartonHdrStore',
+                	store: 'CartonInquiryStore',
                 	pageSize: 10,
                     displayInfo: true,
                     displayMsg: 'Displaying items {0} - {1} of {2}',

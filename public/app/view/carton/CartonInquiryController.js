@@ -11,7 +11,6 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
 
     requires: [
         'Ext.MessageBox',
-        'vfw.view.carton.CartonHdrModel',
         'Ext.Array'
     ],
 

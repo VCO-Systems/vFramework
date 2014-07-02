@@ -12,39 +12,31 @@ import play.db.ebean.*;
 //@Table(name="carton_hdr")
 public class CartonInquiry extends Model{
 
-    
-    // carton_hdr fields
-//    @Id
+	// CARTON_HDR fields
     public String carton_nbr;
     public String pkt_ctrl_nbr;
     public String whse;
-    public String sku_id;
+    public String wave_nbr;
     
-    // carton_dtl fields
+    // CARTON_DTL fields
     public Long carton_seq_nbr;
     public long units_pakd;
+    public long to_be_pakd_units;
     
-    // item_master fields
+    // ITEM_MASTER fields
     public String season;
     public String season_yr;
+    public String style;
+    public String style_sfx;
+    public String color;
+    public String color_sfx;
     
-    // Lists
-    public List<CartonDtl> carton_dtls;
-    public int nbrCartonDtls;
-//    public List<OutbdLoad> outbd_loads;
-    
-    // One to ones
-    public OutbdLoad outbd_load;
-    public int nbrOutbdLoads;
-    
-    public List<ItemMaster> items;
-    
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 14L;
     
     /**
-     * Generic query helper for entity CartonHdr with id Long
+     * Generic query helper for entity CartonInquiry with id Long
      */
-    public static Model.Finder<Long,CartonHdr> find = new Model.Finder<Long,CartonHdr>(Long.class, CartonHdr.class);
+    public static Model.Finder<Long,CartonInquiry> find = new Model.Finder<Long,CartonInquiry>(Long.class, CartonInquiry.class);
 
     
 	
