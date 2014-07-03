@@ -41,6 +41,11 @@ public class ItemMaster extends Model {
 	
 	public String season;
 	public String season_yr;
+	public String style;
+	public String style_sfx;
+	public String size_desc;
+	public String sku_brcd;
+	public String sku_desc;
 	
 	
 //	@ManyToOne

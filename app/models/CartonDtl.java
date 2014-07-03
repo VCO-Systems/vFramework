@@ -19,7 +19,7 @@ public class CartonDtl extends Model {
 	@Embeddable
 	public class CartonNbrKey implements Serializable {
 		public String carton_nbr;
-		public String carton_seq_nbr;
+		public Long carton_seq_nbr;
 		
 		public int hashCode() {
 	        return (int) carton_nbr.hashCode() + carton_nbr.length();//+ carton_seq_nbr;
@@ -39,18 +39,19 @@ public class CartonDtl extends Model {
 	
 //	public String carton_nbr;
 	
-	private CartonHdr cartonHdr;
+	
 	
 	@JsonIgnore
 	@ManyToOne
     @JoinColumn(name="carton_nbr")
-	public CartonHdr getCartonHdr() {
-		return cartonHdr;
-	}
-	
-	public void setCartonHdr(CartonHdr hdr) {
-		cartonHdr=hdr;
-	}
+	public CartonHdr cartonHdr;
+//	public CartonHdr getCartonHdr() {
+//		return cartonHdr;
+//	}
+//	
+//	public void setCartonHdr(CartonHdr hdr) {
+//		cartonHdr=hdr;
+//	}
 	
 	@OneToOne
 	@JoinColumn(name="sku_id")

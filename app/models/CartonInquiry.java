@@ -30,6 +30,8 @@ public class CartonInquiry extends Model{
     public String style_sfx;
     public String color;
     public String color_sfx;
+    public String sku_brcd;
+    public String sku_desc;
     
     private static final long serialVersionUID = 14L;
     

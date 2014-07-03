@@ -80,7 +80,9 @@ public class Application extends Controller {
     	
     	
     	// Build the initial Ebean query expression
-    	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find.where();
+    	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find
+    			.fetch("cartonDtls")
+    			.where();
     	
     	// Apply any search criteria (filters) from the UI
     	List<JsonNode> results = json.findValues("filters");  // Json node called filters
@@ -126,7 +128,7 @@ public class Application extends Controller {
     			.getList();
     	
     	// Convert these WMOS objects into a CartonInquiry model
-    	convertToCartonInquiry(data);
+//    	convertToCartonInquiry(data);
     	
     	// Construct the return JSON object
     	ObjectNode retval = play.libs.Json.newObject();
@@ -151,7 +153,10 @@ public class Application extends Controller {
     	
     	
     	// Build the initial Ebean query expression
-    	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find.where();
+    	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
+    			.fetch("item")
+    			.where()
+    			;
     	
     	// Apply any search criteria (filters) from the UI
     	List<JsonNode> results = json.findValues("filters");  // Json node called filters
@@ -186,12 +191,12 @@ public class Application extends Controller {
 //    	cartons_expr=cartons_expr.orderBy("carton_nbr");
     	
     	// Build the paging list
-    	PagingList<CartonHdr> cartons = cartons_expr	
+    	PagingList<CartonDtl> carton_dtl_pl = cartons_expr	
     		.findPagingList(Integer.parseInt(limit));
     	// Get the total row count
-    	int totalRows = cartons.getTotalRowCount();
+    	int totalRows = carton_dtl_pl.getTotalRowCount();
     	// Get the requested page
-    	List<CartonHdr> data = cartons
+    	List<CartonDtl> data = carton_dtl_pl
     			// ExtJs starts pageNum at 1, eBean starts at 0, so adjust here
     			.getPage(Integer.parseInt(page)-1) 
     			.getList();
@@ -205,18 +210,38 @@ public class Application extends Controller {
     	retval.put("totalrows", totalRows);
     	retval.put("data", play.libs.Json.toJson(cartonInquiryList));
     	
+    	//
+    	System.out.println("Total rows: " + totalRows);
+    	
     	return ok(retval);
     }
     
-    public static List<CartonInquiry> convertToCartonInquiry(List<CartonHdr> carton_hdrs) {
+    public static List<CartonInquiry> convertToCartonInquiry(List<CartonDtl> carton_dtls) {
     	List<CartonInquiry> retval = new ArrayList<CartonInquiry>();
     	
     	// Iterate the carton_hdr records
-    	Iterator<CartonHdr> cartons = carton_hdrs.iterator();
+    	Iterator<CartonDtl> cartons = carton_dtls.iterator();
     	while (cartons.hasNext()) {
-    		CartonHdr carton = cartons.next();
+    		CartonDtl carton = cartons.next();
     		CartonInquiry inq = new CartonInquiry();
-    		inq.carton_nbr = carton.carton_nbr;
+
+    		// carton_dtl fields
+    		inq.carton_nbr       = carton.pk.carton_nbr;
+    		inq.carton_seq_nbr   = carton.pk.carton_seq_nbr;
+    		inq.to_be_pakd_units = carton.to_be_pakd_units;
+    		inq.units_pakd       = carton.units_pakd;
+    		
+    		// carton_hdr fields
+    		inq.pkt_ctrl_nbr     = carton.cartonHdr.pkt_ctrl_nbr;
+    		inq.whse             = carton.cartonHdr.whse;
+    		inq.wave_nbr         = carton.cartonHdr.wave_nbr;
+    		
+    		// item_master fields
+    		inq.style           = carton.item.style;
+    		inq.style_sfx       = carton.item.style_sfx;
+    		inq.sku_brcd        = carton.item.sku_brcd;
+    		inq.sku_desc        = carton.item.sku_desc;
+    		
     		retval.add(inq);
     	}
     	return retval;
@@ -242,7 +267,7 @@ public class Application extends Controller {
     	
     	// Set up the basic query on carton_hdr
     	ExpressionList<CartonHdr> cartons_expr = CartonHdr.find
-//    			.fetch("outbdLoads")
+    			.fetch("cartonDtls")
     			.where()
 //    				.eq("carton_nbr","00000999990001369860")
     			;

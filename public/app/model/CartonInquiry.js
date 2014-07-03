@@ -11,11 +11,9 @@ Ext.define('vfw.model.CartonInquiry',{
         'units_pakd',
         'to_be_pakd_units',
         // ITEM_MASTER fields
-        'season',
-        'season_yr',
         'style',
         'style_sfx',
-        'color',
-        'color_sfx'
+        'sku_barcd',
+        'sku_desc'
 	]
 });

@@ -219,6 +219,17 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 store: 'CartonInquiryStore',
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
+                    { text: 'Carton Seq Nbr',  dataIndex: 'carton_seq_nbr' },
+                    { text: 'PKT_CTRL_NBR',  dataIndex: 'pkt_ctrl_nbr' },
+                    { text: 'WHSE',  dataIndex: 'whse' },
+                    { text: 'Wave Nbr',  dataIndex: 'wave_nbr' },
+                    { text: 'TO_BE_PAKD_UNITS',  dataIndex: 'to_be_pakd_units' },
+                    { text: 'Units PKD',  dataIndex: 'units_pakd' },
+                    { text: 'Style',  dataIndex: 'style' },
+                    { text: 'Style SFX',  dataIndex: 'style_sfx' },
+                    { text: 'SKU Brcd',  dataIndex: 'sku_brcd' },
+                    { text: 'SKU Desc',  dataIndex: 'sku_desc' }
+                    
                     
                 ],
              // paging bar on the bottom

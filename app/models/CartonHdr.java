@@ -64,6 +64,7 @@ public class CartonHdr extends Model{
     public String last_zone;
     public Long nbr_of_zones;
     public String load_nbr;
+    public String wave_nbr;
     
     
     private static final long serialVersionUID = 1L;
