@@ -18,7 +18,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                ],
     controller: 'cartoninquiry',
     viewModel: {
-        type: 'cartoninquiry'
+        type: 'main'
     },
 
     layout: {
