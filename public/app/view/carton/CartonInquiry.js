@@ -94,49 +94,40 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 							},
 							items: [
 								{ fieldLabel: 'From Carton:',
-								  name: 'txtFromCarton',
+								  name: 'from_CartonHdr.carton_nbr',
 								  allowBlank:true,
-								  reference: 'from_carton_nbr'
 								},
 								{ fieldLabel: 'To Carton:',
-								  name: 'txtToCarton',
+								  name: 'to_CartonHdr.carton_nbr',
 								  allowBlank:true,
-								  reference: 'to_carton_nbr'
 								},
 								{ fieldLabel: 'Carton:',
-								  name: 'txtCarton',
+								  name: 'CartonHdr.carton_nbr',
 								  allowBlank:true,
-								  reference: 'carton_nbr'
 								},
 								{ fieldLabel: 'Pickticket Ctrl Nbr:',
-								  name: 'txtPickTckCtrlNbr',
+								  name: 'CartonHdr.pkt_ctrl_nbr',
 								  allowBlank:true,
-								  reference: 'pkt_ctrl_nbr'
 								},
 								{ fieldLabel: 'Wave:',
-								  name: 'txtWave',
+								  name: 'CartonHdr.wave_nbr',
 								  allowBlank:true,
-								  reference: 'wave_nbr'
 								},
 								{ fieldLabel: 'Load:',
-								  name: 'txtLoad',
+								  name: 'CartonHdr.load_nbr',
 								  allowBlank:true,
-								  reference: 'load_nbr'
 								},
 								{ fieldLabel: 'Outbound Shipment:',
-								  name: 'txtOutboundShipment',
+								  name: 'CartonHdr.shpmt_nbr',
 								  allowBlank:true,
-								  reference: 'fldOutboundShipment'
 								},
 								{ fieldLabel: 'From Status:',
-								  name: 'txtFromStatus',
+								  name: 'from_CartonHdr.stat_code',
 								  allowBlank:true,
-								  reference: 'fldFromStatus'
 								},
 								{ fieldLabel: 'To Status:',
-								  name: 'txtToStatus',
+								  name: 'to_CartonHdr.stat_code',
 								  allowBlank:true,
-								  reference: 'fldToStatus'
 								}
 							        ],
 						},  // end fieldset
@@ -152,29 +143,24 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 							},
 							items: [
 								{ fieldLabel: 'Size Desc:',
-								  name: 'txtSizeDesc',
+								  name: 'ItemMaster.size_desc',
 								  allowBlank:true,
-								  reference: 'fldSizeDesc'
 								},
 								{ fieldLabel: 'Style:',
-								  name: 'txtStyle',
+								  name: 'ItemMaster.style',
 								  allowBlank:true,
-								  reference: 'fldStyle'
 								},
 								{ fieldLabel: 'Style Sfx:',
-								  name: 'txtStyleSfx',
+								  name: 'ItemMaster.style_sfx',
 								  allowBlank:true,
-								  reference: 'fldStyleSfx'
 								},
 								{ fieldLabel: 'Color:',
-								  name: 'txtColor',
+								  name: 'ItemMaster.color',
 								  allowBlank:true,
-								  reference: 'fldColor'
 								},
 								{ fieldLabel: 'Color Sfx:',
-								  name: 'txtColorSfx',
+								  name: 'ItemMaster.color_sfx',
 								  allowBlank:true,
-								  reference: 'fldColorSfx'
 								},
 								{ fieldLabel: 'Sec Dim:',
 								  name: 'txtSecDim',
@@ -220,16 +206,23 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
                     { text: 'Carton Seq Nbr',  dataIndex: 'carton_seq_nbr' },
+                    { text: 'Carton Creation Code', dataIndex: 'carton_creation_code'},
                     { text: 'PKT_CTRL_NBR',  dataIndex: 'pkt_ctrl_nbr' },
                     { text: 'WHSE',  dataIndex: 'whse' },
                     { text: 'Wave Nbr',  dataIndex: 'wave_nbr' },
                     { text: 'TO_BE_PAKD_UNITS',  dataIndex: 'to_be_pakd_units' },
                     { text: 'Units PKD',  dataIndex: 'units_pakd' },
+                    { text: 'Size Desc',  dataIndex: 'size_desc'},
                     { text: 'Style',  dataIndex: 'style' },
                     { text: 'Style SFX',  dataIndex: 'style_sfx' },
+                    { text: 'Color',  dataIndex: 'color' },
+                    { text: 'Color SFX',  dataIndex: 'color_sfx' },
                     { text: 'SKU Brcd',  dataIndex: 'sku_brcd' },
-                    { text: 'SKU Desc',  dataIndex: 'sku_desc' }
-                    
+                    { text: 'SKU Desc',  dataIndex: 'sku_desc' },
+                    { text: 'sec_dim',  dataIndex: 'sec_dim' },
+                    { text: 'Qual',  dataIndex: 'qual' },
+                    { text: 'season',  dataIndex: 'season' },
+                    { text: 'season_yr',  dataIndex: 'season_yr' },
                     
                 ],
              // paging bar on the bottom

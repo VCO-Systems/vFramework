@@ -55,7 +55,7 @@ public class CartonDtl extends Model {
 	
 	@OneToOne
 	@JoinColumn(name="sku_id")
-	public ItemMaster item;
+	public ItemMaster itemMaster;
 	
 	@Column(name="sku_id")
 	public String sku_id;

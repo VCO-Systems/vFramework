@@ -17,6 +17,8 @@ public class CartonInquiry extends Model{
     public String pkt_ctrl_nbr;
     public String whse;
     public String wave_nbr;
+    public Long carton_creation_code;
+    public String shpmt_nbr;
     
     // CARTON_DTL fields
     public Long carton_seq_nbr;
@@ -32,6 +34,9 @@ public class CartonInquiry extends Model{
     public String color_sfx;
     public String sku_brcd;
     public String sku_desc;
+    public String size_desc;
+    public String sec_dim;
+    public String qual;
     
     private static final long serialVersionUID = 14L;
     

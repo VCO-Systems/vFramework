@@ -54,7 +54,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	var filterToRemove;
     	for (var idx in existingStoreFilters) {
     		var filter = existingStoreFilters[idx];
-    		if (filter.getProperty()==field.reference) {
+    		if (filter.getProperty()==field.name) {
     			filterExists=true;
     			filterToRemove=filter;
     		}
@@ -64,28 +64,28 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	if (filterExists) {
     		if (!newVal) {  // an existing filter has been set to null/empty
     			// Todo: remove filter that has been nullified
-    			console.log('removing filter: ' + field.reference);
+    			console.log('removing filter: ' + field.name);
     			store.removeFilter(filterToRemove);
     		}
     		else {
     			// Update the filter (is this right, or does this make a dup?)
     			var newFilter = new Ext.util.Filter({
-    	    	    property: field.reference,
+    	    	    property: field.name,
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
-    			console.log('modifying existing filter: ' + field.reference)
+    			console.log('modifying existing filter: ' + field.name)
     		}
     	}
     	else {  // filter does not exist on store
     		// Add the filter
     		if (newVal) {
     			var newFilter = new Ext.util.Filter({
-    	    	    property: field.reference,
+    	    	    property: field.name,
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
-    			console.log('Adding filter for field: ' + field.reference)
+    			console.log('Adding filter for field: ' + field.name)
     		}
     	}
     },

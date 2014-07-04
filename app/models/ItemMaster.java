@@ -29,15 +29,8 @@ public class ItemMaster extends Model {
 //		cartonDtl=dtl;
 //	}
 	
-	
-	
-	
-	
 	@Id
 	public String sku_id;
-	
-	
-	
 	
 	public String season;
 	public String season_yr;
@@ -46,6 +39,10 @@ public class ItemMaster extends Model {
 	public String size_desc;
 	public String sku_brcd;
 	public String sku_desc;
+	public String color;
+	public String color_sfx;
+	public String sec_dim;
+	public String qual;
 	
 	
 //	@ManyToOne

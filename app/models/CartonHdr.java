@@ -65,6 +65,7 @@ public class CartonHdr extends Model{
     public Long nbr_of_zones;
     public String load_nbr;
     public String wave_nbr;
+    public String shpmt_nbr;
     
     
     private static final long serialVersionUID = 1L;
@@ -74,12 +75,6 @@ public class CartonHdr extends Model{
      */
     public static Model.Finder<Long,CartonHdr> find = new Model.Finder<Long,CartonHdr>(Long.class, CartonHdr.class);
 
-    
-	
-    
-    
-    
-    
     /**
 	 * 
 	 * 
