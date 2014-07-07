@@ -291,5 +291,38 @@ public class Application extends Controller {
     	return success;
     }
     
+    /**
+     * Server-side actions.
+     */
+    
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result printCartonLabels() throws JsonParseException, JsonMappingException, IOException {
+    	
+    	ObjectNode retval = play.libs.Json.newObject();
+    	
+    	// Get the json data from the UI
+    	JsonNode json = request().body().asJson();
+    	if (json==null) {
+    		System.out.println("ERROR: expecting json data");
+    	}
+    	
+    	// Get the list of carton_nbrs the user selected
+    	List<JsonNode> records = json.findValues("records");
+    	// VC: Play is seeing an extra array inside this array,
+    	// which doesn't show up in the raw JSON data,
+    	// so reach into records and get rec
+    	JsonNode rec = records.get(0);
+    	Iterator<JsonNode> it = rec.iterator();
+    	// Loop over the records
+    	while(it.hasNext()) {
+    		JsonNode carton_info = it.next();
+    		String carton_nbr = carton_info.get("carton_nbr").asText();
+    		System.out.println(carton_nbr);
+    	}
+    	
+    	retval.put("success", "true");
+    	return ok(retval);
+    }
+    
     
 }

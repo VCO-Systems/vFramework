@@ -112,33 +112,47 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
 //    	console.log(barcode,desc);
     	
     	var st = this.lookupReference('mainGrid').getStore();
-    	
-//    	var carton = this.lookupReference('fldCarton').getValue();
-    	
-    	// Loop over controls in the "Criteria" form
-    	
-    	
-    	// Sample of how to add a query filter
-//    	var ageFilter = new Ext.util.Filter({
-//    	    property: 'age',
-//    	    value   : 32
-//    	});
-//    	st.addFilter(ageFilter);
-    	
-    	
-    	// Ext.Msg.confirm('Confirm', 'Are you sure?', 'onConfirm', this);
-    	
-    	// Tell the grid to load its data
-    	
-    	//st.load({params: {limit: 10}});
-//    	st.loadPage(1);
-//    	st.load({params: {'city': 'Atlanta','state':'GA'}});
     	st.load();
     	this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
     },
     
     onPrintCartonLabel: function () {
-    	alert('printing carton label(s)');
+    	// Make sure at least one carton has been selected in the datagrid
+    	var retval = {};
+    	var records =[];
+    	retval["records"]=records;
+    	
+    	// Get a list of "checked" items in the datagrid
+    	var selections = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    	
+    	if (selections.length > 0 ) {
+    		// Insert details of each selected record into the JSON
+    		Ext.each(selections, function(item, index, allItems) {
+    			records.push({"carton_nbr": item.data.carton_nbr});
+    		});
+    		
+    		// send the json to the server
+    		Ext.Ajax.request({
+    		    url: 'printCartonLabels',
+    		    method: 'POST',          
+    		    headers: {'Content-Type': 'application/json','Accept':'application/json'},
+    		    waitTitle: 'Connecting',
+    		    waitMsg: 'Sending data...',                                     
+    		    paramsAsJson: true,
+    		    jsonData: Ext.encode(retval),
+    		    writer: "json",
+    		    scope:this,
+    		    success: this.received,                                    
+    		    failure: function(){console.log('failure');}
+    		});
+    	}
+    	else {
+    		alert('At least one carton must be selected.');
+    	}
+    },
+    
+    received: function(data) {
+    	console.debug(data);
     },
 
     onConfirm: function (choice) {
