@@ -6,13 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Page;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,7 +36,7 @@ public class Application extends Controller {
     	//List<CartonHdr> op = CartonHdr.getAll();
     	//return ok(index.render("Your new application is ready."));
 		
-		return ok(index.render(""));
+		return ok(views.html.index.render(""));
 		
     }
     
@@ -54,12 +47,12 @@ public class Application extends Controller {
     	JsonNode json = request().body().asJson();
     	String limit = json.get("pageSize").asText();
     	String page = json.get("page").asText();
-
+    	ObjectNode retval = play.libs.Json.newObject();
     	/**
     	 * Check for search criteria in "filters" object
     	 */
     	
-    	
+    	/*
     	// Build the initial Ebean query expression
     	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
     			.fetch("itemMaster")
@@ -113,14 +106,14 @@ public class Application extends Controller {
     	List<CartonInquiry> cartonInquiryList = convertToCartonInquiry(data);
     	
     	// Construct the return JSON object
-    	ObjectNode retval = play.libs.Json.newObject();
+    	
     	retval.put("success", "true");
     	retval.put("totalrows", totalRows);
     	retval.put("data", play.libs.Json.toJson(cartonInquiryList));
     	
     	//
     	System.out.println("Total rows: " + totalRows);
-    	
+    	*/
     	return ok(retval);
     }
     
@@ -173,7 +166,8 @@ public class Application extends Controller {
      * @throws ClassNotFoundException 
      */
     
-    public static Boolean evalSearchCriteria(ExpressionList ebean_expression, String prop, Object val) {
+    /*
+    public static Boolean evalSearchCriteria_org(ExpressionList ebean_expression, String prop, Object val) {
     	Boolean success=true;
     	String className="CartonDtl";  // The default model to search on is CartonDtl
     	String fieldName,fieldType="";
@@ -199,14 +193,7 @@ public class Application extends Controller {
     	}
     	
     	
-    	/**
-    	 * VC: Commenting out the section of code for now, but do not
-    	 * delete it.  This is for looking up the requesting Class.Field
-    	 * in the app models, to confirm it exists and get its type for 
-    	 * validation.  We will probably need to do this, but right now 
-    	 * we just pass it straight through to the query from the
-    	 * Field.name property in the UI field.
-    	 */
+    	
     	
 //    	// Make sure that field exists on the model,
 //    	// and get its type
@@ -290,6 +277,7 @@ public class Application extends Controller {
     	}
     	return success;
     }
+    */
     
     /**
      * Server-side actions.
