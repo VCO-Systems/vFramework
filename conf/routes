@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET      /                           controllers.Application.index()
 POST    /getCartonInquiry           controllers.Application.getCartonInquiry()
 
 # Actions

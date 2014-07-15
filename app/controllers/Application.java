@@ -36,23 +36,28 @@ public class Application extends Controller {
     	//List<CartonHdr> op = CartonHdr.getAll();
     	//return ok(index.render("Your new application is ready."));
 		
-		return ok(views.html.index.render(""));
+		return ok(index.render(""));
 		
     }
     
+    @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getCartonInquiry() throws JsonParseException, JsonMappingException, IOException {
-
+    	ObjectNode retval = play.libs.Json.newObject();
     	// VC: Use this to get params from POST JSON body
     	JsonNode json = request().body().asJson();
     	String limit = json.get("pageSize").asText();
     	String page = json.get("page").asText();
-    	ObjectNode retval = play.libs.Json.newObject();
+    	
+    	@SuppressWarnings("unchecked")
+		List<CartonHdr> hdrs = JPA.em().createQuery("from CartonHdr order by carton_nbr").getResultList();
+    	
+    	
     	/**
     	 * Check for search criteria in "filters" object
     	 */
     	
-    	/*
+    	/**
     	// Build the initial Ebean query expression
     	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
     			.fetch("itemMaster")
@@ -106,7 +111,7 @@ public class Application extends Controller {
     	List<CartonInquiry> cartonInquiryList = convertToCartonInquiry(data);
     	
     	// Construct the return JSON object
-    	
+    	ObjectNode retval = play.libs.Json.newObject();
     	retval.put("success", "true");
     	retval.put("totalrows", totalRows);
     	retval.put("data", play.libs.Json.toJson(cartonInquiryList));
@@ -114,6 +119,12 @@ public class Application extends Controller {
     	//
     	System.out.println("Total rows: " + totalRows);
     	*/
+    	
+    	// Construct the return JSON object
+    	retval.put("success", "true");
+    	retval.put("totalrows", hdrs.size());
+    	retval.put("data", play.libs.Json.toJson(hdrs));
+    	
     	return ok(retval);
     }
     
@@ -127,8 +138,8 @@ public class Application extends Controller {
     		CartonInquiry inq = new CartonInquiry();
 
     		// carton_dtl fields
-    		inq.carton_nbr       = carton.pk.carton_nbr;
-    		inq.carton_seq_nbr   = carton.pk.carton_seq_nbr;
+//    		inq.carton_nbr       = carton.
+//    		inq.carton_seq_nbr   = carton.pk.carton_seq_nbr;
     		inq.to_be_pakd_units = carton.to_be_pakd_units;
     		inq.units_pakd       = carton.units_pakd;
     		
@@ -166,8 +177,9 @@ public class Application extends Controller {
      * @throws ClassNotFoundException 
      */
     
-    /*
-    public static Boolean evalSearchCriteria_org(ExpressionList ebean_expression, String prop, Object val) {
+    /***
+     * 
+    public static Boolean evalSearchCriteria(ExpressionList ebean_expression, String prop, Object val) {
     	Boolean success=true;
     	String className="CartonDtl";  // The default model to search on is CartonDtl
     	String fieldName,fieldType="";
@@ -195,64 +207,6 @@ public class Application extends Controller {
     	
     	
     	
-//    	// Make sure that field exists on the model,
-//    	// and get its type
-//    	try {
-////    		System.out.println((Class) fieldName.getType()).getName());
-//    		
-//    		// If the fieldname has dot notation, it's:  Classname.fieldname
-//    		
-//			
-//    		String[] field_parts = fieldName.split("\\.");
-//    		System.out.println("--- " + field_parts.length);
-//    		if (field_parts.length==2) {
-//    			
-//    			className=field_parts[0];
-//    			fieldName=field_parts[1];
-//    			System.out.println("\tsearch field with dot notation: " + className + "." + fieldName);
-//    			try {
-//					// Look up this Class in Play Framework's models package
-//    				cl = Class.forName("models." + className);
-//				} catch (ClassNotFoundException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} //className.getClass();
-//    		}
-//    		else {
-//    			// Search fields are assumed to be on CartonDtl,
-//    			// if not specified.
-//    			System.out.println("\tsearch field without dot notation.  treating as fieldname.");
-//    		}
-//    		System.out.println("Filtering on " + className + "." + fieldName + " = " + val);
-//    		
-//    		java.lang.reflect.Field fld = cl.getField(fieldName);
-//			if (fld != null) {
-//				String fqdn = fld.getType().toString().split(" ")[1];
-//				String[] fqdn_parts = fqdn.split("\\.");
-//				fieldType = fqdn_parts[fqdn_parts.length-1];
-//				System.out.println("\tfield type: " + fieldType);
-//			}
-//		} catch (NoSuchFieldException e) {
-//			// TODO Auto-generated catch block
-//			success=false;
-//			e.printStackTrace();
-//		} catch (SecurityException e) {
-//			// TODO Auto-generated catch block
-//			success=false;
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		};
-    	
-    	
-    	// convert "CartonHdr.carton_nbr" to "cartonHdr.carton_nbr"
-    	// because the "CartonHdr" capitalization allows us to use
-    	// Java reflection to validate against the model classes,
-    	// but in the query, we must use the name of the One-to-one
-    	// property added to the model, which by convention is in 
-    	// camel-case.
-    	
     	// If there's dot notation, camel-case the first character
     	if (fieldName.split("\\.").length>0) {
     		StringBuilder tmpFieldName = new StringBuilder(fieldName);
@@ -277,7 +231,8 @@ public class Application extends Controller {
     	}
     	return success;
     }
-    */
+    
+    ****/
     
     /**
      * Server-side actions.

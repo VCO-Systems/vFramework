@@ -7,12 +7,12 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.data.validation.*;
-//import play.db.jpa.*;
-import play.db.ebean.*;
+import play.db.jpa.*;
+// import play.db.ebean.*;
 
 @Entity
 @Table(name="item_master")
-public class ItemMaster extends Model {
+public class ItemMaster {
     
 	
 //	private CartonDtl cartonDtl;
@@ -66,9 +66,5 @@ public class ItemMaster extends Model {
     
     private static final long serialVersionUID = 13L;
     
-    /**
-     * Generic query helper for entity ItemMaster with id Long
-     */
-    public static Model.Finder<Long,ItemMaster> find = new Model.Finder<Long,ItemMaster>(Long.class, ItemMaster.class);
 
 }
