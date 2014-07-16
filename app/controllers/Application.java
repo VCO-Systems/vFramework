@@ -6,6 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Query;
+
+import org.eclipse.persistence.queries.ScrollableCursor;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,7 +40,7 @@ public class Application extends Controller {
     	//List<CartonHdr> op = CartonHdr.getAll();
     	//return ok(index.render("Your new application is ready."));
 		
-		return ok(index.render(""));
+		return ok(index.render("RGH v0.1"));
 		
     }
     
@@ -46,11 +50,21 @@ public class Application extends Controller {
     	ObjectNode retval = play.libs.Json.newObject();
     	// VC: Use this to get params from POST JSON body
     	JsonNode json = request().body().asJson();
-    	String limit = json.get("pageSize").asText();
-    	String page = json.get("page").asText();
+    	int limit = json.get("pageSize").asInt();
+    	int page = json.get("page").asInt();
     	
+    	// Set up basic query
     	@SuppressWarnings("unchecked")
-		List<CartonHdr> hdrs = JPA.em().createQuery("from CartonHdr order by carton_nbr").getResultList();
+    	Query cartonHdrQuery = JPA.em().createQuery("select h FROM CartonHdr h order by h.carton_nbr");
+    	
+//    	// Get total record count
+    	List<CartonHdr> cartonHdrList = cartonHdrQuery.getResultList();
+    	int totalRows = cartonHdrList.size();
+
+    	// Apply pagination
+    	cartonHdrQuery.setMaxResults(limit);
+    	cartonHdrQuery.setFirstResult((page-1)*limit);
+    	cartonHdrList = cartonHdrQuery.getResultList();
     	
     	
     	/**
@@ -58,11 +72,6 @@ public class Application extends Controller {
     	 */
     	
     	/**
-    	// Build the initial Ebean query expression
-    	ExpressionList<CartonDtl> cartons_expr = CartonDtl.find
-    			.fetch("itemMaster")
-    			.where()
-    			;
     	
     	// Apply any search criteria (filters) from the UI
     	List<JsonNode> results = json.findValues("filters");  // Json node called filters
@@ -109,21 +118,13 @@ public class Application extends Controller {
     	
     	// Flatten these WMOS records into a list of CartonInquiry objects for the UI
     	List<CartonInquiry> cartonInquiryList = convertToCartonInquiry(data);
-    	
-    	// Construct the return JSON object
-    	ObjectNode retval = play.libs.Json.newObject();
-    	retval.put("success", "true");
-    	retval.put("totalrows", totalRows);
-    	retval.put("data", play.libs.Json.toJson(cartonInquiryList));
-    	
-    	//
-    	System.out.println("Total rows: " + totalRows);
+
     	*/
     	
     	// Construct the return JSON object
     	retval.put("success", "true");
-    	retval.put("totalrows", hdrs.size());
-    	retval.put("data", play.libs.Json.toJson(hdrs));
+    	retval.put("totalrows", totalRows);
+    	retval.put("data", play.libs.Json.toJson(cartonHdrList));
     	
     	return ok(retval);
     }

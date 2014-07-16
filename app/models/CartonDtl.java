@@ -18,15 +18,16 @@ public class CartonDtl {
     
 	private static final long serialVersionUID = 11L;
 	
-	@Id
-	@AttributeOverrides({
-		@AttributeOverride(name = "cartonNbr",
-		column = @Column(name="carton_nbr", updatable=false,insertable=false)),
-		@AttributeOverride(name = "cartonSeqNbr",
-		column = @Column(name="carton_seq_nbr", updatable=false,insertable=false))
-	})
 	
+//	@AttributeOverrides({
+//		@AttributeOverride(name = "cartonNbr",
+//		column = @Column(name="carton_nbr", updatable=false,insertable=false)),
+//		@AttributeOverride(name = "cartonSeqNbr",
+//		column = @Column(name="carton_seq_nbr", updatable=false,insertable=false))
+//	})
+	@Id
 	private String carton_nbr;
+	@Id
 	private Long carton_seq_nbr;
 	
 	public String getCartonNbr() {
@@ -79,7 +80,9 @@ public class CartonDtl {
     public String misc_instr_code_3;
     public String misc_instr_code_4;
     public String misc_instr_code_5;
+    @Temporal(TemporalType.DATE)
     public Date create_date_time;
+    @Temporal(TemporalType.DATE)
     public Date mod_date_time;
     public String batch_nbr;
     

@@ -57,19 +57,11 @@
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/org.reflections/reflections/0.9.8/jars/reflections.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/com.google.code.findbugs/jsr305/2.0.1/jars/jsr305.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/javax.servlet/javax.servlet-api/3.0.1/jars/javax.servlet-api.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/com.typesafe.play/play-java-ebean_2.10/2.2.3/jars/play-java-ebean_2.10.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/org.avaje.ebeanorm/avaje-ebeanorm/3.2.2/jars/avaje-ebeanorm.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-agent/3.2.1/jars/avaje-ebeanorm-agent.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/org.hibernate.javax.persistence/hibernate-jpa-2.0-api/1.0.1.Final/jars/hibernate-jpa-2.0-api.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/com.typesafe.play/play-java-jpa_2.10/2.2.3/jars/play-java-jpa_2.10.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.hibernate/hibernate-entitymanager/jars/hibernate-entitymanager-3.6.9.Final.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.hibernate/hibernate-core/jars/hibernate-core-3.6.9.Final.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/antlr/antlr/jars/antlr-2.7.6.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/dom4j/dom4j/jars/dom4j-1.6.1.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.hibernate/hibernate-commons-annotations/jars/hibernate-commons-annotations-3.2.0.Final.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/cglib/cglib/jars/cglib-2.2.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/asm/asm/jars/asm-3.1.jar"/>
-  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/javassist/javassist/jars/javassist-3.12.0.GA.jar"/>
+  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/org.hibernate.javax.persistence/hibernate-jpa-2.0-api/1.0.1.Final/jars/hibernate-jpa-2.0-api.jar"/>
+  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.eclipse.persistence/eclipselink/jars/eclipselink-2.5.0.jar"/>
+  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.eclipse.persistence/javax.persistence/jars/javax.persistence-2.1.0.jar"/>
+  <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/framework/../repository/cache/org.eclipse.persistence/commonj.sdo/jars/commonj.sdo-2.1.1.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/com.typesafe.play/play-cache_2.10/2.2.3/jars/play-cache_2.10.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/net.sf.ehcache/ehcache-core/2.6.6/jars/ehcache-core.jar"/>
   <classpathentry kind="lib" path="/home/vco/dev/tools/play-2.2.3/repository/local/com.typesafe.play/play-test_2.10/2.2.3/jars/play-test_2.10.jar"/>
