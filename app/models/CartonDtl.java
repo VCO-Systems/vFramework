@@ -18,13 +18,6 @@ public class CartonDtl {
     
 	private static final long serialVersionUID = 11L;
 	
-	
-//	@AttributeOverrides({
-//		@AttributeOverride(name = "cartonNbr",
-//		column = @Column(name="carton_nbr", updatable=false,insertable=false)),
-//		@AttributeOverride(name = "cartonSeqNbr",
-//		column = @Column(name="carton_seq_nbr", updatable=false,insertable=false))
-//	})
 	@Id
 	private String carton_nbr;
 	@Id

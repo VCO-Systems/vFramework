@@ -38,7 +38,7 @@ import play.api.libs.json.Json;
 import play.api.libs.json.Writes;
 import play.db.jpa.*;
 
-public class Application extends Controller {
+public class RGHUsingJPQL extends Controller {
 	
 	// @Transactional
     public static Result index() {
@@ -60,12 +60,21 @@ public class Application extends Controller {
     	
     	// Set up basic query
     	@SuppressWarnings("unchecked")
-    	Query cartonHdrQuery = JPA.em().createQuery("select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls d WHERE d.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr");
-//    	Query cartonHdrQuery = JPA.em().createQuery("select hdr FROM CartonHdr hdr LEFT JOIN CartonHdr.cartonDtls dtl WHERE hdr.carton_nbr = '00000999990001369860' and hdr.carton_nbr = dtl.carton_nbr order by hdr.carton_nbr");
-    	List<CartonHdr> lst = cartonHdrQuery.getResultList();
     	
-    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
-//    	CriteriaQuery cq = cb.
+    	// Basic JPQL Examples to demonstrate behavior joins, etc
+//    	String queryString = "select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls dtl WHERE hdr.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr";
+//    	String queryString = "select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls dtl WHERE dtl.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr";
+//    	// Execute the query
+//    	Query cartonHdrQuery = JPA.em().createQuery(queryString);
+//    	List<CartonHdr> lst = cartonHdrQuery.getResultList();
+    	
+    	// Alternate version using view-model class
+    	String queryStringCI = "SELECT NEW models.CartonInquiry(hdr.carton_nbr,hdr.whse) " +
+    			"FROM CartonHdr AS hdr";
+    	Query ciQuery = JPA.em().createQuery(queryStringCI);
+    	List<CartonInquiry> lst = ciQuery.getResultList();
+    	
+    	// Construct return object
     	retval.put("data", play.libs.Json.toJson(lst));
     	return ok(retval);
     }

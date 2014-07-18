@@ -11,6 +11,15 @@ import play.db.jpa.*;
 //@Entity
 //@Table(name="carton_hdr")
 public class CartonInquiry {
+	
+	public CartonInquiry() {
+		
+	}
+	
+	public CartonInquiry(String carton_nbr_in, String whse_in) {
+		carton_nbr=carton_nbr_in;
+		whse=whse_in;
+	}
 
 	// CARTON_HDR fields
     public String carton_nbr;

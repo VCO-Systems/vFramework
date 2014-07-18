@@ -38,7 +38,7 @@ import play.api.libs.json.Json;
 import play.api.libs.json.Writes;
 import play.db.jpa.*;
 
-public class Application extends Controller {
+public class RGHUsingCriteriaQuery extends Controller {
 	
 	// @Transactional
     public static Result index() {
@@ -49,23 +49,36 @@ public class Application extends Controller {
 		
     }
     
-    @Transactional
+    @SuppressWarnings("unchecked")
+	@Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result getCartonsJPQL() throws JsonParseException, JsonMappingException, IOException {
+    public static Result getCartonsCQ() throws JsonParseException, JsonMappingException, IOException {
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
     	JsonNode json = request().body().asJson();
     	int limit = json.get("pageSize").asInt();
     	int page = json.get("page").asInt();
     	
-    	// Set up basic query
-    	@SuppressWarnings("unchecked")
-    	Query cartonHdrQuery = JPA.em().createQuery("select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls d WHERE d.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr");
-//    	Query cartonHdrQuery = JPA.em().createQuery("select hdr FROM CartonHdr hdr LEFT JOIN CartonHdr.cartonDtls dtl WHERE hdr.carton_nbr = '00000999990001369860' and hdr.carton_nbr = dtl.carton_nbr order by hdr.carton_nbr");
-    	List<CartonHdr> lst = cartonHdrQuery.getResultList();
-    	
+    	// Set up basic query on CartonHdr
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
-//    	CriteriaQuery cq = cb.
+    	CriteriaQuery cq = cb.createQuery();
+    	Root<CartonHdr> hdr = cq.from(CartonHdr.class);
+    	cq.select(hdr);
+    	
+    	// Join CartonDtl
+//    	Join dtl = hdr.join("cartonDtls");
+    	
+    	/**
+    	 * Examples of filter criteria
+    	 */
+    	// carton_nbr
+    	cq.where(cb.equal(hdr.get("carton_nbr"), "00000999990001369860"));
+    	
+    	
+    	// Execute query
+    	Query q = JPA.em().createQuery(cq);
+    	List<CartonHdr> lst = q.getResultList();
+    	
     	retval.put("data", play.libs.Json.toJson(lst));
     	return ok(retval);
     }
