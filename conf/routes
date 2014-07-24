@@ -3,15 +3,14 @@
 # ~~~~
 
 # Home page
-GET      /                           controllers.Application.index()
-POST    /getCartonInquiry           controllers.Application.getCartonInquiry()
+GET      /                          controllers.Application.index()
 
-# Actions
-POST    /printCartonLabels          controllers.Application.printCartonLabels()
+# RGH functions
+POST    /getCartons                 controllers.RGH.getCartons()
+POST    /printCartonLabels          controllers.RGH.printCartonLabels()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
-# Test functions
-POST    /getCartonsJPQL             controllers.RGHUsingJPQL.getCartonsJPQL()
-POST    /getCartonsCQ               controllers.RGHUsingCriteriaQuery.getCartonsCQ()
+# Test functionality
+GET     /getDBSchema                controllers.RGH.getDBSchema()

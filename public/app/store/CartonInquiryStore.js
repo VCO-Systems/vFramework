@@ -11,8 +11,7 @@ Ext.define('vfw.store.CartonInquiryStore',{
 	autoFilter: false,
 	proxy: {
 		type: 'ajax',
-		url: 'getCartonsCQ',
-		// url: 'getCartonsJPQL',
+		url: 'getCartons',
 		filterParam: 'filters',
 		limitParam: 'pageSize',
 		paramsAsJson: true,

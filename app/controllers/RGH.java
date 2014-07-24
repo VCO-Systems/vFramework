@@ -1,6 +1,9 @@
 package controllers;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,8 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
-
-import org.eclipse.persistence.queries.ScrollableCursor;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -36,9 +37,10 @@ import play.mvc.*;
 import views.html.*;
 import play.api.libs.json.Json;
 import play.api.libs.json.Writes;
+import play.db.DB;
 import play.db.jpa.*;
 
-public class RGHUsingJPQL extends Controller {
+public class RGH extends Controller {
 	
 	// @Transactional
     public static Result index() {
@@ -49,39 +51,73 @@ public class RGHUsingJPQL extends Controller {
 		
     }
     
-    @Transactional
+    @SuppressWarnings("unchecked")
+	@Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result getCartonsJPQL() throws JsonParseException, JsonMappingException, IOException {
+    public static Result getCartons() throws JsonParseException, JsonMappingException, IOException {
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
     	JsonNode json = request().body().asJson();
     	int limit = json.get("pageSize").asInt();
     	int page = json.get("page").asInt();
     	
-    	// Set up basic query
-    	@SuppressWarnings("unchecked")
+    	// Set up basic query on CartonHdr
+    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+    	CriteriaQuery cq = cb.createQuery();
+    	Root<CartonHdr> hdr = cq.from(CartonHdr.class);
+    	cq.select(hdr);
     	
-    	// Basic JPQL Examples to demonstrate behavior joins, etc
-//    	String queryString = "select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls dtl WHERE hdr.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr";
-//    	String queryString = "select hdr FROM CartonHdr hdr JOIN hdr.cartonDtls dtl WHERE dtl.carton_nbr = '00000999990001369860'   order by hdr.carton_nbr";
-//    	// Execute the query
-//    	Query cartonHdrQuery = JPA.em().createQuery(queryString);
-//    	List<CartonHdr> lst = cartonHdrQuery.getResultList();
+    	// Join CartonDtl
+//    	Join dtl = hdr.join("cartonDtls");
     	
-    	// Alternate version using view-model class
-    	String queryStringCI = "SELECT NEW models.CartonInquiry(hdr.carton_nbr,hdr.whse) " +
-    			"FROM CartonHdr AS hdr";
-    	Query ciQuery = JPA.em().createQuery(queryStringCI);
-    	List<CartonInquiry> lst = ciQuery.getResultList();
+    	/**
+    	 * Examples of filter criteria
+    	 */
     	
-    	// Construct return object
+    	// CartonHdr.carton_nbr
+//    	cq.where(cb.equal(hdr.get("carton_nbr"), "00000999990001369860"));
+    	
+    	// CartonDtls.units_pakd (via OneToMany)
+    	
+    	// Apply any search criteria (filters) from the UI
+    	List<JsonNode> results = json.findValues("filters");  // Json node called filters
+    	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
+    	ArrayNode filterCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
+    	while (it.hasNext()) {
+    		// VC: For some reason, ExtJs is serializing this JSON array 
+    		// as a string, so instead of getting multiple values here we
+    		// get one string.  So we must take this first element, cast
+    		// it again from string to ArrayNode using Jackson, to get the actual elements.
+    		JsonNode node = it.next();
+    		String node_string = node.asText();
+    		filterCriteriaEntries = (ArrayNode)play.libs.Json.parse(node_string);
+    	}
+    	// Process each of the filter criteria, and apply them to the query expression
+    	// (or not)
+    	for (JsonNode filter:filterCriteriaEntries) {  // Now loop over them as JsonNode
+    		// Example:  {'property':'carton_nbr', 'value': '00000999990005080020'}
+    		String prop = filter.get("property").asText();
+    		String val  = filter.get("value").asText();
+    		// In case the UI returns an empty filter if the user removed
+    		// an existing filter value,for now, ignore these
+    		// (searching for nulls may come later)
+    		if (!val.equals("")){
+    			// Add this to the where clause
+    			evalSearchCriteria(cq, hdr, prop,val);
+    		}
+    	}
+    	
+    	// Execute query
+    	Query q = JPA.em().createQuery(cq);
+    	List<CartonHdr> lst = q.getResultList();
+    	
     	retval.put("data", play.libs.Json.toJson(lst));
     	return ok(retval);
     }
     
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result getCartonInquiry() throws JsonParseException, JsonMappingException, IOException {
+    public static Result getCartonsOld() throws JsonParseException, JsonMappingException, IOException {
     	ObjectNode retval = play.libs.Json.newObject();
     	// VC: Use this to get params from POST JSON body	
     	JsonNode json = request().body().asJson();
@@ -125,7 +161,7 @@ public class RGHUsingJPQL extends Controller {
     		// (searching for nulls may come later)
     		if (!val.equals("")){
     			// Add this to the where clause
-//    			evalSearchCriteria(cq,prop,val);
+    			evalSearchCriteria(cq, ch, prop,val);
     		}
     	}
     	
@@ -148,34 +184,6 @@ public class RGHUsingJPQL extends Controller {
     	
     	/**
     	
-    	// Apply any search criteria (filters) from the UI
-    	List<JsonNode> results = json.findValues("filters");  // Json node called filters
-    	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
-    	ArrayNode filterCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
-    	while (it.hasNext()) {
-    		// VC: For some reason, ExtJs is serializing this JSON array 
-    		// as a string, so instead of getting multiple values here we
-    		// get one string.  So we must take this first element, cast
-    		// it again from string to ArrayNode using Jackson, to get the actual elements.
-    		JsonNode node = it.next();
-    		String node_string = node.asText();
-    		filterCriteriaEntries = (ArrayNode)play.libs.Json.parse(node_string);
-    	}
-    	// Process each of the filter criteria, and apply them to the query expression
-    	// (or not)
-    	for (JsonNode filter:filterCriteriaEntries) {  // Now loop over them as JsonNode
-    		// Example:  {'property':'carton_nbr', 'value': '00000999990005080020'}
-    		String prop = filter.get("property").asText();
-    		String val  = filter.get("value").asText();
-    		// In case the UI returns an empty filter if the user removed
-    		// an existing filter value,for now, ignore these
-    		// (searching for nulls may come later)
-    		if (!val.equals("")){
-    			// Add this to the where clause
-//    			cartons_expr.where().like(prop, val);
-    			evalSearchCriteria(cartons_expr,prop,val);
-    		}
-    	}
     	
     	// Add order by
 //    	cartons_expr=cartons_expr.orderBy("carton_nbr");
@@ -253,9 +261,9 @@ public class RGHUsingJPQL extends Controller {
      * @throws ClassNotFoundException 
      */
     
-    public static Boolean evalSearchCriteria(CriteriaQuery query, String prop, Object val) {
+    public static Boolean evalSearchCriteria(CriteriaQuery query, Root root, String prop, String val) {
     	Boolean success=true;
-    	String className="CartonDtl";  // The default model to search on is CartonDtl
+    	String baseClassName="CartonHdr";  // The default model to search on is CartonDtl
     	String fieldName,fieldType="";
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
 //		try {
@@ -278,11 +286,23 @@ public class RGHUsingJPQL extends Controller {
     		fieldName = prop;
     	}
     	
-    	
-    	
+    	// Tokenize the fieldName to handle dot notation
+    	String[] fieldNameParts=fieldName.split("\\.");
     	
     	// If there's dot notation, camel-case the first character
-    	if (fieldName.split("\\.").length>0) {
+    	if (fieldNameParts.length <=1) {
+    		System.out.println("ERROR: invalid search field definition from UI: " + prop + "   .  Must contain at least TableName.FieldName in field definition.");
+    	}
+    	else if (fieldNameParts.length >= 2) {
+    		// TODO: The recursive approach, not finished yet
+    	    RGH.applyQueryPart(fieldNameParts, query, root, val);
+    		
+    		// TODO: The manual approach to parsing fieldNameParts, based on length of array
+    		
+    		
+    		// Verify that this property exists on this entity
+//    		cb.like(arg0, arg1) 
+    		
     		StringBuilder tmpFieldName = new StringBuilder(fieldName);
     		String v = Character.toString(fieldName.charAt(0)).toLowerCase() + fieldName.substring(1);
     				//Character.toLowerCase(fieldName.indexOf(0)) + fieldName.substring(1);
@@ -307,6 +327,23 @@ public class RGHUsingJPQL extends Controller {
     	return success;
     }
     
+    public static String[] applyQueryPart(String[] fieldDef, CriteriaQuery query, Root root, String criteria) {
+    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+    	// If we're down to Table.Field, apply it to the query
+    	if (fieldDef.length == 2) {
+    		System.out.println("\tApplying filter criteria : " +  fieldDef[0] + "." + fieldDef[1]);
+    		query.where(cb.like(root.get(fieldDef[1]), criteria + "%"));
+    	}
+    	// Otherwise, continue to traverse
+    	else {
+    		System.out.println("\tTraversing.  Looking up property:: " + fieldDef[0] + "." + fieldDef[1]);
+    		// If this property is a OneToMany, add a join to the query
+    		// TODO: determine what type of join is present for fieldDef[1]
+    		
+    	}
+    	
+    	return fieldDef;
+    }
     
     /**
      * Server-side actions.
@@ -338,6 +375,31 @@ public class RGHUsingJPQL extends Controller {
     	}
     	
     	retval.put("success", "true");
+    	return ok(retval);
+    }
+    
+    @Transactional
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result getDBSchema() throws JsonParseException, JsonMappingException, IOException, SQLException {
+    	ObjectNode retval = play.libs.Json.newObject();
+    	// Get UI params from POST JSON body	
+//    	JsonNode json = request().body().asJson();
+//    	int limit = json.get("pageSize").asInt();
+//    	int page = json.get("page").asInt();
+    	
+    	// Set up basic query
+    	Connection conn = DB.getConnection();
+    	DatabaseMetaData databaseMetaData = conn.getMetaData();
+    	String productName    = databaseMetaData.getDatabaseProductName();
+    	String productVersion = databaseMetaData.getDatabaseProductVersion();
+    	retval.put("productName", productName);
+    	retval.put("productVersion", productVersion);
+    	
+    	// Get info on a entity class
+    	
+    	
+//    	CriteriaQuery cq = cb.
+//    	retval.put("data", play.libs.Json.toJson(lst));
     	return ok(retval);
     }
     
