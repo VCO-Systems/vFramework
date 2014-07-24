@@ -7,12 +7,12 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.data.validation.*;
-//import play.db.jpa.*;
-import play.db.ebean.*;
+import play.db.jpa.*;
+//import play.db.ebean.*;
 
 @Entity
 @Table(name="carton_hdr")
-public class CartonHdr extends Model{
+public class CartonHdr {
 
 //    @OneToMany(mappedBy="carton_nbr")
 //    public List<CartonDtl> cartonDtls;
@@ -63,17 +63,12 @@ public class CartonHdr extends Model{
     public String first_zone;
     public String last_zone;
     public Long nbr_of_zones;
-    public String load_nbr;
     public String wave_nbr;
     public String shpmt_nbr;
     
     
     private static final long serialVersionUID = 1L;
     
-    /**
-     * Generic query helper for entity CartonHdr with id Long
-     */
-    public static Model.Finder<Long,CartonHdr> find = new Model.Finder<Long,CartonHdr>(Long.class, CartonHdr.class);
 
     /**
 	 * 

@@ -8,42 +8,43 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.data.validation.*;
-//import play.db.jpa.*;
-import play.db.ebean.*;
+import play.db.jpa.*;
+//import play.db.ebean.*;
 
 @Entity
 @Table(name="carton_dtl")
-public class CartonDtl extends Model {
+@IdClass(CartonDtlKey.class)
+public class CartonDtl {
     
-	
-	@Embeddable
-	public class CartonNbrKey implements Serializable {
-		public String carton_nbr;
-		public Long carton_seq_nbr;
-		
-		public int hashCode() {
-	        return (int) carton_nbr.hashCode() + carton_nbr.length();//+ carton_seq_nbr;
-	    }
-
-	    public boolean equals(Object obj) {
-	        if (obj == this) return true;
-	        if (!(obj instanceof CartonNbrKey)) return false;
-	        if (obj == null) return false;
-	        CartonNbrKey pk = (CartonNbrKey) obj;
-	        return pk.carton_seq_nbr == carton_seq_nbr && pk.carton_nbr.equals(carton_nbr);
-	    }
-	}
+	private static final long serialVersionUID = 11L;
 	
 	@Id
-	public CartonNbrKey pk;
+	private String carton_nbr;
+	@Id
+	private Long carton_seq_nbr;
 	
+	public String getCartonNbr() {
+		return carton_nbr;
+	}
+	
+	public void setCartonNbr(String c) {
+		carton_nbr=c;
+	}
+	
+	public Long getCartonSeqNbr() {
+		return carton_seq_nbr;
+	}
+	
+	public void setCartonSeqNbr(Long c) {
+		carton_seq_nbr = c;
+	}
 //	public String carton_nbr;
 	
 	
 	
 	@JsonIgnore
 	@ManyToOne
-    @JoinColumn(name="carton_nbr")
+    @JoinColumn(name="carton_nbr",insertable=false,updatable=false)
 	public CartonHdr cartonHdr;
 //	public CartonHdr getCartonHdr() {
 //		return cartonHdr;
@@ -57,8 +58,8 @@ public class CartonDtl extends Model {
 	@JoinColumn(name="sku_id")
 	public ItemMaster itemMaster;
 	
-	@Column(name="sku_id")
-	public String sku_id;
+//	@Column(name="sku_id")
+//	public String sku_id;
     
 //    public Long carton_seq_nbr;
     public String pkt_ctrl_nbr;
@@ -72,17 +73,15 @@ public class CartonDtl extends Model {
     public String misc_instr_code_3;
     public String misc_instr_code_4;
     public String misc_instr_code_5;
+    @Temporal(TemporalType.DATE)
     public Date create_date_time;
+    @Temporal(TemporalType.DATE)
     public Date mod_date_time;
     public String batch_nbr;
     
     
     
-    private static final long serialVersionUID = 11L;
     
-    /**
-     * Generic query helper for entity CartonDtl with id Long
-     */
-    public static Model.Finder<Long,CartonDtl> find = new Model.Finder<Long,CartonDtl>(Long.class, CartonDtl.class);
+    
 
 }

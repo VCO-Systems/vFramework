@@ -5,12 +5,21 @@ import java.util.*;
 import javax.persistence.*;
 
 import play.data.validation.*;
-//import play.db.jpa.*;
-import play.db.ebean.*;
+import play.db.jpa.*;
+// import play.db.ebean.*;
 
 //@Entity
 //@Table(name="carton_hdr")
-public class CartonInquiry extends Model{
+public class CartonInquiry {
+	
+	public CartonInquiry() {
+		
+	}
+	
+	public CartonInquiry(String carton_nbr_in, String whse_in) {
+		carton_nbr=carton_nbr_in;
+		whse=whse_in;
+	}
 
 	// CARTON_HDR fields
     public String carton_nbr;
@@ -39,17 +48,6 @@ public class CartonInquiry extends Model{
     public String qual;
     
     private static final long serialVersionUID = 14L;
-    
-    /**
-     * Generic query helper for entity CartonInquiry with id Long
-     */
-    public static Model.Finder<Long,CartonInquiry> find = new Model.Finder<Long,CartonInquiry>(Long.class, CartonInquiry.class);
-
-    
-	
-    
-    
-    
     
 
 }

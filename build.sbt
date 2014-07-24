@@ -4,9 +4,8 @@ version := "1.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   javaJdbc,
-  javaEbean,
   javaJpa,
-  "org.hibernate" % "hibernate-entitymanager" % "3.6.9.Final",
+  "org.eclipse.persistence" % "eclipselink" % "2.5.0",
   cache
 )     
 
