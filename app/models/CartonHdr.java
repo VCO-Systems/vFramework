@@ -20,14 +20,14 @@ public class CartonHdr {
 	@Id
 	public String carton_nbr;
 	
-	@OneToMany(mappedBy="cartonHdr")
-	private List<CartonDtl> cartonDtls;
-	public List<CartonDtl> getCartonDtls() {
-		return cartonDtls;
-	}
-	public void setCartonDtls(List<CartonDtl> dtls) {
-		cartonDtls=dtls;
-	}
+//	@OneToMany(mappedBy="cartonHdr")
+//	private List<CartonDtl> cartonDtls;
+//	public List<CartonDtl> getCartonDtls() {
+//		return cartonDtls;
+//	}
+//	public void setCartonDtls(List<CartonDtl> dtls) {
+//		cartonDtls=dtls;
+//	}
 	
 //	// Outbound loads
 //	@OneToMany(mappedBy="carton")
@@ -39,9 +39,9 @@ public class CartonHdr {
 //		outbdLoads=lds;
 //	}
 	
-	@ManyToOne()
-	@JoinColumn(name="load_nbr")
-	public OutbdLoad load;
+//	@ManyToOne()
+//	@JoinColumn(name="load_nbr")
+//	public OutbdLoad load;
 	
 	
 	

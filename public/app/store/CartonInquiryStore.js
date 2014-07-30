@@ -2,7 +2,7 @@
 Ext.define('vfw.store.CartonInquiryStore',{
 	extend: 'Ext.data.Store',
 	autoload: true,
-	pageSize: 10,
+	pageSize: 20,
 	remoteFilter: true,
 	remoteSort: true,
 	remoteGroup: true,

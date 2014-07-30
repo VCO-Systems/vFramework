@@ -95,39 +95,40 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 							items: [
 								{ fieldLabel: 'From Carton:',
 								  name: 'from_CartonHdr.carton_nbr',
-								  allowBlank:true,
+								  allowBlank: true,disabled: true
 								},
 								{ fieldLabel: 'To Carton:',
 								  name: 'to_CartonHdr.carton_nbr',
 								  allowBlank:true,
+								  disabled: true
 								},
-								{ fieldLabel: 'units pakd:',
-								  name: 'CartonHdr.cartonDtls.units_pakd',
-								  allowBlank:true,
+								{ fieldLabel: 'Carton Nbr:',
+								  name: 'CartonHdr.carton_nbr',
+								  allowBlank: true
 								},
 								{ fieldLabel: 'Pickticket Ctrl Nbr:',
 								  name: 'CartonHdr.pkt_ctrl_nbr',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Wave:',
 								  name: 'CartonHdr.wave_nbr',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Load:',
 								  name: 'CartonHdr.load_nbr',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Outbound Shipment:',
 								  name: 'CartonHdr.shpmt_nbr',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'From Status:',
 								  name: 'from_CartonHdr.stat_code',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'To Status:',
 								  name: 'to_CartonHdr.stat_code',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								}
 							        ],
 						},  // end fieldset
@@ -144,42 +145,42 @@ Ext.define('vfw.view.carton.CartonInquiry', {
 							items: [
 								{ fieldLabel: 'Size Desc:',
 								  name: 'ItemMaster.size_desc',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Style:',
 								  name: 'ItemMaster.style',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Style Sfx:',
 								  name: 'ItemMaster.style_sfx',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Color:',
 								  name: 'ItemMaster.color',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Color Sfx:',
 								  name: 'ItemMaster.color_sfx',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true
 								},
 								{ fieldLabel: 'Sec Dim:',
 								  name: 'txtSecDim',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true,
 								  reference: 'fldSecDim'
 								},
 								{ fieldLabel: 'Quality:',
 								  name: 'txtQuality',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true,
 								  reference: 'fldQuality'
 								},
 								{ fieldLabel: 'Season:',
 								  name: 'txtSeason',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true,
 								  reference: 'fldSeason'
 								},
 								{ fieldLabel: 'Year:',
 								  name: 'txtYear',
-								  allowBlank:true,
+								  allowBlank:true, disabled: true,
 								  reference: 'fldYear'
 								}
 							        ],
@@ -194,7 +195,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
             //layout: 'fit',
             items: [ {// Ext.create('Ext.grid.Panel',{
                 xtype: 'grid',
-                maxHeight: 450,
+                maxHeight: 550,
                 title: 'SKU',
                 reference: 'mainGrid',
                 selType: 'checkboxmodel',
@@ -229,7 +230,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
                     xtype: 'pagingtoolbar',
                 	store: 'CartonInquiryStore',
-                	pageSize: 10,
+                	pageSize: 25,
                     displayInfo: true,
                     displayMsg: 'Displaying items {0} - {1} of {2}',
                     emptyMsg: "No items to display",
