@@ -9,11 +9,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Entity;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -65,7 +68,8 @@ public class RGH extends Controller {
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	CriteriaQuery cq = cb.createQuery();
     	Root<CartonHdr> hdr = cq.from(CartonHdr.class);
-    	cq.select(hdr);
+    	Predicate whereClause = cb.equal(cb.literal(1), 1);
+//    	cq.select(hdr);
     	
     	// Join CartonDtl
 //    	Join dtl = hdr.join("cartonDtls");
@@ -107,11 +111,25 @@ public class RGH extends Controller {
     		}
     	}
     	
-    	// Execute query
-    	Query q = JPA.em().createQuery(cq);
-    	List<CartonHdr> lst = q.getResultList();
+    	// Get record count
+//    	Query count_query = cb.createQuery();//.createQuery(cq);
+    	cq.select(cb.count(hdr));
+    	cq.where(whereClause);
+    	TypedQuery<Long> q = JPA.em().createQuery(cq);
+    	Long total_rows = q.getSingleResult();
     	
+    	// Paginate
+    	cq.select(hdr);
+    	cq.where(whereClause);
+    	TypedQuery<CartonHdr> records = JPA.em().createQuery(cq);
+    	records.setFirstResult((page-1)*limit);
+    	records.setMaxResults(limit);
+
+    	// Execute query
+    	List<CartonHdr> lst = records.getResultList();
+    	retval.put("totalrows",total_rows);
     	retval.put("data", play.libs.Json.toJson(lst));
+    	
     	return ok(retval);
     }
     
@@ -330,13 +348,14 @@ public class RGH extends Controller {
     public static String[] applyQueryPart(String[] fieldDef, CriteriaQuery query, Root root, String criteria) {
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	// If we're down to Table.Field, apply it to the query
+    	// Example:  CartonHdr.carton_nbr
     	if (fieldDef.length == 2) {
     		System.out.println("\tApplying filter criteria : " +  fieldDef[0] + "." + fieldDef[1]);
     		query.where(cb.like(root.get(fieldDef[1]), criteria + "%"));
     	}
     	// Otherwise, continue to traverse
     	else {
-    		System.out.println("\tTraversing.  Looking up property:: " + fieldDef[0] + "." + fieldDef[1]);
+    		System.out.println("\tTraversing.  Looking up property: " + fieldDef[0] + "." + fieldDef[1]);
     		// If this property is a OneToMany, add a join to the query
     		// TODO: determine what type of join is present for fieldDef[1]
     		

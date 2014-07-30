@@ -1,6 +1,6 @@
-name := "vFramework"
+name := "VCO"
 
-version := "1.0-SNAPSHOT"
+version := "POC-v1"
 
 libraryDependencies ++= Seq(
   javaJdbc,
