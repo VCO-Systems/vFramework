@@ -1,12 +1,7 @@
 /**
- * This class is the main view for the application. It is specified in app.js as the
- * "autoCreateViewport" property. That setting automatically applies the "viewport"
- * plugin to promote that instance of this class to the body element.
- *
- * TODO - Replace this content of this view to suite the needs of your application.
  */
 
-Ext.define('vfw.view.carton.CartonInquiryController', {
+Ext.define('vfw.view.LabelReprint.LabelReprintController', {
     extend: 'Ext.app.ViewController',
 
     requires: [
@@ -14,7 +9,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
         'Ext.Array'
     ],
 
-    alias: 'controller.cartoninquiry',
+    alias: 'controller.labelreprint',
     refs: [{
         mainTabs: '#mainTabs'
     }],
@@ -116,7 +111,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
     },
     
-    onReprintMasterShippingLabel: function () {
+    onPrintCartonLabel: function () {
     	// Make sure at least one carton has been selected in the datagrid
     	var retval = {};
     	var records =[];
@@ -133,7 +128,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     		
     		// send the json to the server
     		Ext.Ajax.request({
-    		    url: 'printMasterShippingLabel',
+    		    url: 'printCartonLabels',
     		    method: 'POST',          
     		    headers: {'Content-Type': 'application/json','Accept':'application/json'},
     		    waitTitle: 'Connecting',

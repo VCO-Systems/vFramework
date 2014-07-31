@@ -12,9 +12,9 @@ Ext.define('vfw.Application', {
     views: [
         // TODO: add views here
     ],
-    controllers: ['Root',],
-    stores: ['CartonInquiryStore'],
-    models: ['CartonInquiry'],
+//    controllers: ['Root',],
+//    stores: ['LabelReprintStore'],
+//    models: ['LabelReprint'],
     
     launch: function () {
         // TODO - Launch the application
