@@ -157,8 +157,12 @@ Ext.define('vfw.view.LabelReprint.LabelReprint', {
                 },
                 store: Ext.data.StoreManager.lookup('LabelReprintStore'),
                 columns: [
-                    { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
-
+                    { text: 'Load Nbr',  dataIndex: 'plan_load_nbr' },
+                    { text: 'Shipment Nbr',  dataIndex: 'plan_shpmt_nbr' },
+                    { text: 'WHSE',  dataIndex: 'whse' },
+                    { text: 'Nbr of Pkts',  dataIndex: '' },
+                    { text: 'Nbr of Cartons',  dataIndex: '' },
+                    { text: 'Load Status',  dataIndex: 'stat_code' },
                     
                 ],
              // paging bar on the bottom
