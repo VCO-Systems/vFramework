@@ -203,6 +203,9 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 	checkOnly: true,
                 	injectCheckbox: 0
                 },
+                viewConfig: {
+                    enableTextSelection: true
+                },
                 store: 'CartonInquiryStore',
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
