@@ -44,7 +44,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     },
     
     onFieldChange: function(field,newVal,oldVal) {
-//    	console.log('[[OnFieldChange]] Field [' + field.reference + "] changed to: " + newVal);
+    	console.log('[[OnFieldChange]] Field [' + field.reference + "] changed to: " + newVal);
     	var store = this.lookupReference('mainGrid').getStore();
 //    	store.clearFilter();
     	
@@ -101,17 +101,8 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     },
     
     onList: function () {
-//    	var barcode=this.lookupReference('fldBarcode').getValue();
-//    	var desc   =this.lookupReference('fldStyle').getValue();
-//    	if (barcode.length>0 || desc.length>0 ) {
-//    		this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
-//    	}
-//    	else {
-//    		Ext.Msg.alert('Information', 'Please enter search criteria');
-//    	}
-//    	console.log(barcode,desc);
-    	
     	var st = this.lookupReference('mainGrid').getStore();
+    	console.debug(st);
     	st.load();
     	this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
     },

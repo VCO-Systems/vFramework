@@ -9,7 +9,8 @@ Ext.application({
     extend: 'vfw.Application',
     
     //autoCreateViewport: 'vfw.view.main.Main',
-    autoCreateViewport: 'vfw.view.LabelReprint.LabelReprint',
+//    autoCreateViewport: 'vfw.view.LabelReprint.LabelReprint',
+    autoCreateViewport: 'vfw.view.carton.CartonInquiry',
     appFolder: '/assets/app',
     
 	

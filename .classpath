@@ -3,6 +3,7 @@
   <classpathentry kind="src" path="test" output=".target"/>
   <classpathentry kind="lib" path=".\lib\eclipselink-2.5.2.jar"/>
   <classpathentry kind="lib" path=".\lib\javax.persistence-2.1.0-RC2.jar"/>
+  <classpathentry kind="lib" path=".\lib\jtds-1.3.1.jar"/>
   <classpathentry kind="lib" path=".\lib\ojdbc6.jar"/>
   <classpathentry kind="lib" path=".\lib\org.eclipse.persistence.antlr-2.5.2.jar"/>
   <classpathentry kind="lib" path=".\lib\org.eclipse.persistence.asm-2.5.2.jar"/>
@@ -63,9 +64,6 @@
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\javax.servlet\javax.servlet-api\3.0.1\jars\javax.servlet-api.jar"/>
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\com.typesafe.play\play-java-jpa_2.10\2.2.3\jars\play-java-jpa_2.10.jar"/>
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\org.hibernate.javax.persistence\hibernate-jpa-2.0-api\1.0.1.Final\jars\hibernate-jpa-2.0-api.jar"/>
-  <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\framework\..\repository\cache\org.eclipse.persistence\eclipselink\jars\eclipselink-2.5.0.jar"/>
-  <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\framework\..\repository\cache\org.eclipse.persistence\javax.persistence\jars\javax.persistence-2.1.0.jar"/>
-  <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\framework\..\repository\cache\org.eclipse.persistence\commonj.sdo\jars\commonj.sdo-2.1.1.jar"/>
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\com.typesafe.play\play-cache_2.10\2.2.3\jars\play-cache_2.10.jar"/>
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\net.sf.ehcache\ehcache-core\2.6.6\jars\ehcache-core.jar"/>
   <classpathentry kind="lib" path="C:\dev\tools\play-2.2.3\repository\local\com.typesafe.play\play-test_2.10\2.2.3\jars\play-test_2.10.jar"/>

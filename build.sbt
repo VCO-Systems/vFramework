@@ -5,7 +5,6 @@ version := "POC-v1"
 libraryDependencies ++= Seq(
   javaJdbc,
   javaJpa,
-  "org.eclipse.persistence" % "eclipselink" % "2.5.0",
   cache
 )     
 

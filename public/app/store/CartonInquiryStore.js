@@ -1,6 +1,7 @@
 // The store for items
 Ext.define('vfw.store.CartonInquiryStore',{
 	extend: 'Ext.data.Store',
+	storeId: 'cartonInquiryStore',
 	autoload: true,
 	pageSize: 20,
 	remoteFilter: true,
@@ -35,6 +36,6 @@ Ext.define('vfw.store.CartonInquiryStore',{
 			allowSingle: false,
 		}
 	},
-	model: 'vfw.model.CartonInquiry'
+	model: 'vfw.view.carton.CartonInquiryModel'
 });
 

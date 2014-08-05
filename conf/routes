@@ -4,6 +4,7 @@
 
 # Home page
 GET      /                          controllers.Application.index()
+GET      /cartonInquiry             controllers.Application.index()
 
 # RGH functions
 POST    /getCartons                 controllers.RGH.getCartons()
