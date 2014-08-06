@@ -204,6 +204,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 	injectCheckbox: 0
                 },
                 store: 'CartonInquiryStore',
+                bufferedRenderer: false,
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
                     { text: 'Carton Seq Nbr',  dataIndex: 'carton_seq_nbr' },
@@ -223,7 +224,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                     { text: 'sec_dim',  dataIndex: 'sec_dim' },
                     { text: 'Qual',  dataIndex: 'qual' },
                     { text: 'season',  dataIndex: 'season' },
-                    { text: 'season_yr',  dataIndex: 'season_yr' },
+                    { text: 'season_yr',  dataIndex: 'season_yr' }
                     
                 ],
              // paging bar on the bottom
