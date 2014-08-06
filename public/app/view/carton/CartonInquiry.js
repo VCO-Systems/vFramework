@@ -207,6 +207,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                     enableTextSelection: true
                 },
                 store: 'CartonInquiryStore',
+                bufferedRenderer: false,
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
                     { text: 'Carton Seq Nbr',  dataIndex: 'carton_seq_nbr' },
