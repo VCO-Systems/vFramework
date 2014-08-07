@@ -192,10 +192,9 @@ Ext.define('vfw.view.carton.CartonInquiry', {
         },
         {
             title: 'List',
-            //layout: 'fit',
+            layout: 'fit',
             items: [ {// Ext.create('Ext.grid.Panel',{
                 xtype: 'grid',
-                maxHeight: 550,
                 title: 'SKU',
                 reference: 'mainGrid',
                 selType: 'checkboxmodel',
