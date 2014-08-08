@@ -13,8 +13,8 @@ Ext.define('vfw.view.carton.CartonInquiry', {
     xtype: 'app-main',
     requires: [
                'vfw.view.carton.CartonInquiryController',
-               'vfw.model.CartonInquiry'
-//               'vfw.store.CartonInquiryStore'
+               'vfw.view.carton.CartonInquiryModel',
+               'vfw.store.CartonInquiryStore'
                ],
     controller: 'cartoninquiry',
     viewModel: {
@@ -205,7 +205,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
                 viewConfig: {
                     enableTextSelection: true
                 },
-                store: 'CartonInquiryStore',
+                store: Ext.data.StoreManager.lookup('cartonInquiryStore'),
                 bufferedRenderer: false,
                 columns: [
                     { text: 'Carton Nbr',  dataIndex: 'carton_nbr' },
@@ -232,7 +232,7 @@ Ext.define('vfw.view.carton.CartonInquiry', {
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
                     xtype: 'pagingtoolbar',
-                	store: 'CartonInquiryStore',
+                    store: Ext.data.StoreManager.lookup('cartonInquiryStore'),
                 	pageSize: 25,
                     displayInfo: true,
                     displayMsg: 'Displaying items {0} - {1} of {2}',

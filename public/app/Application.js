@@ -9,16 +9,13 @@ Ext.define('vfw.Application', {
     name: 'vfw',
     appFolder: 'assets/app',
 
-    views: [
-        // TODO: add views here
-    ],
-    controllers: ['Root',],
-    stores: ['CartonInquiryStore'],
-    models: ['CartonInquiry'],
     
     launch: function () {
         // TODO - Launch the application
-    	// console.log('launch');
+//    	 console.log('launch');
     },
-    
+//    models: ['CartonInquiry'],
+//    controllers: ['Root'],
+    stores: ['CarrierPullStore'],
+    models: ['CarrierPull']
 });

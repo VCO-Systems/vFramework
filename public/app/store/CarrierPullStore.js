@@ -1,9 +1,8 @@
 // The store for items
-Ext.define('vfw.store.CartonInquiryStore',{
+Ext.define('vfw.store.CarrierPullStore',{
 	extend: 'Ext.data.Store',
-	storeId: 'cartonInquiryStore',
-	autoload: true,
-	pageSize: 20,
+	model: 'vfw.model.CarrierPull',
+	pageSize: 25,
 	remoteFilter: true,
 	remoteSort: true,
 	remoteGroup: true,
@@ -12,7 +11,7 @@ Ext.define('vfw.store.CartonInquiryStore',{
 	autoFilter: false,
 	proxy: {
 		type: 'ajax',
-		url: 'getCartons',
+		url: 'getCarrierPull',
 		filterParam: 'filters',
 		limitParam: 'pageSize',
 		paramsAsJson: true,
@@ -33,9 +32,8 @@ Ext.define('vfw.store.CartonInquiryStore',{
 		},
 		writer: {
 			type: 'json',
-			allowSingle: false,
+			allowSingle: true
 		}
-	},
-	model: 'vfw.view.carton.CartonInquiryModel'
+	}
 });
 

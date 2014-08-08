@@ -9,8 +9,9 @@ Ext.application({
     extend: 'vfw.Application',
     
     //autoCreateViewport: 'vfw.view.main.Main',
-    autoCreateViewport: 'vfw.view.carton.CartonInquiry',
-    appFolder: '/assets/app',
+//    autoCreateViewport: 'vfw.view.carton.CartonInquiry',
+    autoCreateViewport: 'vfw.view.carrierpull.CarrierPull',
+    appFolder: '/assets/app'
     
 	
     //-------------------------------------------------------------------------
