@@ -1,0 +1,18 @@
+.x-panel-header-title-default {
+	font-size: 1.2em;
+}
+
+.x-panel-header-title-default h4 {
+	-webkit-margin-before: .25em;
+	-webkit-margin-after:  .25em;
+}
+
+/**
+* When using horizontal fieldset layout in criteria
+screens, the last row of form controls ends up touching
+the bottom border of the fieldset.
+*/
+
+.x-fieldset-body-default {
+	padding-bottom: 10px;
+}

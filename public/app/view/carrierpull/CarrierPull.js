@@ -28,7 +28,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
     items: [{
         xtype: 'panel',
         region: 'north',
-        html: '<h4>Carrier Pull Maintanence</h4>',
+//        html: '<h4>Carrier Pull Maintanence</h4>',
         width: 250,
         split: false,
         tbar: [{
@@ -42,6 +42,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
         xtype: 'tabpanel',
         reference: 'mainTabs',
         cls: 'mainTabPanel',
+        title: '<h4>Carrier Pull Table</h4>',
         items:[{
             title: 'Criteria',
             html: '',
