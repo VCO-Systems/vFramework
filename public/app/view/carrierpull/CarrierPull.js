@@ -131,7 +131,15 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     { text: 'Ship Via',  dataIndex: 'shipVia' },
                     { text: 'Ship Via Description',  dataIndex: 'todo' },
                     { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode' },
-                    { text: 'Pull Time',  dataIndex: 'pullTime' },
+                    { text: 'Pull Time',  dataIndex: 'pullTime',
+                    	renderer: function(value) {
+                    		var tm="";
+                    		var parts = value.split(":");
+                    		tm += ((parts[0] <= 11) ? (parseInt(parts[0])) : (parseInt(parts[0]) - 12) + 1);
+                    		tm+= ":" + parts[1];
+                    		tm += (parts[0] <= 11) ? " AM" : " PM";
+                    		return tm;
+                    	} },
                     { text: 'Ship To Zip',  dataIndex: 'shiptoZip' }
                 ],
              // paging bar on the bottom

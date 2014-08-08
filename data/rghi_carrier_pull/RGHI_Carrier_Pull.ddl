@@ -8,7 +8,7 @@ CREATE TABLE RGH.dbo.RGHI_Carrier_Pull
     SHIPTO_ZIP varchar(11) NULL,
 	SHIP_VIA varchar(4) NOT NULL,
 	PULL_TRLR_CODE varchar(8) NULL,
-	PULL_TIME time(7) NULL,
+	PULL_TIME time(0) NULL,
 	ANYTEXT1 varchar(10) NULL,
 	ANYNBR1 int,
 	CREATE_DATE_TIME date,

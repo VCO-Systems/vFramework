@@ -1,8 +1,15 @@
 package models;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import org.joda.time.format.DateTimeFormatter;
+
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
@@ -33,9 +40,9 @@ public class RGHICarrierPull implements Serializable {
 	@Column(name="PULL_TRLR_CODE")
 	private String pullTrlrCode;
 	
-	@Temporal(TemporalType.TIME)
+//	@Temporal(TemporalType.TIME)
 	@Column(name="PULL_TIME")
-	private Date pullTime;
+	private Time pullTime;
 	
 	@Column(name="ANYTEXT1")
 	private String anyText1;
@@ -86,11 +93,29 @@ public class RGHICarrierPull implements Serializable {
 		this.pullTrlrCode = pullTrlrCode;
 	}
 
-	public Date getPullTime() {
-		return pullTime;
+	public Time getPullTime() {
+//		Time return_date = new Time();
+//		try {
+//			StringBuilder vals = new StringBuilder();
+//			vals.append(pullTime.toString());
+//			SimpleDateFormat sm = new SimpleDateFormat("hh:mm a");
+//			String strDate = sm.format(pullTime);
+//			vals.append(" | " + strDate.toString());
+//			return_date = sm.parse(strDate);
+//			vals.append(" | " + strDate);
+//			System.out.println(vals);
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		SimpleDateFormat df = new SimpleDateFormat("h:m a");
+//		Date dt = df.format(this.pullTime);
+		
+		
+		return this.pullTime;
 	}
 
-	public void setPullTime(Date pullTime) {
+	public void setPullTime(Time pullTime) {
 		this.pullTime = pullTime;
 	}
 
