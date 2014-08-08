@@ -18,12 +18,15 @@ public class RGHICarrierPull implements Serializable {
 	
 	private static final long serialVersionUID = 284729281L;
 
+	@Id
 	@Column(name="WHSE")
 	private String whse;
 	
+	@Id
 	@Column(name="SHIPTO_ZIP")
 	private String shiptoZip;
 	
+	@Id
 	@Column(name="SHIP_VIA")
 	private String shipVia;
 	

@@ -11,9 +11,9 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 
     xtype: 'app-main',
     requires: [
-//               'vfw.view.carrierpull.CarrierPullModel',
-//               'vfw.view.carrierpull.CarrierPullStore',
-			   'vfw.model.CarrierPull',
+               'vfw.view.carrierpull.CarrierPullModel',
+//               'vfw.store.CarrierPullStore',
+//			   'vfw.model.CarrierPull',
                'vfw.view.carrierpull.CarrierPullController'
                ],
     controller: 'carrierpullctrl',
@@ -127,13 +127,11 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 store: 'CarrierPullStore',
                 bufferedRenderer: false,
                 columns: [
-                    { text: 'Ship Via',  dataIndex: 'shipvia' },
-                    { text: 'Ship Via Description',  dataIndex: 'shipvia' },
+                    { text: 'Ship Via',  dataIndex: 'shipVia' },
+                    { text: 'Ship Via Description',  dataIndex: 'todo' },
                     { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode' },
-                    { text: 'Ship Via',  dataIndex: 'shipvia' },
                     { text: 'Pull Time',  dataIndex: 'pullTime' },
-                    { text: 'Ship Via',  dataIndex: 'shipvia' },
-                    { text: 'Ship to Zip',  dataIndex: 'shiptoZip' }
+                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip' }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {

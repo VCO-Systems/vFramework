@@ -1,7 +1,8 @@
 // The store for items
 Ext.define('vfw.store.CarrierPullStore',{
 	extend: 'Ext.data.Store',
-	model: 'vfw.model.CarrierPull',
+	model: 'vfw.view.carrierpull.CarrierPullModel',
+	storeId: 'carrierPullStore',
 	pageSize: 25,
 	remoteFilter: true,
 	remoteSort: true,
