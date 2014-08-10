@@ -96,8 +96,41 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 								},
 								{ fieldLabel: 'Ship Via',
 								  name: 'RGHICarrierPull.shipVia',
-								  allowBlank: true
+								  xtype: 'combobox',
+								  queryMode: 'local', 
+								  allowBlank: true,
+//								  forceSelection: true,
+								  triggerAction: 'all',
+								  maxWidth: 100,
+								  listeners: {
+										// VC: this is a valid way to listen to field udpates,
+										// however we're doing it in the controller
+										change: function(self, newValue, oldValue, eOpts) {
+											console.log(newValue);
+											if(!self.getValue() || self.getValue().length==0) {
+												console.log('attempting to clear combobox');
+												self.reset();
+											}
+										},
+										
+								  },
+								  store: {
+								        autoLoad: true, 
+								        fields: ['id','text'], 
+								        proxy: { 
+								            type: 'ajax', 
+								            url: 'getShipVias' 
+								        } ,
+								        
+								        listeners: {
+											load: function(self,records,successfull,opts) {
+												self.insert(0,{})
+											}
+										}  
+								  
+								  }
 								},
+								
 								{ fieldLabel: 'Pull Trailer Code',
 								  name: 'RGHICarrierPull.pullTrlrCode',
 								  allowBlank: true
@@ -114,7 +147,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
             layout: 'fit',
             items: [ {// Ext.create('Ext.grid.Panel',{
                 xtype: 'grid',
-                title: 'SKU',
+//                title: 'SKU',
                 reference: 'mainGrid',
                 selType: 'checkboxmodel',
                 selModel: {
@@ -127,6 +160,14 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //                store: Ext.data.StoreManager.lookup('carrierPullStore'),
                 store: 'CarrierPullStore',
                 bufferedRenderer: false,
+                tbar: [{
+                    text: 'Delete',
+                    iconCls: 'delete',
+                    handler : function() {
+                        
+                    }
+                }
+                ],
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia' },
                     { text: 'Ship Via Description',  dataIndex: 'todo' },

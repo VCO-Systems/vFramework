@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,10 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+
+
+
 
 
 
@@ -65,7 +70,7 @@ public class CarrierPull extends Controller {
      */
     
     @SuppressWarnings("unchecked")
-	@Transactional
+    @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getCarrierPull() throws JsonParseException, JsonMappingException, IOException {
     	System.out.println("getCarrierPull()");
@@ -78,8 +83,11 @@ public class CarrierPull extends Controller {
     	// Set up basic query on CartonHdr
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	CriteriaQuery cq = cb.createQuery();
+    	List<Predicate> predicateList = new ArrayList<Predicate>();
     	Root<RGHICarrierPull> hdr = cq.from(RGHICarrierPull.class);
     	Predicate whereClause = cb.equal(cb.literal(1), 1);
+    	cq.select(hdr);
+    	cq.where(whereClause);
 //    	cq.select(hdr);
     	
     	// Join CartonDtl
@@ -116,35 +124,50 @@ public class CarrierPull extends Controller {
     		// In case the UI returns an empty filter if the user removed
     		// an existing filter value,for now, ignore these
     		// (searching for nulls may come later)
-    		if (!val.equals("")){
+    		if (!val.equals("")){ 
     			// Add this to the where clause
-    			evalSearchCriteria(cq, hdr, prop,val);
+    			CarrierPull.evalSearchCriteria(predicateList, hdr, prop,val);
     		}
     	}
     	
+    	// Add the predicates from the UI filters
+    	Predicate[] predicates = new Predicate[predicateList.size()];
+        predicates=predicateList.toArray(predicates);
+        cq.where(predicates);
+    	
     	// Get record count
-//    	Query count_query = cb.createQuery();//.createQuery(cq);
-    	cq.select(cb.count(hdr));
-    	cq.where(whereClause);
-    	TypedQuery<Long> q = JPA.em().createQuery(cq);
-    	Long total_rows = q.getSingleResult();
+//    	Query count_query = JPA.em().createQuery(cq);//.createQuer  (cq);//.createQuery(cq);
+//    	
+//    	.select(cb.count(hdr));
+//    	cq.where(whereClause);
+//    	TypedQuery<Long> q = JPA.em().createQuery(cq);
+//    	Long total_rows = q.getSingleResult();
     	
     	// Paginate
-    	cq.select(hdr);
-    	cq.where(whereClause);
+//    	cq.select(hdr);
+//    	cq.where(whereClause);
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(cq);
     	records.setFirstResult((page-1)*limit);
     	records.setMaxResults(limit);
 
     	// Execute query
     	List<RGHICarrierPull> lst = records.getResultList();
-    	retval.put("totalrows",total_rows);
     	retval.put("data", play.libs.Json.toJson(lst));
+    	
+    	// Get the record count
+    	cq.select(cb.count(hdr));  // add the count
+    	cq.where(predicates);      // add the filter criteria
+    	TypedQuery<Long> q = JPA.em().createQuery(cq);  // create a new query object
+    	Long total_rows = q.getSingleResult(); // get the count
+    	retval.put("totalrows",total_rows);  // add total to the json
+    	
+//    	TypedQuery<Long> q = JPA.em().createQuery(cq);
+//    	Long total_rows = q.getSingleResult();
     	
     	return ok(retval);
     }
     
-    public static Boolean evalSearchCriteria(CriteriaQuery query, Root root, String prop, String val) {
+    public static Boolean evalSearchCriteria(List<Predicate> predicateList, Root root, String prop, String val) {
     	Boolean success=true;
     	String baseClassName="RGHICarrierPull";  // The default model to search on is CartonDtl
     	String fieldName,fieldType="";
@@ -178,7 +201,7 @@ public class CarrierPull extends Controller {
     	}
     	else if (fieldNameParts.length >= 2) {
     		// TODO: The recursive approach, not finished yet
-    	    RGH.applyQueryPart(fieldNameParts, query, root, val);
+    	    RGH.applyQueryPart(fieldNameParts, predicateList, root, val);
     		
     		// TODO: The manual approach to parsing fieldNameParts, based on length of array
     		
@@ -192,6 +215,11 @@ public class CarrierPull extends Controller {
     		fieldName=v;
     	}
     	
+    	/**
+    	 * Note from VC: to/from is currently disabled in CarrierPull, since the
+    	 * previous code won't work, and CarrierPull doesn't have any from/to.
+    	 * Someone will need to update this from/to code to use the new approach.
+    	 */
 //    	// Apply from/to fields to the expression
 //    	if (prop.startsWith("from_")) {
 //    		query.where(cb.ge(query.get, val));  
@@ -208,6 +236,31 @@ public class CarrierPull extends Controller {
 //    		System.out.println("\tadded expression: " + fieldName + " = " + val);
 //    	}
     	return success;
+    }
+    
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result getShipVias() {
+    	ObjectNode retval = play.libs.Json.newObject();
+    	
+    	// Get the json data from the UI
+    	JsonNode json = request().body().asJson();
+    	if (json==null) {
+    		System.out.println("ERROR: expecting json data");
+    	}
+    	
+    	// Get the list of carton_nbrs the user selected
+//    	List<JsonNode> records = json.findValues("records");
+    	
+    	// For now, this list is hard-coded so UI development
+    	// can continue.
+    	// TODO: replace this with proper DB query
+    	List<JsonNode> lst = new ArrayList();
+    	lst.add(play.libs.Json.parse("{\"id\":\"E07\",\"text\":\"E07\"}"));
+    	lst.add(play.libs.Json.parse("{\"id\":\"E08\",\"text\":\"E08\"}"));
+    	lst.add(play.libs.Json.parse("{\"id\":\"E09\",\"text\":\"E09\"}"));
+    	lst.add(play.libs.Json.parse("{\"id\":\"E10\",\"text\":\"E10\"}"));
+    	
+    	return ok(play.libs.Json.toJson(lst));
     }
     
 }

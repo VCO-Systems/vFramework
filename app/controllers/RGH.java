@@ -313,7 +313,7 @@ public class RGH extends Controller {
     	}
     	else if (fieldNameParts.length >= 2) {
     		// TODO: The recursive approach, not finished yet
-    	    RGH.applyQueryPart(fieldNameParts, query, root, val);
+//    	    RGH.applyQueryPart(fieldNameParts, query, root, val);
     		
     		// TODO: The manual approach to parsing fieldNameParts, based on length of array
     		
@@ -345,13 +345,15 @@ public class RGH extends Controller {
     	return success;
     }
     
-    public static String[] applyQueryPart(String[] fieldDef, CriteriaQuery query, Root root, String criteria) {
+    public static String[] applyQueryPart(String[] fieldDef, List<Predicate> predicateList, Root root, String criteria) {
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	// If we're down to Table.Field, apply it to the query
     	// Example:  CartonHdr.carton_nbr
     	if (fieldDef.length == 2) {
     		System.out.println("\tApplying filter criteria : " +  fieldDef[0] + "." + fieldDef[1]);
-    		query.where(cb.like(root.get(fieldDef[1]), criteria + "%"));
+    		Predicate newPred = cb.like(root.get(fieldDef[1]), criteria + "%");
+    		predicateList.add(newPred);
+//    		query.and(cb.like(root.get(fieldDef[1]), criteria + "%"))
     	}
     	// Otherwise, continue to traverse
     	else {

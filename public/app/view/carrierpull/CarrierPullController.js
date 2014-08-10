@@ -15,7 +15,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
 
     alias: 'controller.carrierpullctrl',
     refs: [{
-        mainTabs: '#mainTabs'
+        mainTabs: '#mainTabs',
+        mainGrid: '#mainGrid'
     }],
     
     init: function() {
@@ -42,52 +43,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	});
     },
     
-    onFieldChange: function(field,newVal,oldVal) {
-    	console.log('[[OnFieldChange]] Field [' + field.reference + "] changed to: " + newVal);
-    	var store = this.lookupReference('mainGrid').getStore();
-//    	store.clearFilter();
-    	
-		// See if this filter already exists for the store
-    	var filterExists=false;
-    	var existingStoreFilters = store.getFilters().items;
-    	var filterToRemove;
-    	for (var idx in existingStoreFilters) {
-    		var filter = existingStoreFilters[idx];
-    		if (filter.getProperty()==field.name) {
-    			filterExists=true;
-    			filterToRemove=filter;
-    		}
-    	}
-    	
-    	// Add/remove/update the filter
-    	if (filterExists) {
-    		if (!newVal) {  // an existing filter has been set to null/empty
-    			// Todo: remove filter that has been nullified
-    			console.log('removing filter: ' + field.name);
-    			store.removeFilter(filterToRemove);
-    		}
-    		else {
-    			// Update the filter (is this right, or does this make a dup?)
-    			var newFilter = new Ext.util.Filter({
-    	    	    property: field.name,
-    	    	    value   : newVal
-    	    	});
-    			store.addFilter(newFilter);
-    			console.log('modifying existing filter: ' + field.name)
-    		}
-    	}
-    	else {  // filter does not exist on store
-    		// Add the filter
-    		if (newVal) {
-    			var newFilter = new Ext.util.Filter({
-    	    	    property: field.name,
-    	    	    value   : newVal
-    	    	});
-    			store.addFilter(newFilter);
-    			console.log('Adding filter for field: ' + field.name)
-    		}
-    	}
-    },
     
     handleNode: function(node) {
 //		console.log(rec.getProperty() + " / " + ageFilter.getProperty());
@@ -100,9 +55,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     },
     
     onFieldChange: function(field,newVal,oldVal) {
-//    	console.log('[[OnFieldChange]] Field [' + field.reference + "] changed to: " + newVal);
+//    	console.log('[[OnFieldChange]] Field [' + field.name + "] changed to: " + newVal);
     	var store = this.lookupReference('mainGrid').getStore();
-//    	store.clearFilter();
     	
 		// See if this filter already exists for the store
     	var filterExists=false;
@@ -120,7 +74,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	if (filterExists) {
     		if (!newVal) {  // an existing filter has been set to null/empty
     			// Todo: remove filter that has been nullified
-    			console.log('removing filter: ' + field.name);
+//    			console.log('removing filter: ' + field.name);
     			store.removeFilter(filterToRemove);
     		}
     		else {
@@ -130,7 +84,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
-    			console.log('modifying existing filter: ' + field.name)
+//    			console.log('modifying existing filter: ' + field.name)
     		}
     	}
     	else {  // filter does not exist on store
