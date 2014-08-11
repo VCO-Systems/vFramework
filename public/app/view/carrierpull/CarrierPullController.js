@@ -219,9 +219,60 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	
     },
     /**
-     * User has press "Delete all records..."
+     * User has pressed "Delete all records..."
      */
     onDeleteAllRecords: function() {
+    	Ext.Msg.show({
+    	    title: 'WARNING',
+    	    message: 'If you press OK, all records for the current warehouse will be deleted.  This action cannot be undone.',
+    	    width: 300,
+    	    buttons: Ext.Msg.OKCANCEL,
+//    	    multiline: true,
+    	    fn: function(btn) {
+    	    	if(btn=='ok'){
+    	    		Ext.Ajax.request({
+    	    		    url: 'deleteAllCarrierPull',
+    	    		    success: function(result) {
+    	    		    	console.debug(result);
+    	    		    	var resp = Ext.util.JSON.decode(result.responseText); 
+    	    		    	var status = (resp.success=='true') ? "SUCCEEDED" : "FAILED";
+    	    		    	var message = resp.message;
+    	    		    	console.log(message);
+    	    		    	if (message) {
+    	    		    		Ext.MessageBox.alert(status, message);
+    	    		    		if (resp.success=='true') {
+    	    		    			// records were deleted from server,
+    	    		    			// so remove them from UI as well
+    	    		    			var store = this.lookupReference('mainGrid').getStore();
+    	    		    			store.removeAll();
+    	    		    		}
+    	    		    	}
+    	    		    },
+    	    		});
+    	    	}
+    	    },
+//    	    animateTarget: 'addAddressBtn',
+    	    icon: Ext.window.MessageBox.INFO
+    	});
+    },
+    
+    onDeleteAllRecordsResult: function(result) {
+    	console.debug(result);
+    },
+    
+    onEditClick: function() {
+    	var grid = this.lookupReference('mainGrid');
+    	var selections = grid.getSelectionModel().getSelection();
+    	if (selections.length == 1) {
+//    		var editManager = this.getPlugin('rowEditor');
+//        	console.debug(editManager);
+        	var ed = grid.editingPlugin;
+        	console.debug(ed)
+    		ed.startEdit(selections[0]);
+    	}
+    	else {
+    		Ext.MessageBox.alert("WARNING", "Please select exactly one row for editing.")
+    	}
     	
     }
 });

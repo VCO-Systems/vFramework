@@ -4,7 +4,15 @@
  * plugin to promote that instance of this class to the body element.
  *
  */
-
+var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
+        clicksToMoveEditor: 2,
+        autoCancel: true,
+        listeners: {
+        	beforeedit: function() {
+        		console.log('before edit')
+        	}
+        }
+    });
 
 Ext.define('vfw.view.carrierpull.CarrierPull', {
     extend: 'Ext.container.Container',
@@ -169,11 +177,11 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 xtype: 'grid',
 //                title: 'SKU',
                 reference: 'mainGrid',
-                selType: 'checkboxmodel',
-                selModel: {
-                	checkOnly: true,
-                	injectCheckbox: 0
-                },
+                
+//                selModel: {
+//                	checkOnly: true,
+//                	injectCheckbox: 0
+//                },
                 viewConfig: {
                     enableTextSelection: true
                 },
@@ -182,15 +190,43 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 bufferedRenderer: false,
                 tbar: [{
                     text: 'Delete',
-                    iconCls: 'delete',
                     handler: 'onDeleteCarrierPull'
-                    
+                },
+                {
+                    text: 'Edit',
+                    handler: 'onEditClick'
                 }
-                ],
+                ], // tbar items
+                
+                
+//                selType: 'cellmodel',
+//                plugins: {
+//                    ptype: 'cellediting',
+//                    clicksToEdit: 1
+//                },
+               
+                  plugins: [rowEditing],
+//                plugins: {
+//                    ptype: 'rowediting',
+//                    clicksToEdit: 2,
+//                    pluginId: 'rowEditor'
+//                    	listeners: {
+//    	                	beforeedit: function(editor, e, opts) {
+//    	                		console.log('beforeedit')
+//    	                	}
+//    	                }
+//                }, // grid plugins
+	                
+                selType: 'checkboxmodel',
+                selModel: {
+                	checkOnly: true,
+                	injectCheckbox: 0
+                },
+                
                 columns: [
-                    { text: 'Ship Via',  dataIndex: 'shipVia' },
+                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', editor: {allowBlank: false} },
                     { text: 'Ship Via Description',  dataIndex: 'todo' },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode' },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', editor: {allowBlank: false} },
                     { text: 'Pull Time',  dataIndex: 'pullTime',
                     	renderer: function(value) {
                     		var tm="";
@@ -200,7 +236,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     		tm += (parts[0] <= 11) ? " AM" : " PM";
                     		return tm;
                     	} },
-                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip' }
+                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip', editor: {allowBlank: false} }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {

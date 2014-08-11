@@ -308,4 +308,31 @@ public class CarrierPull extends Controller {
     	return ok(retval);
     }
     
+    
+    @Transactional
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result deleteAllCarrierPullForWarehouse() throws JsonParseException, JsonMappingException, IOException {
+    	System.out.println("getCarrierPull()");
+    	Boolean success = false;
+    	ObjectNode retval = play.libs.Json.newObject();
+    	// Get UI params from POST JSON body	
+    	JsonNode json = request().body().asJson();
+//    	int limit = json.get("pageSize").asInt();
+    	
+    	// TODO:  Write query for deleting all carrier pulls
+    	// todo:  set "success" variable depending on whether
+    	//        query succeeds or not
+    	success=true;
+    	if (success) {
+    		retval.put("success", "true");
+    		retval.put("message", "All records for this warehouse were deleted.");
+    	}
+    	else {
+    		retval.put("success", "false");
+    		retval.put("message", "(Describe the error that happened here...)");
+    	}
+    	
+    	return ok(retval);
+    }
+    
 }
