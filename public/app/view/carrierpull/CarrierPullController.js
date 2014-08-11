@@ -130,8 +130,60 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
     },
     
-    received: function(data) {
-    	console.debug(data);
+    /**
+     * User has pressed the "Delete" button to delete any selected Carrier Pull entries.
+     */
+    onDeleteCarrierPull: function () {
+    	// Make sure at least one carton has been selected in the datagrid
+    	var retval = {};
+    	var records =[];
+    	retval["records"]=records;
+    	
+    	// Get a list of "checked" items in the datagrid
+    	var selections = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    	
+    	if (selections.length > 0 ) {
+    		// Insert details of each selected record into the JSON
+    		Ext.each(selections, function(item, index, allItems) {
+//    			records.push({"carton_nbr": item.data.carton_nbr});
+    			records.push(item.data);
+    		});
+    		
+    		// send the json to the server
+    		Ext.Ajax.request({
+    		    url: 'deleteCarrierPull',
+    		    method: 'POST',          
+    		    headers: {'Content-Type': 'application/json','Accept':'application/json'},
+    		    waitTitle: 'Connecting',
+    		    waitMsg: 'Sending data...',                                     
+    		    paramsAsJson: true,
+    		    jsonData: Ext.encode(retval),
+    		    writer: "json",
+    		    scope:this,
+    		    success: this.onDeleteCarrierPullResult,                                    
+    		    failure: function(){console.log('failure');}
+    		});
+    	}
+    	else {
+    		Ext.MessageBox.alert('ERROR', 'At least one record must be selected for this action.');
+    	}
+    },
+    
+    onDeleteCarrierPullResult: function(data) {
+    	var resp = Ext.util.JSON.decode(data.responseText); 
+    	if(resp.success=="true"){
+    		Ext.MessageBox.alert('SUCCESS', 'Record(s) deleted.');
+    		// Remove any selected records from the store
+    		// so they are removed from UI
+    		var store = this.lookupReference('mainGrid').getStore();
+    		var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    		store.remove(selectedRecords);
+    	}
+    	else if (resp.success=="false") {
+    		var errorMsg = resp.message;
+    		errorMsg=errorMsg.replace(/\n/g,"<br/>");  // Replace newlines with HTML line break
+    		Ext.MessageBox.alert('ERROR (deletion failed)', errorMsg);
+    	}
     },
 
     onConfirm: function (choice) {

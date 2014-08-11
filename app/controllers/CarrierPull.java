@@ -27,6 +27,7 @@ import javax.persistence.criteria.Root;
 
 
 
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -143,7 +144,7 @@ public class CarrierPull extends Controller {
 //    	TypedQuery<Long> q = JPA.em().createQuery(cq);
 //    	Long total_rows = q.getSingleResult();
     	
-    	// Paginate
+    	// Return the records
 //    	cq.select(hdr);
 //    	cq.where(whereClause);
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(cq);
@@ -238,6 +239,10 @@ public class CarrierPull extends Controller {
     	return success;
     }
     
+    /****************************
+     * Handle requests from UI
+     ****************************/
+    
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getShipVias() {
     	ObjectNode retval = play.libs.Json.newObject();
@@ -261,6 +266,46 @@ public class CarrierPull extends Controller {
     	lst.add(play.libs.Json.parse("{\"id\":\"E10\",\"text\":\"E10\"}"));
     	
     	return ok(play.libs.Json.toJson(lst));
+    }
+    
+    @Transactional
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result deleteCarrierPull() throws JsonParseException, JsonMappingException, IOException {
+    	System.out.println("getCarrierPull()");
+    	ObjectNode retval = play.libs.Json.newObject();
+    	// Get UI params from POST JSON body	
+    	JsonNode json = request().body().asJson();
+    	
+    	// Get the records to delete from the JSON
+    	List<JsonNode> results = json.findValues("records");  // records to be deleted
+    	ArrayNode recsToDelete = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
+    	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
+    	recsToDelete = (ArrayNode)results.get(0);
+    	Boolean success=true;
+    	// Loop over the records to delete
+    	for (JsonNode rec : recsToDelete) {
+    		// TODO:  Delete each record
+    		// Note:  the UI assumes that either:
+    		//     - all records are deleted, and success = true
+    		//     - if any records failed to delete, the whole transaction
+    		//       was rolled back and success=false was sent back to UI
+    		//       and the error message was sent back in the json in
+    		//       message: "Could not delete record because..."
+    		System.out.println("about to delete record: " + rec.get("shipVia"));
+    		success=false;	
+    		// If any delete failed, roll back 
+    		if (success.equals(false)) {
+    			retval.put("success", "false");
+    			retval.put("message", "Error msg from failed SQL delete goes here...\nLine 2\nLine 3");
+    		}
+    		else {
+    			retval.put("success", "true");
+    		}
+    	}
+    	
+    	
+    	
+    	return ok(retval);
     }
     
 }

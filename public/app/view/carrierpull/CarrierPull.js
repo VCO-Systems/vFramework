@@ -143,7 +143,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
         	
         },
         {
-            title: 'List',
+            title: 'Data',
             layout: 'fit',
             items: [ {// Ext.create('Ext.grid.Panel',{
                 xtype: 'grid',
@@ -163,9 +163,8 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 tbar: [{
                     text: 'Delete',
                     iconCls: 'delete',
-                    handler : function() {
-                        
-                    }
+                    handler: 'onDeleteCarrierPull'
+                    
                 }
                 ],
                 columns: [
