@@ -10,7 +10,15 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         listeners: {
         	beforeedit: function() {
         		console.log('before edit')
-        	}
+        	},
+        	validateedit: function ( editor, context, eOpts ) {
+        		console.log('validateedit()');
+        		return true;
+        	},
+//        	edit: function(editor, e) {
+//        		console.log('edit()')
+//        		e.record.commit();
+//        	}
         }
     });
 
@@ -226,17 +234,27 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', editor: {allowBlank: false} },
                     { text: 'Ship Via Description',  dataIndex: 'todo' },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', editor: {allowBlank: false} },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: false} },
                     { text: 'Pull Time',  dataIndex: 'pullTime',
+                    	editor: {
+                    		allowBlank: false,
+//                    		maskRe: "/^[0-9]{2}\/"
+                    	},
                     	renderer: function(value) {
-                    		var tm="";
-                    		var parts = value.split(":");
-                    		tm += ((parts[0] <= 11) ? (parseInt(parts[0])) : (parseInt(parts[0]) - 12) + 1);
-                    		tm+= ":" + parts[1];
-                    		tm += (parts[0] <= 11) ? " AM" : " PM";
-                    		return tm;
+                    		// VC: until custom editor is ready, we'll
+                    		// show/edit military time in  UI
+                    		return value;
+                    		
+                    		// VC: when custom editor is ready, uncomment
+                    		// this code to display time as: 10:20 PM
+//                    		var tm="";
+//                    		var parts = value.split(":");
+//                    		tm += ((parts[0] <= 11) ? (parseInt(parts[0])) : (parseInt(parts[0]) - 12) + 1);
+//                    		tm+= ":" + parts[1];
+//                    		tm += (parts[0] <= 11) ? " AM" : " PM";
+//                    		return tm;
                     	} },
-                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip', editor: {allowBlank: false} }
+                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip',header: 'shiptoZip', editor: {allowBlank: false} }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
