@@ -16,3 +16,7 @@ the bottom border of the fieldset.
 .x-fieldset-body-default {
 	padding-bottom: 10px;
 }
+
+.x-btn-default-toolbar-small {
+	border: 1px solid #C3C3C3;
+}

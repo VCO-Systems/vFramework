@@ -31,12 +31,32 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //        html: '<h4>Carrier Pull Maintanence</h4>',
         width: 250,
         split: false,
-        tbar: [{
-        	xtype: 'button',
-            text: 'List',
-            handler: 'onList',
-        }
-        ]
+        tbar: [
+           {xtype: "toolbar", 
+        	   border: false,
+
+        	   items: [
+	            {
+		        	xtype: 'button',
+		            text: 'List',
+		            handler: 'onList',
+		        },
+		        {   
+		        	text: 'Actions',
+		        	menu: 
+		            {
+				        xtype : 'menu',
+				        
+				        items:[
+		                    {text: "Import", disabled: true},
+		                    {text: "Export", disabled: true},
+		                    {xtype: 'menuseparator'},
+				            {text : 'Delete all records...'}
+				        ]
+			    	}
+		        } // menu
+          ] } // buttongroup
+        ] // tbar
     },{
         region: 'center',
         xtype: 'tabpanel',

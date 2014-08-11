@@ -39,6 +39,22 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     					this.onList();
     				}
     			}
+    		},
+    		'[xtype="menu"]': {
+    			click: function(menu,item, e, opts) {
+    				var actionRequested=item.text;
+    				switch(actionRequested) {
+    				case "Import":
+    					this.onImport();
+    					break;
+    				case "Export":
+    					this.onExport();
+    					break;
+    				case "Delete all records...":
+    					this.onDeleteAllRecords();
+    					break;
+    				}
+    			}
     		}
     	});
     },
@@ -186,12 +202,23 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	}
     },
 
-    onConfirm: function (choice) {
-        if (choice === 'yes') {
-            //
-        }
+    /**
+     * User has pressed the Import button.
+     */
+    onImport: function() {
+    	
     },
-    getItems: function() {
-    	alert('[Controller] getItems()');
+    
+    /**
+     * User has pressed the Export button.
+     */
+    onExport: function() {
+    	
+    },
+    /**
+     * User has press "Delete all records..."
+     */
+    onDeleteAllRecords: function() {
+    	
     }
 });
