@@ -19,4 +19,5 @@ the bottom border of the fieldset.
 
 .x-btn-default-toolbar-small {
 	border: 1px solid #C3C3C3;
+	background-image:-webkit-linear-gradient(top, #ffffff,#eeeeee);
 }
