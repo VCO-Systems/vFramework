@@ -58,6 +58,11 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     					break;
     				}
     			}
+    		},
+    		'': {
+    			'saveRecordEvent': function(e) {
+    				console.debug(e);
+    			}
     		}
     	});
     },
@@ -275,4 +280,5 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	}
     	
     }
+    
 });

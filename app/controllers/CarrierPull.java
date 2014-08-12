@@ -57,11 +57,8 @@ public class CarrierPull extends Controller {
 	
 	// @Transactional
     public static Result index() {
-    	//List<CartonHdr> op = CartonHdr.getAll();
-    	//return ok(index.render("Your new application is ready."));
     	
 		return ok(index.render("RGH v0.1"));
-		
 		
     }
   
@@ -343,12 +340,19 @@ public class CarrierPull extends Controller {
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
     	JsonNode jsonToSave = request().body().asJson();
-    	RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
-    	JPA.em().persist(rec);
+    	
     	
     	// TODO:  Write query for deleting all carrier pulls
     	// todo:  set "success" variable depending on whether
     	//        query succeeds or not
+    	
+    	// Here's an example of converting the incoming JSON to an in-memory object,
+    	// and saving that object as a record in the db
+//    	RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
+//    	JPA.em().persist(rec);
+    	
+    	
+    	
     	success=true;
     	if (success) {
     		retval.put("success", "true");

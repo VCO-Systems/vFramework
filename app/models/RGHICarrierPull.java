@@ -30,15 +30,21 @@ public class RGHICarrierPull implements Serializable {
 	private static final long serialVersionUID = 284729281L;
 
 	@EmbeddedId
-//	@JsonUnwrapped
+	@JsonUnwrapped
 	private RGHICarrierPullPK pk;
+	
+	@Column(name="SHIP_VIA_DESCR")
+	private String shipViaDescr;
 	
 	@Column(name="PULL_TRLR_CODE")
 	private String pullTrlrCode;
 	
 //	@Temporal(TemporalType.TIME)
 	@Column(name="PULL_TIME")
-	private Time pullTime;
+	private String pullTime;
+	
+	@Column(name="PULL_TIME_AMPM")
+	private String pullTimeAMPM;
 	
 	@Column(name="ANYTEXT1")
 	private String anyText1;
@@ -89,7 +95,7 @@ public class RGHICarrierPull implements Serializable {
 		this.pullTrlrCode = pullTrlrCode;
 	}
 
-	public Time getPullTime() {
+	public String getPullTime() {
 //		Time return_date = new Time();
 //		try {
 //			StringBuilder vals = new StringBuilder();
@@ -111,8 +117,16 @@ public class RGHICarrierPull implements Serializable {
 		return this.pullTime;
 	}
 
-	public void setPullTime(Time pullTime) {
+	public void setPullTime(String pullTime) {
 		this.pullTime = pullTime;
+	}
+	
+	public String getPullTimeAMPM() {
+		return pullTimeAMPM;
+	}
+
+	public void setPullTimeAMPM(String pullTimeAMPM) {
+		this.pullTimeAMPM = pullTimeAMPM;
 	}
 
 	public String getAnyText1() {
@@ -163,8 +177,13 @@ public class RGHICarrierPull implements Serializable {
 		this.pk = pk;
 	}
 
+	public String getShipViaDescr() {
+		return shipViaDescr;
+	}
 
+	public void setShipViaDescr(String shipViaDescr) {
+		this.shipViaDescr = shipViaDescr;
+	}
 
 	
-
 }

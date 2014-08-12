@@ -9,7 +9,8 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         autoCancel: true,
         listeners: {
         	beforeedit: function() {
-        		console.log('before edit')
+        		console.log('before edit');
+        		
         	},
         	validateedit: function ( editor, context, eOpts ) {
         		console.log('validateedit()');
@@ -17,6 +18,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		// Validate any field values, then return true
         		// to commit change in UI, close editor, and
         		// mark changed fields dirty
+        		this.fireEvent('saveRecordEvent');
         		return true;
         	},
         	edit: function(editor, e) {
@@ -32,11 +34,11 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    paramsAsJson: true,
         		    jsonData: Ext.encode(record.data),
         		    writer: "json",
-//        		    success: this.dfa,
         		    scope:this,
         		    success: function(options, success, response) {
-        		    	console.debug(response);
-        		    	editor.commitEdit();
+        		    	console.log('Successfully saved record to db.  Refreshing view.');
+        		    	console.debug(editor);
+        		    	editor.grid.getStore().load();
         		    },                                    
         		    failure: function(){console.log('failure');}
         		});
@@ -256,11 +258,11 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', editor: {allowBlank: false} },
-                    { text: 'Ship Via Description',  dataIndex: 'todo' },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: false} },
+                    { text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr' },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true} },
                     { text: 'Pull Time',  dataIndex: 'pullTime',
                     	editor: {
-                    		allowBlank: false,
+                    		allowBlank: true,
 //                    		maskRe: "/^[0-9]{2}\/"
                     	},
                     	renderer: function(value) {
