@@ -9,7 +9,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullModel', {
     data: {
         name: 'Hello World'
     },
-    fields: ['whse','shiptoZip','shipVia','pullTrlrCode','pullTime']
+    fields: ['whse','shipToZip','shipVia','pullTrlrCode','pullTime']
 
     //TODO - add data, formulas and/or methods to support your view
 });

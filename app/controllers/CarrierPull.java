@@ -250,7 +250,7 @@ public class CarrierPull extends Controller {
     	// Get the json data from the UI
     	JsonNode json = request().body().asJson();
     	if (json==null) {
-    		System.out.println("ERROR: expecting json data");
+//    		System.out.println("ERROR: expecting json data");
     	}
     	
     	// Get the list of carton_nbrs the user selected
@@ -330,6 +330,33 @@ public class CarrierPull extends Controller {
     	else {
     		retval.put("success", "false");
     		retval.put("message", "(Describe the error that happened here...)");
+    	}
+    	
+    	return ok(retval);
+    }
+    
+    @Transactional
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result saveCarrierPull() throws JsonParseException, JsonMappingException, IOException {
+    	System.out.println("in saveCarrierPull()");
+    	Boolean success = false;
+    	ObjectNode retval = play.libs.Json.newObject();
+    	// Get UI params from POST JSON body	
+    	JsonNode jsonToSave = request().body().asJson();
+    	RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
+    	JPA.em().persist(rec);
+    	
+    	// TODO:  Write query for deleting all carrier pulls
+    	// todo:  set "success" variable depending on whether
+    	//        query succeeds or not
+    	success=true;
+    	if (success) {
+    		retval.put("success", "true");
+    		retval.put("message", "Record was saved.");
+    	}
+    	else {
+    		retval.put("success", "false");
+    		retval.put("message", "There was a problem saving your record");
     	}
     	
     	return ok(retval);

@@ -6,6 +6,9 @@ import javax.persistence.*;
 
 import org.joda.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.ParseException;
@@ -20,22 +23,15 @@ import java.util.Date;
  */
 @Entity
 @Table(name="RGHI_Carrier_Pull")
+@JsonIgnoreProperties(ignoreUnknown = true)
 @NamedQuery(name="RGHICarrierPull.findAll", query="SELECT p FROM RGHICarrierPull p")
 public class RGHICarrierPull implements Serializable {
 	
 	private static final long serialVersionUID = 284729281L;
 
-	@Id
-	@Column(name="WHSE")
-	private String whse;
-	
-	@Id
-	@Column(name="SHIPTO_ZIP")
-	private String shiptoZip;
-	
-	@Id
-	@Column(name="SHIP_VIA")
-	private String shipVia;
+	@EmbeddedId
+//	@JsonUnwrapped
+	private RGHICarrierPullPK pk;
 	
 	@Column(name="PULL_TRLR_CODE")
 	private String pullTrlrCode;
@@ -61,29 +57,29 @@ public class RGHICarrierPull implements Serializable {
 	@Column(name="USER_ID")
 	private String userId;
 
-	public String getWhse() {
-		return whse;
-	}
-
-	public void setWhse(String whse) {
-		this.whse = whse;
-	}
-
-	public String getShiptoZip() {
-		return shiptoZip;
-	}
-
-	public void setShiptoZip(String shiptoZip) {
-		this.shiptoZip = shiptoZip;
-	}
-
-	public String getShipVia() {
-		return shipVia;
-	}
-
-	public void setShipVia(String shipVia) {
-		this.shipVia = shipVia;
-	}
+//	public String getWhse() {
+//		return whse;
+//	}
+//
+//	public void setWhse(String whse) {
+//		this.whse = whse;
+//	}
+//
+//	public String getShiptoZip() {
+//		return shiptoZip;
+//	}
+//
+//	public void setShiptoZip(String shiptoZip) {
+//		this.shiptoZip = shiptoZip;
+//	}
+//
+//	public String getShipVia() {
+//		return shipVia;
+//	}
+//
+//	public void setShipVia(String shipVia) {
+//		this.shipVia = shipVia;
+//	}
 
 	public String getPullTrlrCode() {
 		return pullTrlrCode;
@@ -157,6 +153,14 @@ public class RGHICarrierPull implements Serializable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public RGHICarrierPullPK getPk() {
+		return pk;
+	}
+
+	public void setPk(RGHICarrierPullPK pk) {
+		this.pk = pk;
 	}
 
 

@@ -13,12 +13,35 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         	},
         	validateedit: function ( editor, context, eOpts ) {
         		console.log('validateedit()');
+        		// To revert changes to row: editor.cancelEdit();
+        		// Validate any field values, then return true
+        		// to commit change in UI, close editor, and
+        		// mark changed fields dirty
         		return true;
         	},
-//        	edit: function(editor, e) {
-//        		console.log('edit()')
-//        		e.record.commit();
-//        	}
+        	edit: function(editor, e) {
+        		var record = e.record;
+        		console.debug(e);
+        		// send the json to the server
+        		Ext.Ajax.request({
+        		    url: 'saveCarrierPull',
+        		    method: 'POST',          
+        		    headers: {'Content-Type': 'application/json','Accept':'application/json'},
+        		    waitTitle: 'Connecting',
+        		    waitMsg: 'Sending data...',                                     
+        		    paramsAsJson: true,
+        		    jsonData: Ext.encode(record.data),
+        		    writer: "json",
+//        		    success: this.dfa,
+        		    scope:this,
+        		    success: function(options, success, response) {
+        		    	console.debug(response);
+        		    	editor.commitEdit();
+        		    },                                    
+        		    failure: function(){console.log('failure');}
+        		});
+        		
+        	}
         }
     });
 
@@ -254,7 +277,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //                    		tm += (parts[0] <= 11) ? " AM" : " PM";
 //                    		return tm;
                     	} },
-                    { text: 'Ship To Zip',  dataIndex: 'shiptoZip',header: 'shiptoZip', editor: {allowBlank: false} }
+                    { text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', editor: {allowBlank: false} }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
