@@ -21,3 +21,11 @@ the bottom border of the fieldset.
 	border: 1px solid #C3C3C3;
 	background-image:-webkit-linear-gradient(top, #ffffff,#eeeeee);
 }
+
+.x-grid-item-alt {
+/* 	background-color: #F7F7C5; */
+	background: -webkit-linear-gradient(#FFFFFF,#F7F7C5); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(#FFFFFF,#F7F7C5); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(#FFFFFF,#F7F7C5); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(#FFFFFF,#F7F7C5); /* Standard syntax */
+}
