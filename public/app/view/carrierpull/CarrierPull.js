@@ -6,11 +6,11 @@
  */
 
 var editModeColumns = [
-	{ text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', sortable: false },
-	{ text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
-	{ text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
+	{ text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false },
+	{ text: 'Ship Via Description',  dataIndex: 'todo', header: 'Ship Via Description', sortable: false  },
+	{ text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code',editor: {allowBlank: true}, sortable: false  },
 	{ text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
-	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
+	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time', editor: {allowBlank: true}, sortable: false },
 	{ text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', sortable: false  }
 ];
 
@@ -19,8 +19,8 @@ var addModeColumns = [
                    	{ text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
                    	{ text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
                    	{ text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
-                   	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
-                   	{ text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', editor: {allowBlank: false}, sortable: false  }
+                   	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM', editor: {allowBlank: true}, sortable: false },
+                   	{ text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'Ship To Zip', editor: {allowBlank: false}, sortable: false  }
                    ];
 
 var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
@@ -305,12 +305,12 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 },
                 
                 columns: [
-                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', sortable: false,editor: {allowBlank: false} },
-                    { text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
-                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
-                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
-                    { text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', sortable: false  }
+                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false,editor: {allowBlank: false} },
+                    { text: 'Ship Via Description',  dataIndex: 'todo', header: 'Ship Via Description', sortable: false  },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code',editor: {allowBlank: true}, sortable: false  },
+                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', editor: {allowBlank: true}, sortable: false },
+                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM', editor: {allowBlank: true}, sortable: false },
+                    { text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'Ship To Zip', sortable: false,editor: {allowBlank: false}  }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {

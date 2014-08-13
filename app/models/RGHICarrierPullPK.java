@@ -8,16 +8,23 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class RGHICarrierPullPK implements Serializable {
  
+	private static final long serialVersionUID = 284728781L;
 	
     private String whse;
     
     @Column(name="shipto_zip")
-    private String shiptoZip;
+    private String shipToZip;
 
     @Column(name="ship_via")
     private String shipVia;
     
     public RGHICarrierPullPK() {
+    }
+    
+    public RGHICarrierPullPK(String whse, String shiptoZip, String shipVia) {
+    	this.setWhse(whse);
+    	this.setShipToZip(shiptoZip);
+    	this.setShipVia(shipVia);
     }
  
     
@@ -35,13 +42,13 @@ public class RGHICarrierPullPK implements Serializable {
 
 
 	public String getShipToZip() {
-		return shiptoZip;
+		return shipToZip;
 	}
 
 
 
 	public void setShipToZip(String shipToZip) {
-		this.shiptoZip = shipToZip;
+		this.shipToZip = shipToZip;
 	}
 
 
@@ -59,13 +66,13 @@ public class RGHICarrierPullPK implements Serializable {
 
 
 	public int hashCode() {
-        return (int)this.shiptoZip.hashCode()+ (int)this.shipVia.hashCode()+(int)this.whse.hashCode();
+        return (int)this.shipToZip.hashCode()+ (int)this.shipVia.hashCode()+(int)this.whse.hashCode();
     }
  
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (!(obj instanceof RGHICarrierPullPK)) return false;
         RGHICarrierPullPK pk = (RGHICarrierPullPK) obj;
-        return pk.whse.equals(this.whse) && pk.shiptoZip.equals(this.shiptoZip) && pk.shipVia.equals(this.shipVia);
+        return pk.whse.equals(this.whse) && pk.shipToZip.equals(this.shipToZip) && pk.shipVia.equals(this.shipVia);
     }
 }

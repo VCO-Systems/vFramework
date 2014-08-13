@@ -68,8 +68,14 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     				var record = context.record;
     				var grid   = context.grid;
     				if (!record.phantom) {  
-    					// disable editing of key columns
+    					// editing a record - disable editing of key columns
     					grid.getPlugin('rowEditingPlugin').editor.form.findField('shipVia').disable();
+    					grid.getPlugin('rowEditingPlugin').editor.form.findField('shipToZip').disable();
+    				}
+    				else {
+    					// adding - enabled editing of key columns
+    					grid.getPlugin('rowEditingPlugin').editor.form.findField('shipVia').enable();
+    					grid.getPlugin('rowEditingPlugin').editor.form.findField('shipToZip').enable();
     				}
     				
     			}

@@ -5,11 +5,13 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -18,6 +20,10 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+
+
+
 
 
 
@@ -45,6 +51,7 @@ import models.FilterCriteria;
 import models.ItemMaster;
 import models.OutbdLoad;
 import models.RGHICarrierPull;
+import models.RGHICarrierPullPK;
 import play.*;
 import play.mvc.*;
 import views.html.*;
@@ -268,7 +275,7 @@ public class CarrierPull extends Controller {
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result deleteCarrierPull() throws JsonParseException, JsonMappingException, IOException {
-    	System.out.println("getCarrierPull()");
+//    	System.out.println("getCarrierPull()");
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
     	JsonNode json = request().body().asJson();
@@ -288,8 +295,19 @@ public class CarrierPull extends Controller {
     		//       was rolled back and success=false was sent back to UI
     		//       and the error message was sent back in the json in
     		//       message: "Could not delete record because..."
-    		System.out.println("about to delete record: " + rec.get("shipVia"));
-    		success=false;	
+//    		System.out.println("about to delete record: " + rec.get("shipVia"));
+    		String q = "Select c FROM RGHICarrierPull c WHERE c.pk.shipVia=:via AND c.pk.shipToZip=:zip AND c.pk.whse=:whse";
+    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q,RGHICarrierPull.class);
+    		
+    		query.setParameter("zip", rec.get("shipToZip").asText());
+    		query.setParameter("via", rec.get("shipVia").asText());
+    		query.setParameter("whse", "OH1");
+    		RGHICarrierPull result = (RGHICarrierPull)query.getSingleResult();
+//    		RGHICarrierPull entityToDel = play.libs.Json.fromJson(rec, RGHICarrierPull.class);
+    		JPA.em().remove(result);
+    		
+    		
+    		success=true;	
     		// If any delete failed, roll back 
     		if (success.equals(false)) {
     			retval.put("success", "false");
@@ -309,7 +327,7 @@ public class CarrierPull extends Controller {
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result deleteAllCarrierPullForWarehouse() throws JsonParseException, JsonMappingException, IOException {
-    	System.out.println("getCarrierPull()");
+//    	System.out.println("getCarrierPull()");
     	Boolean success = false;
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
@@ -335,17 +353,49 @@ public class CarrierPull extends Controller {
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result saveCarrierPull() throws JsonParseException, JsonMappingException, IOException {
-    	System.out.println("in saveCarrierPull()");
+//    	System.out.println("in saveCarrierPull()");
+    	EntityManager em = JPA.em();
     	Boolean success = false;
     	ObjectNode retval = play.libs.Json.newObject();
-    	// Get UI params from POST JSON body	
-    	JsonNode jsonToSave = request().body().asJson();
+    	// Get the incoming record as JSON and Entity
+    	JsonNode recJson = request().body().asJson();
+    	RGHICarrierPull recEntity = play.libs.Json.fromJson(recJson, RGHICarrierPull.class);
+    	
+    	String isNew="";
+    	if (recJson.get("isNew")!=null) {
+    		isNew=recJson.get("isNew").asText();
+    	}
     	
     	
-    	// TODO:  Write query for deleting all carrier pulls
-    	// todo:  set "success" variable depending on whether
-    	//        query succeeds or not
-    	
+    	// See if we're editing a new record or editing an existing one
+    	if (isNew.equals("true")) {  // We're inserting a new record
+    		// We are inserting a new record
+    		// TODO: programatically set values that don't come from the UI
+    		// - ship_via_description
+    		recEntity.setCreateDateTime(new Date());
+    		recEntity.setModDateTime(new Date());
+    		em.persist(recEntity);
+    		System.out.println("New record saved: " + recJson);
+    	}
+    	else { // We're editing an existing record.
+    		// Look up the existing record
+    		String q = "Select c FROM RGHICarrierPull c WHERE c.pk.shipVia=:via AND c.pk.shipToZip=:zip AND c.pk.whse=:whse";
+    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q,RGHICarrierPull.class);
+    		
+    		query.setParameter("zip", recJson.get("shipToZip").asText());
+    		query.setParameter("via", recJson.get("shipVia").asText());
+    		query.setParameter("whse", "OH1");
+    		RGHICarrierPull result = (RGHICarrierPull)query.getSingleResult();
+    		if (result != null) {  // we found the record to update in db
+    			result.setModDateTime(new Date());
+    			result.setPullTime(recEntity.getPullTime());
+    			result.setPullTimeAMPM(recEntity.getPullTimeAMPM());
+    			result.setPullTrlrCode(recEntity.getPullTrlrCode());
+    			// update the record in db
+    			JPA.em().persist(result);
+    		}
+    		System.out.println("Record updated.");
+    	}
     	// Here's an example of converting the incoming JSON to an in-memory object,
     	// and saving that object as a record in the db
 //    	RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
