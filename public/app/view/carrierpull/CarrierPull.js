@@ -4,21 +4,64 @@
  * plugin to promote that instance of this class to the body element.
  *
  */
+
+var editModeColumns = [
+	{ text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', sortable: false },
+	{ text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
+	{ text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
+	{ text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
+	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
+	{ text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', sortable: false  }
+];
+
+var addModeColumns = [
+                   	{ text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia',editor: {allowBlank: true}, sortable: false },
+                   	{ text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
+                   	{ text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
+                   	{ text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
+                   	{ text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
+                   	{ text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', editor: {allowBlank: false}, sortable: false  }
+                   ];
+
 var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         clicksToMoveEditor: 2,
         autoCancel: true,
+        pluginId: 'rowEditingPlugin',
         listeners: {
-        	beforeedit: function() {
-        		console.log('before edit');
+        	beforeedit: function(editor,context,opts) {
+//        		console.log('before edit');
+        		var grid = context.grid;
+//        		grid.reconfigure(null, addModeColumns
+//        		);
+        		// after grid.reconfigure(), grid loses its reference to this RowEditing plugin
+        		console.debug("plugins", grid.plugins);
+//        		
+        		// try to loop over the column objects
+//        		console.debug(context.grid.columns);
+//        		for (var idx = 0; idx < context.grid.getColumnModel().length; idx++ ) {
+//        			var column = context.grid.getColumnModel()[idx];
+//        			console.debug(column);
+////        			column.editable=false;
+//        			column.setEditable(idx,false);
+//        		}
+        		
+//        		console.debug(context.store.getAt(context.rowIdx).get('shipVia')); 
+//        		if (!context.record.phantom && context.column.dataIndex == 'shipVia') {
+//                    return false;
+//                }
+        		return true;
         		
         	},
         	validateedit: function ( editor, context, eOpts ) {
         		console.log('validateedit()');
+        		
         		// To revert changes to row: editor.cancelEdit();
+        		
         		// Validate any field values, then return true
         		// to commit change in UI, close editor, and
         		// mark changed fields dirty
         		this.fireEvent('saveRecordEvent');
+        		console.debug(editor.grid);
         		return true;
         	},
         	edit: function(editor, e) {
@@ -221,6 +264,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //                store: Ext.data.StoreManager.lookup('carrierPullStore'),
                 store: 'CarrierPullStore',
                 bufferedRenderer: false,
+                sortableColumns: false,
                 tbar: [{
                     text: 'Delete',
                     handler: 'onDeleteCarrierPull'
@@ -228,6 +272,10 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 {
                     text: 'Edit',
                     handler: 'onEditClick'
+                },
+                {
+                    text: 'Add',
+                    handler: 'onAddClick'
                 }
                 ], // tbar items
                 
@@ -257,29 +305,12 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 },
                 
                 columns: [
-                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', editor: {allowBlank: false} },
-                    { text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr' },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true} },
-                    { text: 'Pull Time',  dataIndex: 'pullTime',
-                    	editor: {
-                    		allowBlank: true,
-//                    		maskRe: "/^[0-9]{2}\/"
-                    	},
-                    	renderer: function(value) {
-                    		// VC: until custom editor is ready, we'll
-                    		// show/edit military time in  UI
-                    		return value;
-                    		
-                    		// VC: when custom editor is ready, uncomment
-                    		// this code to display time as: 10:20 PM
-//                    		var tm="";
-//                    		var parts = value.split(":");
-//                    		tm += ((parts[0] <= 11) ? (parseInt(parts[0])) : (parseInt(parts[0]) - 12) + 1);
-//                    		tm+= ":" + parts[1];
-//                    		tm += (parts[0] <= 11) ? " AM" : " PM";
-//                    		return tm;
-                    	} },
-                    { text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', editor: {allowBlank: false} }
+                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'shipVia', sortable: false,editor: {allowBlank: false} },
+                    { text: 'Ship Via Description',  dataIndex: 'todo', header: 'shipViaDescr', sortable: false  },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'pullTrlrCode',editor: {allowBlank: true}, sortable: false  },
+                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'pullTime', editor: {allowBlank: true}, sortable: false },
+                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'pullTimeAMPM', editor: {allowBlank: true}, sortable: false },
+                    { text: 'Ship To Zip',  dataIndex: 'shipToZip',header: 'shiptoZip', sortable: false  }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {

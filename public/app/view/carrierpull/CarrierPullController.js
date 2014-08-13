@@ -59,9 +59,19 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     				}
     			}
     		},
-    		'': {
+    		'[xtype="grid"]': {
     			'saveRecordEvent': function(e) {
-    				console.debug(e);
+    				console.debug('BAM',e);
+    			},
+    			'beforeedit': function(editor,context,options) {
+    				console.debug(context);
+    				var record = context.record;
+    				var grid   = context.grid;
+    				if (!record.phantom) {  
+    					// disable editing of key columns
+    					grid.getPlugin('rowEditingPlugin').editor.form.findField('shipVia').disable();
+    				}
+    				
     			}
     		}
     	});
@@ -265,6 +275,9 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	console.debug(result);
     },
     
+    /**
+     * User has pressed Edit btn in the UI
+     */
     onEditClick: function() {
     	var grid = this.lookupReference('mainGrid');
     	var selections = grid.getSelectionModel().getSelection();
@@ -278,6 +291,23 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	else {
     		Ext.MessageBox.alert("WARNING", "Please select exactly one row for editing.")
     	}
+    	
+    },
+    /**
+     * User has pressed Add btn in the UI
+     */
+    onAddClick: function() {
+    	var grid = this.lookupReference('mainGrid');
+    	var ed = grid.editingPlugin;
+    	ed.cancelEdit();
+    	// Create a model instance
+        var r = Ext.create('vfw.view.carrierpull.CarrierPullModel', {
+            isNew: true
+        });
+        grid.getStore().insert(0, r);
+        ed.startEdit(0, 0);
+//		ed.startEdit(selections[0]);
+    	
     	
     }
     
