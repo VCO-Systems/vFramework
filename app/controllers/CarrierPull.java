@@ -374,6 +374,7 @@ public class CarrierPull extends Controller {
     		// - ship_via_description
     		recEntity.setCreateDateTime(new Date());
     		recEntity.setModDateTime(new Date());
+    		recEntity.setPk(new RGHICarrierPullPK("OH1", recJson.get("shipToZip").asText(), recJson.get("shipVia").asText()));
     		em.persist(recEntity);
     		System.out.println("New record saved: " + recJson);
     	}

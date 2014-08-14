@@ -93,7 +93,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     
     handleNode: function(node) {
 //		console.log(rec.getProperty() + " / " + ageFilter.getProperty());
-		console.debug(rec);
+//		console.debug(rec);
 		if (rec.getProperty()==ageFilter.getProperty()) {
 			filterExists=true;
 		}
@@ -153,7 +153,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     },
     
     received: function(data) {
-    	console.debug(data);
+//    	console.debug(data);
     },
 
     onConfirm: function (choice) {

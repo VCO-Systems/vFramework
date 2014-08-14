@@ -34,7 +34,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
 //        		grid.reconfigure(null, addModeColumns
 //        		);
         		// after grid.reconfigure(), grid loses its reference to this RowEditing plugin
-        		console.debug("plugins", grid.plugins);
+//        		console.debug("plugins", grid.plugins);
 //        		
         		// try to loop over the column objects
 //        		console.debug(context.grid.columns);
@@ -61,12 +61,12 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		// to commit change in UI, close editor, and
         		// mark changed fields dirty
         		this.fireEvent('saveRecordEvent');
-        		console.debug(editor.grid);
+//        		console.debug(editor.grid);
         		return true;
         	},
         	edit: function(editor, e) {
         		var record = e.record;
-        		console.debug(e);
+//        		console.debug(e);
         		// send the json to the server
         		Ext.Ajax.request({
         		    url: 'saveCarrierPull',
@@ -80,7 +80,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    scope:this,
         		    success: function(options, success, response) {
         		    	console.log('Successfully saved record to db.  Refreshing view.');
-        		    	console.debug(editor);
+//        		    	console.debug(editor);
         		    	editor.grid.getStore().load();
         		    },                                    
         		    failure: function(){console.log('failure');}

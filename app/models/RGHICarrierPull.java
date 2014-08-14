@@ -33,7 +33,8 @@ public class RGHICarrierPull implements Serializable {
 	@JsonUnwrapped
 	private RGHICarrierPullPK pk;
 	
-	@Column(name="SHIP_VIA_DESCR")
+//	@Column(name="SHIP_VIA_DESCR")
+	@Transient
 	private String shipViaDescr;
 	
 	@Column(name="PULL_TRLR_CODE")
