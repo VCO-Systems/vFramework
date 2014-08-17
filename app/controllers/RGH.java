@@ -351,7 +351,22 @@ public class RGH extends Controller {
     	// Example:  CartonHdr.carton_nbr
     	if (fieldDef.length == 2) {
     		System.out.println("\tApplying filter criteria : " +  fieldDef[0] + "." + fieldDef[1]);
-    		Predicate newPred = cb.like(root.get(fieldDef[1]), criteria + "%");
+    		Predicate newPred = null;
+    		if (fieldDef[1].equals("shipVia")) {
+    			System.out.println("Adding pk criteria for shipVia");
+    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
+    		}
+    		else if (fieldDef[1].equals("shipToZip")) {
+    			System.out.println("Adding pk criteria for shipToZip");
+    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
+    		}
+    		else if (fieldDef[1].equals("whse")) {
+    			System.out.println("Adding pk criteria for whse");
+    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
+    		}
+    		else {
+    			newPred = cb.like(root.get(fieldDef[1]), criteria + "%");
+    		}
     		predicateList.add(newPred);
 //    		query.and(cb.like(root.get(fieldDef[1]), criteria + "%"))
     	}

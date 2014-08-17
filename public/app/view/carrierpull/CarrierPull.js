@@ -195,7 +195,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 							},
 							items: [
 								{ fieldLabel: 'Ship to Zip',
-								  name: 'RGHICarrierPull.shiptoZip',
+								  name: 'RGHICarrierPull.shipToZip',
 								  allowBlank: true
 								},
 								{ fieldLabel: 'Ship Via',
