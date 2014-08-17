@@ -26,38 +26,38 @@ public class ShipVia implements Serializable {
 	@Column(name="SHIP_VIA_DESC")
 	private String shipViaDesc;
 	
-	@Column(name="CARR_ID")
-	private String carrId;
-	
-	@Column(name="SERV_TYPE")
-	private String servType;
-	
-	@Column(name="LABEL_TYPE")
-	private String labelType;
-	
-	@Column(name="BILL_SHIP_VIA")
-	private String billShipVia;
-	
-	@Column(name="INSUR_COVER_CODE")
-	private String insurCoverCode;
-	
-	@Column(name="SERV_LEVEL_INDIC")
-	private String servLevelIndic;
-	
-	@Column(name="ICON")
-	private String icon;
-	
-	@Column(name="TMS_CARR_CODE")
-	private String tmsCarrCode;
-	
-	@Column(name="FRT_BASED_ON_NBR_OF_CARTON")
-	private String frtBasedOnNbrOfCarton;
-	
-	@Column(name="MODE_OF_TRANSPORT")
-	private Double modeOfTransport;
-	
-	@Column(name="INSUR_TYPE")
-	private String insurType;
+//	@Column(name="CARR_ID")
+//	private String carrId;
+//	
+//	@Column(name="SERV_TYPE")
+//	private String servType;
+//	
+//	@Column(name="LABEL_TYPE")
+//	private String labelType;
+//	
+//	@Column(name="BILL_SHIP_VIA")
+//	private String billShipVia;
+//	
+//	@Column(name="INSUR_COVER_CODE")
+//	private String insurCoverCode;
+//	
+//	@Column(name="SERV_LEVEL_INDIC")
+//	private String servLevelIndic;
+//	
+//	@Column(name="ICON")
+//	private String icon;
+//	
+//	@Column(name="TMS_CARR_CODE")
+//	private String tmsCarrCode;
+//	
+//	@Column(name="FRT_BASED_ON_NBR_OF_CARTON")
+//	private String frtBasedOnNbrOfCarton;
+//	
+//	@Column(name="MODE_OF_TRANSPORT")
+//	private Double modeOfTransport;
+//	
+//	@Column(name="INSUR_TYPE")
+//	private String insurType;
 	
 	@Column(name="CREATE_DATE_TIME")
 	@Temporal(TemporalType.DATE)
@@ -86,97 +86,97 @@ public class ShipVia implements Serializable {
 		this.shipViaDesc = shipViaDesc;
 	}
 	
-	public String getCarrId() {
-		return this.carrId;
-	}
-
-	public void setCarrId(String carrId) {
-		this.carrId = carrId;
-	}
-	
-	public String getServType() {
-		return this.servType;
-	}
-
-	public void setServType(String servType) {
-		this.servType = servType;
-	}
-	
-	public String getLabelType() {
-		return this.labelType;
-	}
-
-	public void setLabelType(String labelType) {
-		this.labelType = labelType;
-	}
-	
-	public String getBillShipVia() {
-		return this.billShipVia;
-	}
-
-	public void setBillShipVia(String billShipVia) {
-		this.billShipVia = billShipVia;
-	}
-	
-	public String getInsurCoverCode() {
-		return this.insurCoverCode;
-	}
-
-	public void setInsurCoverCode(String insurCoverCode) {
-		this.insurCoverCode = insurCoverCode;
-	}
-	
-	public String getServLevelIndic() {
-		return this.servLevelIndic;
-	}
-
-	public void setServLevelIndic(String servLevelIndic) {
-		this.servLevelIndic = servLevelIndic;
-	}
-	
-	public String getIcon() {
-		return this.icon;
-	}
-
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-	
-	public String getTmsCarrCode() {
-		return this.tmsCarrCode;
-	}
-
-	public void setTmsCarrCode(String tmsCarrCode) {
-		this.tmsCarrCode = tmsCarrCode;
-	}
-	
-	public String getFrtBasedOnNbrOfCarton() {
-		return this.frtBasedOnNbrOfCarton;
-	}
-
-	public void setFrtBasedOnNbrOfCarton(String frtBasedOnNbrOfCarton) {
-		this.frtBasedOnNbrOfCarton = frtBasedOnNbrOfCarton;
-	}
-	
-	public Double getModeOfTransport() {
-		return this.modeOfTransport;
-	}
-
-	public void setModeOfTransport(Double modeOfTransport) {
-		this.modeOfTransport = modeOfTransport;
-	}
-	
-	public String getInsurType() {
-		return this.insurType;
-	}
-
-	public void setInsurType(String insurType) {
-		this.insurType = insurType;
-	}
-	
-	public Date getCreateDateTime() {
-		return this.createDateTime;
-	}
+//	public String getCarrId() {
+//		return this.carrId;
+//	}
+//
+//	public void setCarrId(String carrId) {
+//		this.carrId = carrId;
+//	}
+//	
+//	public String getServType() {
+//		return this.servType;
+//	}
+//
+//	public void setServType(String servType) {
+//		this.servType = servType;
+//	}
+//	
+//	public String getLabelType() {
+//		return this.labelType;
+//	}
+//
+//	public void setLabelType(String labelType) {
+//		this.labelType = labelType;
+//	}
+//	
+//	public String getBillShipVia() {
+//		return this.billShipVia;
+//	}
+//
+//	public void setBillShipVia(String billShipVia) {
+//		this.billShipVia = billShipVia;
+//	}
+//	
+//	public String getInsurCoverCode() {
+//		return this.insurCoverCode;
+//	}
+//
+//	public void setInsurCoverCode(String insurCoverCode) {
+//		this.insurCoverCode = insurCoverCode;
+//	}
+//	
+//	public String getServLevelIndic() {
+//		return this.servLevelIndic;
+//	}
+//
+//	public void setServLevelIndic(String servLevelIndic) {
+//		this.servLevelIndic = servLevelIndic;
+//	}
+//	
+//	public String getIcon() {
+//		return this.icon;
+//	}
+//
+//	public void setIcon(String icon) {
+//		this.icon = icon;
+//	}
+//	
+//	public String getTmsCarrCode() {
+//		return this.tmsCarrCode;
+//	}
+//
+//	public void setTmsCarrCode(String tmsCarrCode) {
+//		this.tmsCarrCode = tmsCarrCode;
+//	}
+//	
+//	public String getFrtBasedOnNbrOfCarton() {
+//		return this.frtBasedOnNbrOfCarton;
+//	}
+//
+//	public void setFrtBasedOnNbrOfCarton(String frtBasedOnNbrOfCarton) {
+//		this.frtBasedOnNbrOfCarton = frtBasedOnNbrOfCarton;
+//	}
+//	
+//	public Double getModeOfTransport() {
+//		return this.modeOfTransport;
+//	}
+//
+//	public void setModeOfTransport(Double modeOfTransport) {
+//		this.modeOfTransport = modeOfTransport;
+//	}
+//	
+//	public String getInsurType() {
+//		return this.insurType;
+//	}
+//
+//	public void setInsurType(String insurType) {
+//		this.insurType = insurType;
+//	}
+//	
+//	public Date getCreateDateTime() {
+//		return this.createDateTime;
+//	}
 
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
