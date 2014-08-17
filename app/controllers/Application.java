@@ -53,6 +53,8 @@ public class Application extends Controller {
     	//List<CartonHdr> op = CartonHdr.getAll();
     	//return ok(index.render("Your new application is ready."));
     	
+    	//Get SessionID from URL and check for WHSE and USER_ID
+    	
 		return ok(index.render("RGH v0.1"));
 		
     }

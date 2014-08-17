@@ -9,6 +9,7 @@
         <class>models.ItemMaster</class>
         <class>models.OutbdLoad</class>
         <class>models.RGHICarrierPull</class>
+        <class>models.ShipVia</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
         </properties>

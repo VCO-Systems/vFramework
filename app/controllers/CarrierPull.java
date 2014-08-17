@@ -34,6 +34,9 @@ import javax.persistence.criteria.Root;
 
 
 
+
+
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +55,7 @@ import models.ItemMaster;
 import models.OutbdLoad;
 import models.RGHICarrierPull;
 import models.RGHICarrierPullPK;
+import models.ShipVia;
 import play.*;
 import play.mvc.*;
 import views.html.*;
@@ -247,15 +251,16 @@ public class CarrierPull extends Controller {
      * Handle requests from UI
      ****************************/
     
+    @Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result getShipVias() {
+    public static Result getShipVias() throws JsonParseException, JsonMappingException, IOException {
     	ObjectNode retval = play.libs.Json.newObject();
     	
     	// Get the json data from the UI
-    	JsonNode json = request().body().asJson();
-    	if (json==null) {
+    	//JsonNode json = request().body().asJson();
+    	//if (json==null) {
 //    		System.out.println("ERROR: expecting json data");
-    	}
+    	//}
     	
     	// Get the list of carton_nbrs the user selected
 //    	List<JsonNode> records = json.findValues("records");
@@ -263,13 +268,28 @@ public class CarrierPull extends Controller {
     	// For now, this list is hard-coded so UI development
     	// can continue.
     	// TODO: replace this with proper DB query
-    	List<JsonNode> lst = new ArrayList();
-    	lst.add(play.libs.Json.parse("{\"id\":\"E07\",\"text\":\"E07\"}"));
-    	lst.add(play.libs.Json.parse("{\"id\":\"E08\",\"text\":\"E08\"}"));
-    	lst.add(play.libs.Json.parse("{\"id\":\"E09\",\"text\":\"E09\"}"));
-    	lst.add(play.libs.Json.parse("{\"id\":\"E10\",\"text\":\"E10\"}"));
+//    	List<JsonNode> lst = new ArrayList();
+//    	lst.add(play.libs.Json.parse("{\"id\":\"E07\",\"text\":\"E07T\"}"));
+//    	lst.add(play.libs.Json.parse("{\"id\":\"E08\",\"text\":\"E08T\"}"));
+//    	lst.add(play.libs.Json.parse("{\"id\":\"E09\",\"text\":\"E09T\"}"));
+//    	lst.add(play.libs.Json.parse("{\"id\":\"E10\",\"text\":\"E10T\"}"));
+//    	
+//    	return ok(play.libs.Json.toJson(lst));
     	
-    	return ok(play.libs.Json.toJson(lst));
+    	//Create the Query
+    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+    	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
+    	Root<ShipVia> r = cq.from(ShipVia.class);
+    	cq.select(r);
+    	cq.orderBy(cb.asc(r.get("shipVia")));
+    	
+    	//Run the Query
+    	TypedQuery<ShipVia> query = JPA.em().createQuery(cq);
+    	List<ShipVia> shipViaList = query.getResultList();
+    	
+    	//retval.put("data", play.libs.Json.toJson(shipViaList));
+    	return ok(play.libs.Json.toJson(shipViaList));
+    	
     }
     
     @Transactional

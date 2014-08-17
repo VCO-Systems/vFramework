@@ -14,7 +14,7 @@ Ext.define('vfw.Application', {
         // TODO - Launch the application
 //    	 console.log('launch');
     },
-    stores: ['CarrierPullStore']
+    stores: ['CarrierPullStore', 'ShipViaStore']
 //    models: ['CartonInquiry'],
 //    controllers: ['Root'],
 });

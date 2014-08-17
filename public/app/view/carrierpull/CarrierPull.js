@@ -203,36 +203,39 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 								  xtype: 'combobox',
 								  queryMode: 'local', 
 								  allowBlank: true,
-//								  forceSelection: true,
+								  forceSelection: false,
 								  triggerAction: 'all',
 								  maxWidth: 100,
-								  listeners: {
-										// VC: this is a valid way to listen to field udpates,
-										// however we're doing it in the controller
-										change: function(self, newValue, oldValue, eOpts) {
-											console.log(newValue);
-											if(!self.getValue() || self.getValue().length==0) {
-												console.log('attempting to clear combobox');
-												self.reset();
-											}
-										},
-										
-								  },
-								  store: {
-								        autoLoad: true, 
-								        fields: ['id','text'], 
-								        proxy: { 
-								            type: 'ajax', 
-								            url: 'getShipVias' 
-								        } ,
-								        
-								        listeners: {
-											load: function(self,records,successfull,opts) {
-												self.insert(0,{})
-											}
-										}  
-								  
-								  }
+								  displayField : 'shipVia',
+								  valueField : 'shipVia',
+								  store : 'ShipViaStore'
+//								  listeners: {
+//										// VC: this is a valid way to listen to field udpates,
+//										// however we're doing it in the controller
+//										change: function(self, newValue, oldValue, eOpts) {
+//											console.log(newValue);
+//											if(!self.getValue() || self.getValue().length==0) {
+//												console.log('attempting to clear combobox');
+//												self.reset();
+//											}
+//										},
+//										
+//								  },
+//								  store: {
+//								        autoLoad: true, 
+//								        fields: ['id','text'], 
+//								        proxy: { 
+//								            type: 'ajax', 
+//								            url: 'getShipVias' 
+//								        }, 
+//								        
+//								        listeners: {
+//											load: function(self,records,successfull,opts) {
+//												self.insert(0,{})
+//											}
+//										}  
+//								  
+//								  }
 								},
 								
 								{ fieldLabel: 'Pull Trailer Code',

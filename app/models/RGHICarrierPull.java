@@ -111,7 +111,7 @@ public class RGHICarrierPull implements Serializable {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		SimpleDateFormat df = new SimpleDateFormat("h:m a");
+		//SimpleDateFormat df = new SimpleDateFormat("h:m a");
 //		Date dt = df.format(this.pullTime);
 		
 		
