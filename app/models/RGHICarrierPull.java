@@ -57,7 +57,7 @@ public class RGHICarrierPull implements Serializable {
 	private String anyText1;
 
 	@Column(name="ANYNBR1")
-	private String anyNbr1;
+	private Long anyNbr1;
 
 	@Temporal(TemporalType.DATE)
 	@Column(name="CREATE_DATE_TIME")
@@ -142,24 +142,24 @@ public class RGHICarrierPull implements Serializable {
 		this.anyText1 = anyText1;
 	}
 
-	public String getAnyNbr1() {
-		return anyNbr1;
+	public Long getAnyNbr1() {
+		return this.anyNbr1;
 	}
 
-	public void setAnyNbr1(String anyNbr1) {
+	public void setAnyNbr1(Long anyNbr1) {
 		this.anyNbr1 = anyNbr1;
 	}
 
-	public Date getCreateDateTime() {
-		return createDateTime;
+	public String getCreateDateTime() {
+		return createDateTime.toString();
 	}
 
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
 	}
 
-	public Date getModDateTime() {
-		return modDateTime;
+	public String getModDateTime() {
+		return modDateTime.toString();
 	}
 
 	public void setModDateTime(Date modDateTime) {

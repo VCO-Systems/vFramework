@@ -300,16 +300,16 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 																											  displayField : 'shipVia',
 																											  valueField : 'shipVia',
 																											  store : 'ShipViaStore'} },
-                    { text: 'Ship Via Description',  dataIndex: 'shipViaDesc', header: 'Ship Via Description', sortable: false, width: 300 },
+                    { text: 'Ship Via Description',  dataIndex: 'shipViaDesc', header: 'Ship Via Description', sortable: false, width: 200 },
                     { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code',editor: {allowBlank: true}, sortable: false  },
                     { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', editor: {allowBlank: true}, sortable: false },
                     { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM', editor: {allowBlank: true}, sortable: false },
                     { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: false,editor: {allowBlank: false}  },
                     { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: false, editor: {allowBlank: true}  },
                     { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: false, editor: {allowBlank: true}  },
-                    { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: false, editor: {allowBlank: true}  },
-                    { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: false, editor: {allowBlank: true}  },
-                    { text: 'User Id',  dataIndex: 'userId',header: 'User Id', sortable: false, editor: {allowBlank: true}  }
+                    { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: false, width: 100  },
+                    { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: false, width: 100  },
+                    { text: 'User Id',  dataIndex: 'userId',header: 'User Id', sortable: false  }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {

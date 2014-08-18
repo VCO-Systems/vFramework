@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +22,8 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+
 
 
 
@@ -222,9 +226,9 @@ public class CarrierPull extends Controller {
     
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result getShipVias() throws JsonParseException, JsonMappingException, IOException {
+    public static Result getShipVias() throws Exception {
     	//ObjectNode retval = play.libs.Json.newObject();
-    	
+		
     	//Create the Query
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
@@ -321,14 +325,15 @@ public class CarrierPull extends Controller {
     
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result saveCarrierPull() throws JsonParseException, JsonMappingException, IOException {
-//    	System.out.println("in saveCarrierPull()");
+    //public static Result saveCarrierPull() throws JsonParseException, JsonMappingException, IOException {
+    public static Result saveCarrierPull() throws Exception {
+    	System.out.println("in saveCarrierPull()");
     	EntityManager em = JPA.em();
     	Boolean success = false;
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get the incoming record as JSON and Entity
     	JsonNode recJson = request().body().asJson();
-    	RGHICarrierPull recEntity = play.libs.Json.fromJson(recJson, RGHICarrierPull.class);
+    	//RGHICarrierPull recEntity = play.libs.Json.fromJson(recJson, RGHICarrierPull.class);
     	
     	String isNew="";
     	if (recJson.get("isNew")!=null) {
@@ -337,61 +342,124 @@ public class CarrierPull extends Controller {
     	
     	
     	// See if we're editing a new record or editing an existing one
-    	if (isNew.equals("true")) {  // We're inserting a new record
-    		// We are inserting a new record
-    		// TODO: programatically set values that don't come from the UI
-    		// - ship_via_description
-    		recEntity.setCreateDateTime(new Date());
-    		recEntity.setModDateTime(new Date());
-    		//recEntity.setPk(new RGHICarrierPullPK("OH1", recJson.get("shipToZip").asText(), recJson.get("shipVia").asText()));
-    		recEntity.setWhse("OH1");
-    		recEntity.setShipToZip(recJson.get("shipToZip").asText());
-    		
-    		//Get the ShipVia Object
-    		//Create the Query
-        	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
-        	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
-        	Root<ShipVia> r = cq.from(ShipVia.class);
-        	cq.select(r);
-        	cq.where(cb.equal(r.get("shipVia"), recJson.get("shipVia").asText()));
-        	
-        	//Run the Query
-        	TypedQuery<ShipVia> query = JPA.em().createQuery(cq);
-        	ShipVia shipViaObj = query.getSingleResult();
-        	
-        	recEntity.setShipVia(shipViaObj);
-    		
-    		
-    		em.persist(recEntity);
-    		System.out.println("New record saved: " + recJson);
+    	if (isNew.equals("true")) {
+    		try {
+	    		// We are inserting a new record
+	    		RGHICarrierPull recEntity = new RGHICarrierPull();
+	    		
+	    		// Set Default fields
+	    		recEntity.setCreateDateTime(new Date());
+	    		recEntity.setModDateTime(new Date());
+	    		
+	    		// Set the Primary Key Values
+	    		recEntity.setWhse("OH1");
+	    		recEntity.setShipToZip(recJson.get("shipToZip").asText());
+	    		
+	    		//Get the ShipVia Object
+	    		//Create the Query
+	        	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+	        	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
+	        	Root<ShipVia> r = cq.from(ShipVia.class);
+	        	cq.select(r);
+	        	cq.where(cb.equal(r.get("shipVia"), recJson.get("shipVia").asText()));
+	        	
+	        	//Run the Query
+	        	TypedQuery<ShipVia> query = JPA.em().createQuery(cq);
+	        	ShipVia shipViaObj = query.getSingleResult();
+	        	
+	        	recEntity.setShipVia(shipViaObj);
+	        	
+	        	//Set the Optional Values
+	        	if (recJson.get("pullTrlrCode")!=null) {
+	        		recEntity.setPullTrlrCode(recJson.get("pullTrlrCode").asText());
+	        	}
+	        	if (recJson.get("pullTime")!=null) {
+	        		recEntity.setPullTime(recJson.get("pullTime").asText());
+	        	}
+	        	if (recJson.get("pullTimeAMPM")!=null) {
+	        		recEntity.setPullTimeAMPM(recJson.get("pullTimeAMPM").asText());
+	        	}
+	        	if (recJson.get("anyText1")!=null) {
+	        		recEntity.setAnyText1(recJson.get("anyText1").asText());
+	        	}
+	        	if (recJson.get("anyNbr1")!=null) {
+	        		recEntity.setAnyNbr1(recJson.get("anyNbr1").asLong());
+	        	}
+	    		    		
+	    		em.persist(recEntity);
+	    		em.flush();
+	    		success = true;
+	    		System.out.println("New record saved: " + recJson);
+    		}
+    		catch (Exception e) {
+    			System.out.println("VCO Add Exception : " + e.toString());
+    			success = false;
+    			retval.put("success", "false");
+        		retval.put("message", e.toString());
+        		return ok(retval);
+    		}
     	}
     	else { // We're editing an existing record.
-    		// Look up the existing record
-    		String q = "Select c FROM RGHICarrierPull c WHERE c.pk.shipVia=:via AND c.pk.shipToZip=:zip AND c.pk.whse=:whse";
-    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q,RGHICarrierPull.class);
-    		
-    		query.setParameter("zip", recJson.get("shipToZip").asText());
-    		query.setParameter("via", recJson.get("shipVia").asText());
-    		query.setParameter("whse", "OH1");
-    		RGHICarrierPull result = (RGHICarrierPull)query.getSingleResult();
-    		if (result != null) {  // we found the record to update in db
-    			result.setModDateTime(new Date());
-    			result.setPullTime(recEntity.getPullTime());
-    			result.setPullTimeAMPM(recEntity.getPullTimeAMPM());
-    			result.setPullTrlrCode(recEntity.getPullTrlrCode());
-    			// update the record in db
-    			JPA.em().persist(result);
+    		try {
+	    		// Look up the existing record
+	    		String q = "Select c FROM RGHICarrierPull c WHERE c.shipVia.shipVia = :via AND c.shipToZip = :zip AND c.whse = :whse";
+	    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q, RGHICarrierPull.class);
+	    		
+	    		query.setParameter("zip", recJson.get("shipToZip").asText());
+	    		query.setParameter("via", recJson.get("shipVia").asText());
+	    		query.setParameter("whse", "OH1");
+	    		RGHICarrierPull rghiCarrierPull = (RGHICarrierPull)query.getSingleResult();
+	    		
+	    		if (rghiCarrierPull != null) {  // we found the record to update in db
+	    			// Set Default fields
+	    			rghiCarrierPull.setModDateTime(new Date());
+	    			
+	    			
+	    			//Set the Optional Values
+	            	if (recJson.get("pullTrlrCode")!=null) {
+	            		rghiCarrierPull.setPullTrlrCode(recJson.get("pullTrlrCode").asText());
+	            	}
+	            	if (recJson.get("pullTime")!=null) {
+	            		rghiCarrierPull.setPullTime(recJson.get("pullTime").asText());
+	            	}
+	            	if (recJson.get("pullTimeAMPM")!=null) {
+	            		rghiCarrierPull.setPullTimeAMPM(recJson.get("pullTimeAMPM").asText());
+	            	}
+	            	if (recJson.get("anyText1")!=null) {
+	            		rghiCarrierPull.setAnyText1(recJson.get("anyText1").asText());
+	            	}
+	            	if (recJson.get("anyNbr1")!=null) {
+	            		rghiCarrierPull.setAnyNbr1(recJson.get("anyNbr1").asLong());
+	            	}
+	    			
+	    			// update the record in db
+	    			JPA.em().persist(rghiCarrierPull);
+	    			em.flush();
+	    			success = true;
+	    			System.out.println("Record updated.");
+	    		}
+	    		else {
+	    			System.out.println("Record Lookup failed.");
+	    			success = false;
+	    			retval.put("success", "false");
+	        		retval.put("message", "Record Lookup failed for Whse = " + "OH1" + ", ShipVia = " + recJson.get("shipVia").asText() + ", shipToZip = " + recJson.get("shipToZip").asText());
+	        		return ok(retval);
+	    		}
     		}
-    		System.out.println("Record updated.");
+    		catch (Exception e) {
+    			System.out.println("VCO Edit Exception : " + e.toString());
+    			success = false;
+    			retval.put("success", "false");
+        		retval.put("message", e.toString());
+        		return ok(retval);
+    		}    		
     	}
+    	
     	// Here's an example of converting the incoming JSON to an in-memory object,
     	// and saving that object as a record in the db
-//    	RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
-//    	JPA.em().persist(rec);
-    	
-    	
-    	
-    	success=true;
+    	//RGHICarrierPull rec = play.libs.Json.fromJson(jsonToSave, RGHICarrierPull.class);
+    	//JPA.em().persist(rec);
+    
     	if (success) {
     		retval.put("success", "true");
     		retval.put("message", "Record was saved.");
