@@ -151,7 +151,10 @@ public class RGHICarrierPull implements Serializable {
 	}
 
 	public String getCreateDateTime() {
-		return createDateTime.toString();
+		if (this.createDateTime != null)
+			return createDateTime.toString();
+		else
+			return "";
 	}
 
 	public void setCreateDateTime(Date createDateTime) {
@@ -159,7 +162,10 @@ public class RGHICarrierPull implements Serializable {
 	}
 
 	public String getModDateTime() {
-		return modDateTime.toString();
+		if (this.modDateTime != null)
+			return modDateTime.toString();
+		else
+			return "";
 	}
 
 	public void setModDateTime(Date modDateTime) {
