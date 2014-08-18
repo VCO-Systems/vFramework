@@ -46,6 +46,19 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
 //        		console.debug(editor.grid);
         		return true;
         	},
+        	canceledit: function ( editor, context, eOpts ) {
+        		console.log('canceledit()');
+        		editor.grid.getStore().each(function(record)
+        		{
+        			if (record.phantom)
+        			{
+        				editor.grid.getStore().remove(record);
+        				return false;
+        				
+        			}
+        		}, this);
+        		
+        	},        	
         	edit: function(editor, e) {
         		var record = e.record;
 //        		console.debug(e);
@@ -63,9 +76,19 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    success: function(options, success, response) {
         		    	console.log('Successfully saved record to db.  Refreshing view.');
 //        		    	console.debug(editor);
+        		    	var resp = Ext.util.JSON.decode(options.responseText);
+        		    	if (resp.success=="false") {
+        		    		var errorMsg = resp.message;
+        		    		errorMsg=errorMsg.replace(/\n/g,"<br/>");  // Replace newlines with HTML line break
+        		    		Ext.MessageBox.alert('ERROR (addedit failed)', errorMsg);
+        		    	}
+        		    	Ext.MessageBox.alert('ERROR (addedit failed)', errorMsg);
         		    	editor.grid.getStore().load();
         		    },                                    
-        		    failure: function(){console.log('failure');}
+        		    failure: function(){
+        		    	console.log('failure');
+        		    	
+        		    	}
         		});
         		
         	}
