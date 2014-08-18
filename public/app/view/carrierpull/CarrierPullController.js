@@ -212,12 +212,15 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     onDeleteCarrierPullResult: function(data) {
     	var resp = Ext.util.JSON.decode(data.responseText); 
     	if(resp.success=="true"){
-    		Ext.MessageBox.alert('SUCCESS', 'Record(s) deleted.');
+    		var errorMsg = resp.message;
+    		errorMsg=errorMsg.replace(/\n/g,"<br/>");  // Replace newlines with HTML line break
+    		Ext.MessageBox.alert('SUCCESS', errorMsg);
+    		
     		// Remove any selected records from the store
     		// so they are removed from UI
     		var store = this.lookupReference('mainGrid').getStore();
-    		var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
-    		store.remove(selectedRecords);
+    		//var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    		//store.remove(selectedRecords);
     		store.load();
     		this.lookupReference('mainGrid').getView().refresh();
     	}
@@ -225,6 +228,14 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		var errorMsg = resp.message;
     		errorMsg=errorMsg.replace(/\n/g,"<br/>");  // Replace newlines with HTML line break
     		Ext.MessageBox.alert('ERROR (deletion failed)', errorMsg);
+    		
+    		// Remove any selected records from the store
+    		// so they are removed from UI
+    		var store = this.lookupReference('mainGrid').getStore();
+    		//var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    		//store.remove(selectedRecords);
+    		store.load();
+    		this.lookupReference('mainGrid').getView().refresh();
     	}
     },
 
@@ -267,7 +278,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    		    			// records were deleted from server,
     	    		    			// so remove them from UI as well
     	    		    			var store = this.lookupReference('mainGrid').getStore();
-    	    		    			store.removeAll();
+    	    		    			store.load();
+    	    		        		this.lookupReference('mainGrid').getView().refresh();
     	    		    		}
     	    		    	}
     	    		    },

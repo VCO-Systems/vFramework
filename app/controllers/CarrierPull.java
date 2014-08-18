@@ -137,6 +137,7 @@ public class CarrierPull extends Controller {
     	Predicate[] predicates = new Predicate[predicateList.size()];
         predicates=predicateList.toArray(predicates);
         cq.where(predicates);
+        cq.orderBy(cb.asc(hdr.get("shipVia").get("shipVia")), cb.asc(hdr.get("shipToZip")));
     	
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(cq);
     	records.setFirstResult((page-1)*limit);
@@ -247,52 +248,65 @@ public class CarrierPull extends Controller {
     
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result deleteCarrierPull() throws JsonParseException, JsonMappingException, IOException {
-//    	System.out.println("getCarrierPull()");
+    //public static Result deleteCarrierPull() throws JsonParseException, JsonMappingException, IOException {
+    public static Result deleteCarrierPull() throws Exception {
+    	System.out.println("deleteCarrierPull()");
+    	Boolean success=false;
+    	Long nbr_of_recs_deleted = 0L;
+    	String shipVia = "";
+    	String shipToZip = "";
+    	String whse = "";
+    	EntityManager em = JPA.em();
     	ObjectNode retval = play.libs.Json.newObject();
-    	// Get UI params from POST JSON body	
-    	JsonNode json = request().body().asJson();
     	
-    	// Get the records to delete from the JSON
-    	List<JsonNode> results = json.findValues("records");  // records to be deleted
-    	ArrayNode recsToDelete = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
-    	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
-    	recsToDelete = (ArrayNode)results.get(0);
-    	Boolean success=true;
-    	// Loop over the records to delete
-    	for (JsonNode rec : recsToDelete) {
-    		// TODO:  Delete each record
-    		// Note:  the UI assumes that either:
-    		//     - all records are deleted, and success = true
-    		//     - if any records failed to delete, the whole transaction
-    		//       was rolled back and success=false was sent back to UI
-    		//       and the error message was sent back in the json in
-    		//       message: "Could not delete record because..."
-//    		System.out.println("about to delete record: " + rec.get("shipVia"));
-    		String q = "Select c FROM RGHICarrierPull c WHERE c.pk.shipVia=:via AND c.pk.shipToZip=:zip AND c.pk.whse=:whse";
-    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q,RGHICarrierPull.class);
-    		
-    		query.setParameter("zip", rec.get("shipToZip").asText());
-    		query.setParameter("via", rec.get("shipVia").asText());
-    		query.setParameter("whse", "OH1");
-    		RGHICarrierPull result = (RGHICarrierPull)query.getSingleResult();
-//    		RGHICarrierPull entityToDel = play.libs.Json.fromJson(rec, RGHICarrierPull.class);
-    		JPA.em().remove(result);
-    		
-    		
-    		success=true;	
-    		// If any delete failed, roll back 
-    		if (success.equals(false)) {
-    			retval.put("success", "false");
-    			retval.put("message", "Error msg from failed SQL delete goes here...\nLine 2\nLine 3");
-    		}
-    		else {
-    			retval.put("success", "true");
-    		}
+    	try {
+	    	// Get UI params from POST JSON body	
+	    	JsonNode json = request().body().asJson();
+	    	
+	    	// Get the records to delete from the JSON
+	    	List<JsonNode> results = json.findValues("records");  // records to be deleted
+	    	ArrayNode recsToDelete = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
+	    	//Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
+	    	recsToDelete = (ArrayNode)results.get(0);
+	  
+	    	// Loop over the records to delete
+	    	for (JsonNode rec : recsToDelete) {
+	    		// TODO:  Delete each record
+	    		// Note:  the UI assumes that either:
+	    		//     - all records are deleted, and success = true
+	    		//     - if any records failed to delete, the whole transaction
+	    		//       was rolled back and success=false was sent back to UI
+	    		//       and the error message was sent back in the json in
+	    		//       message: "Could not delete record because..."
+	    		//System.out.println("about to delete record: " + rec.get("shipVia"));
+	    		String q = "Select c FROM RGHICarrierPull c WHERE c.shipVia.shipVia = :via AND c.shipToZip = :zip AND c.whse = :whse";
+	    		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q, RGHICarrierPull.class);
+	    		
+	    		whse = rec.get("whse").asText();
+	    		shipToZip = rec.get("shipToZip").asText();
+	    		shipVia = rec.get("shipVia").asText();
+	    		
+	    		query.setParameter("zip", shipToZip);
+	    		query.setParameter("via", shipVia);
+	    		query.setParameter("whse", whse);
+	    		RGHICarrierPull result = (RGHICarrierPull)query.getSingleResult();
+	    		//RGHICarrierPull entityToDel = play.libs.Json.fromJson(rec, RGHICarrierPull.class);
+	    		em.remove(result);
+	    		em.flush();
+	    		nbr_of_recs_deleted += 1;
+	    		
+	    	}
+    	}
+    	catch (Exception e) {
+    		success = false;
+			retval.put("success", "false");
+    		retval.put("message", nbr_of_recs_deleted.toString() + " Records Deleted.\n Delete failed for Whse = " + "OH1" + ", ShipVia = " + shipVia + ", shipToZip = " + shipToZip + "\nException : " + e.toString());
+    		return ok(retval);
     	}
     	
-    	
-    	
+		success=true;	
+		retval.put("success", "true");
+		retval.put("message", nbr_of_recs_deleted.toString() + " Records Deleted");
     	return ok(retval);
     }
     
@@ -300,26 +314,35 @@ public class CarrierPull extends Controller {
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result deleteAllCarrierPullForWarehouse() throws JsonParseException, JsonMappingException, IOException {
-//    	System.out.println("getCarrierPull()");
+    	System.out.println("deleteAllCarrierPullForWarehouse()");
+    	EntityManager em = JPA.em();
     	Boolean success = false;
+    	int nbr_of_recs_deleted = 0;
     	ObjectNode retval = play.libs.Json.newObject();
     	// Get UI params from POST JSON body	
     	JsonNode json = request().body().asJson();
 //    	int limit = json.get("pageSize").asInt();
     	
-    	// TODO:  Write query for deleting all carrier pulls
-    	// todo:  set "success" variable depending on whether
-    	//        query succeeds or not
-    	success=true;
-    	if (success) {
-    		retval.put("success", "true");
-    		retval.put("message", "All records for this warehouse were deleted.");
+    	try {
+    	
+    	String q = "Delete FROM RGHICarrierPull c WHERE c.whse = :whse";
+		TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q, RGHICarrierPull.class);
+		
+		query.setParameter("whse", "OH1"); //hardcoded for now
+		nbr_of_recs_deleted = query.executeUpdate();
+
+		em.flush();
     	}
-    	else {
+    	catch (Exception e) {
+    		success=false;	
     		retval.put("success", "false");
-    		retval.put("message", "(Describe the error that happened here...)");
+    		retval.put("message", "Exception deleting records for Whse.\n Exception : " + e.toString());
+    		return ok(retval);
     	}
     	
+		success=true;	
+		retval.put("success", "true");
+		retval.put("message", nbr_of_recs_deleted + " Records Deleted for Whse");
     	return ok(retval);
     }
     
