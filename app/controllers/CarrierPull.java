@@ -78,7 +78,6 @@ public class CarrierPull extends Controller {
      * Server-side actions.
      */
     
-    @SuppressWarnings("unchecked")
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getCarrierPull() throws JsonParseException, JsonMappingException, IOException {
@@ -91,35 +90,26 @@ public class CarrierPull extends Controller {
     	
     	// Set up basic query on CartonHdr
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
-    	CriteriaQuery cq = cb.createQuery();
+    	CriteriaQuery<RGHICarrierPull> cq = cb.createQuery(RGHICarrierPull.class);
     	List<Predicate> predicateList = new ArrayList<Predicate>();
     	Root<RGHICarrierPull> hdr = cq.from(RGHICarrierPull.class);
-    	Predicate whereClause = cb.equal(cb.literal(1), 1);
     	cq.select(hdr);
-    	cq.where(whereClause);
-//    	cq.select(hdr);
-    	
-    	// Join CartonDtl
-//    	Join dtl = hdr.join("cartonDtls");
+    	//Predicate whereClause = cb.equal(cb.literal(1), 1);
+    	//cq.where(whereClause);
     	
     	/**
     	 * Examples of filter criteria
     	 */
-    	
-    	// CartonHdr.carton_nbr
-//    	cq.where(cb.equal(hdr.get("carton_nbr"), "00000999990001369860"));
-    	
-    	// CartonDtls.units_pakd (via OneToMany)
-    	
+
     	// Apply any search criteria (filters) from the UI
     	List<JsonNode> results = json.findValues("filters");  // Json node called filters
     	Iterator<JsonNode> it = results.iterator();  // Get ready to iterate them
-    	ArrayNode filterCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode
+    	ArrayNode filterCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode TODO : VA : cant we just initialize this to NULL? why create a new object?
     	while (it.hasNext()) {
     		// VC: For some reason, ExtJs is serializing this JSON array 
     		// as a string, so instead of getting multiple values here we
     		// get one string.  So we must take this first element, cast
-    		// it again from string to ArrayNode using Jackson, to get the actual elements.
+    		// it again from string to ArrayNode using Json, to get the actual elements.
     		JsonNode node = it.next();
     		String node_string = node.asText();
     		filterCriteriaEntries = (ArrayNode)play.libs.Json.parse(node_string);
@@ -135,7 +125,7 @@ public class CarrierPull extends Controller {
     		// (searching for nulls may come later)
     		if (!val.equals("")){ 
     			// Add this to the where clause
-    			CarrierPull.evalSearchCriteria(predicateList, hdr, prop,val);
+    			CarrierPull.evalSearchCriteria(predicateList, hdr, prop, val);
     		}
     	}
     	
@@ -144,49 +134,33 @@ public class CarrierPull extends Controller {
         predicates=predicateList.toArray(predicates);
         cq.where(predicates);
     	
-    	// Get record count
-//    	Query count_query = JPA.em().createQuery(cq);//.createQuer  (cq);//.createQuery(cq);
-//    	
-//    	.select(cb.count(hdr));
-//    	cq.where(whereClause);
-//    	TypedQuery<Long> q = JPA.em().createQuery(cq);
-//    	Long total_rows = q.getSingleResult();
-    	
-    	// Return the records
-//    	cq.select(hdr);
-//    	cq.where(whereClause);
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(cq);
     	records.setFirstResult((page-1)*limit);
     	records.setMaxResults(limit);
 
     	// Execute query
     	List<RGHICarrierPull> lst = records.getResultList();
+//    	for (int i=0; i < lst.size(); i++) {
+//    		System.out.println("whse = " + lst.get(i).getWhse() + ", shipToZip = " + lst.get(i).getShiptoZip() + ", shipVia = " + lst.get(i).getShipVia().getShipVia());
+//    	}
     	retval.put("data", play.libs.Json.toJson(lst));
     	
     	// Get the record count
-    	cq.select(cb.count(hdr));  // add the count
-    	cq.where(predicates);      // add the filter criteria
-    	TypedQuery<Long> q = JPA.em().createQuery(cq);  // create a new query object
+    	CriteriaQuery<Long> cq_recCount = cb.createQuery(Long.class);
+    	Root<RGHICarrierPull> r = cq_recCount.from(RGHICarrierPull.class);
+    	cq_recCount.select(cb.count(r));  // add the count
+    	cq_recCount.where(predicates);      // add the filter criteria
+    	
+    	TypedQuery<Long> q = JPA.em().createQuery(cq_recCount);  // create a new query object
     	Long total_rows = q.getSingleResult(); // get the count
     	retval.put("totalrows",total_rows);  // add total to the json
-    	
-//    	TypedQuery<Long> q = JPA.em().createQuery(cq);
-//    	Long total_rows = q.getSingleResult();
     	
     	return ok(retval);
     }
     
-    public static Boolean evalSearchCriteria(List<Predicate> predicateList, Root root, String prop, String val) {
+    public static Boolean evalSearchCriteria(List<Predicate> predicateList, Root<RGHICarrierPull> root, String prop, String val) {
     	Boolean success=true;
-    	String baseClassName="RGHICarrierPull";  // The default model to search on is CartonDtl
-    	String fieldName,fieldType="";
-    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
-//		try {
-//			Class cl = Class.forName("models.CartonDtl");
-//		} catch (ClassNotFoundException e2) {
-//			// TODO Auto-generated catch block
-//			e2.printStackTrace();
-//		}
+    	String fieldName = "";
     	
     	System.out.println("Processing search criteria: " + prop + " = " + val);
     	
@@ -207,6 +181,7 @@ public class CarrierPull extends Controller {
     	// If there's dot notation, camel-case the first character
     	if (fieldNameParts.length <=1) {
     		System.out.println("ERROR: invalid search field definition from UI: " + prop + "   .  Must contain at least TableName.FieldName in field definition.");
+    		//TODO : VA : Need to throw an Exception here
     	}
     	else if (fieldNameParts.length >= 2) {
     		// TODO: The recursive approach, not finished yet
@@ -214,13 +189,7 @@ public class CarrierPull extends Controller {
     		
     		// TODO: The manual approach to parsing fieldNameParts, based on length of array
     		
-    		
-    		// Verify that this property exists on this entity
-//    		cb.like(arg0, arg1) 
-    		
-    		StringBuilder tmpFieldName = new StringBuilder(fieldName);
     		String v = Character.toString(fieldName.charAt(0)).toLowerCase() + fieldName.substring(1);
-    				//Character.toLowerCase(fieldName.indexOf(0)) + fieldName.substring(1);
     		fieldName=v;
     	}
     	
@@ -254,27 +223,7 @@ public class CarrierPull extends Controller {
     @Transactional
     @BodyParser.Of(BodyParser.Json.class)
     public static Result getShipVias() throws JsonParseException, JsonMappingException, IOException {
-    	ObjectNode retval = play.libs.Json.newObject();
-    	
-    	// Get the json data from the UI
-    	//JsonNode json = request().body().asJson();
-    	//if (json==null) {
-//    		System.out.println("ERROR: expecting json data");
-    	//}
-    	
-    	// Get the list of carton_nbrs the user selected
-//    	List<JsonNode> records = json.findValues("records");
-    	
-    	// For now, this list is hard-coded so UI development
-    	// can continue.
-    	// TODO: replace this with proper DB query
-//    	List<JsonNode> lst = new ArrayList();
-//    	lst.add(play.libs.Json.parse("{\"id\":\"E07\",\"text\":\"E07T\"}"));
-//    	lst.add(play.libs.Json.parse("{\"id\":\"E08\",\"text\":\"E08T\"}"));
-//    	lst.add(play.libs.Json.parse("{\"id\":\"E09\",\"text\":\"E09T\"}"));
-//    	lst.add(play.libs.Json.parse("{\"id\":\"E10\",\"text\":\"E10T\"}"));
-//    	
-//    	return ok(play.libs.Json.toJson(lst));
+    	//ObjectNode retval = play.libs.Json.newObject();
     	
     	//Create the Query
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
@@ -394,7 +343,25 @@ public class CarrierPull extends Controller {
     		// - ship_via_description
     		recEntity.setCreateDateTime(new Date());
     		recEntity.setModDateTime(new Date());
-    		recEntity.setPk(new RGHICarrierPullPK("OH1", recJson.get("shipToZip").asText(), recJson.get("shipVia").asText()));
+    		//recEntity.setPk(new RGHICarrierPullPK("OH1", recJson.get("shipToZip").asText(), recJson.get("shipVia").asText()));
+    		recEntity.setWhse("OH1");
+    		recEntity.setShipToZip(recJson.get("shipToZip").asText());
+    		
+    		//Get the ShipVia Object
+    		//Create the Query
+        	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+        	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
+        	Root<ShipVia> r = cq.from(ShipVia.class);
+        	cq.select(r);
+        	cq.where(cb.equal(r.get("shipVia"), recJson.get("shipVia").asText()));
+        	
+        	//Run the Query
+        	TypedQuery<ShipVia> query = JPA.em().createQuery(cq);
+        	ShipVia shipViaObj = query.getSingleResult();
+        	
+        	recEntity.setShipVia(shipViaObj);
+    		
+    		
     		em.persist(recEntity);
     		System.out.println("New record saved: " + recJson);
     	}

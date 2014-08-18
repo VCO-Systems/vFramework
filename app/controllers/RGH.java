@@ -35,6 +35,7 @@ import models.CartonInquiry;
 import models.FilterCriteria;
 import models.ItemMaster;
 import models.OutbdLoad;
+import models.RGHICarrierPull;
 import play.*;
 import play.mvc.*;
 import views.html.*;
@@ -345,7 +346,7 @@ public class RGH extends Controller {
     	return success;
     }
     
-    public static String[] applyQueryPart(String[] fieldDef, List<Predicate> predicateList, Root root, String criteria) {
+    public static String[] applyQueryPart(String[] fieldDef, List<Predicate> predicateList, Root<RGHICarrierPull> root, String criteria) {
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	// If we're down to Table.Field, apply it to the query
     	// Example:  CartonHdr.carton_nbr
@@ -353,22 +354,13 @@ public class RGH extends Controller {
     		System.out.println("\tApplying filter criteria : " +  fieldDef[0] + "." + fieldDef[1]);
     		Predicate newPred = null;
     		if (fieldDef[1].equals("shipVia")) {
-    			System.out.println("Adding pk criteria for shipVia");
-    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
-    		}
-    		else if (fieldDef[1].equals("shipToZip")) {
-    			System.out.println("Adding pk criteria for shipToZip");
-    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
-    		}
-    		else if (fieldDef[1].equals("whse")) {
-    			System.out.println("Adding pk criteria for whse");
-    			newPred = cb.like(root.get("pk").get(fieldDef[1]), criteria + "%");
+    			System.out.println("Adding criteria for shipVia");
+    			newPred = cb.like(root.get(fieldDef[1]).get(fieldDef[1]).as(String.class), criteria + "%");
     		}
     		else {
-    			newPred = cb.like(root.get(fieldDef[1]), criteria + "%");
+    			newPred = cb.like(root.get(fieldDef[1]).as(String.class), criteria + "%");
     		}
     		predicateList.add(newPred);
-//    		query.and(cb.like(root.get(fieldDef[1]), criteria + "%"))
     	}
     	// Otherwise, continue to traverse
     	else {

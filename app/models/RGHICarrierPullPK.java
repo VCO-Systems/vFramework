@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-@Embeddable
 public class RGHICarrierPullPK implements Serializable {
  
 	private static final long serialVersionUID = 284728781L;
@@ -21,9 +20,9 @@ public class RGHICarrierPullPK implements Serializable {
     public RGHICarrierPullPK() {
     }
     
-    public RGHICarrierPullPK(String whse, String shiptoZip, String shipVia) {
+    public RGHICarrierPullPK(String whse, String shipToZip, String shipVia) {
     	this.setWhse(whse);
-    	this.setShipToZip(shiptoZip);
+    	this.setShipToZip(shipToZip);
     	this.setShipVia(shipVia);
     }
  
@@ -70,7 +69,6 @@ public class RGHICarrierPullPK implements Serializable {
     }
  
     public boolean equals(Object obj) {
-        if (obj == this) return true;
         if (!(obj instanceof RGHICarrierPullPK)) return false;
         RGHICarrierPullPK pk = (RGHICarrierPullPK) obj;
         return pk.whse.equals(this.whse) && pk.shipToZip.equals(this.shipToZip) && pk.shipVia.equals(this.shipVia);

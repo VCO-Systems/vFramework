@@ -9,7 +9,21 @@ Ext.define('vfw.view.carrierpull.CarrierPullModel', {
     data: {
         name: 'Hello World'
     },
-    fields: ['whse','shipToZip','shipVia', 'shipViaDescr','pullTrlrCode','pullTime', 'pullTimeAMPM','isNew']
+    
+    fields: ['whse',
+             'shipToZip', 
+             'shipVia', 
+             'shipViaDesc', 
+             'pullTrlrCode',
+             'pullTime', 
+             'pullTimeAMPM', 
+             'anyText1', 
+             'anyNbr1', 
+             'createDateTime', 
+             'modDateTime', 
+             'userId', 
+             'isNew'
+            ]
 
     //TODO - add data, formulas and/or methods to support your view
 });
