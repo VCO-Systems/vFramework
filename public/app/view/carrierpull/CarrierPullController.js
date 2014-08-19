@@ -20,6 +20,9 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     }],
     
     init: function() {
+    	// get session id from cookie
+//    	console.debug(Ext.util.Cookies.get("PLAY_SESSION"));
+    	// Set up event listeners
     	this.control({
     		'tabpanel[cls=mainTabPanel]': {
     			tabchange: function(tabPanel,newTab,oldTab,eOpts) {
@@ -256,6 +259,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
      * User has pressed "Delete all records..."
      */
     onDeleteAllRecords: function() {
+    	var this_ctrl=this;
     	Ext.Msg.show({
     	    title: 'WARNING',
     	    message: 'If you press OK, all records for the current warehouse will be deleted.  This action cannot be undone.',
@@ -267,19 +271,17 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    		Ext.Ajax.request({
     	    		    url: 'deleteAllCarrierPull',
     	    		    success: function(result) {
-//    	    		    	console.debug(result);
     	    		    	var resp = Ext.util.JSON.decode(result.responseText); 
     	    		    	var status = (resp.success=='true') ? "SUCCEEDED" : "FAILED";
     	    		    	var message = resp.message;
-    	    		    	console.log(message);
     	    		    	if (message) {
     	    		    		Ext.MessageBox.alert(status, message);
     	    		    		if (resp.success=='true') {
     	    		    			// records were deleted from server,
     	    		    			// so remove them from UI as well
-    	    		    			var store = this.lookupReference('mainGrid').getStore();
+    	    		    			var store = this_ctrl.lookupReference('mainGrid').getStore();
     	    		    			store.load();
-    	    		        		this.lookupReference('mainGrid').getView().refresh();
+    	    		    			this_ctrl.lookupReference('mainGrid').getView().refresh();
     	    		    		}
     	    		    	}
     	    		    },
