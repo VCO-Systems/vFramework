@@ -228,9 +228,16 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		// Remove any selected records from the store
     		// so they are removed from UI
     		var store = this.lookupReference('mainGrid').getStore();
-    		//var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
-    		//store.remove(selectedRecords);
-    		store.load();
+    		var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
+    		store.remove(selectedRecords);
+    		var recordsLeftThisPage = store.getCount();
+    		if (recordsLeftThisPage==0) {
+    			var currentPage = store.currentPage;
+    			if (currentPage>1) {
+    				store.currentPage=store.currentPage-1;
+    				store.load();
+    			}
+    		}
     		this.lookupReference('mainGrid').getView().refresh();
     	}
     	else if (resp.success=="false") {

@@ -345,7 +345,8 @@ public class CarrierPull extends Controller {
 		success=true;	
 		retval.put("success", "true");
 		retval.put("message", nbr_of_recs_deleted.toString() + " Records Deleted");
-    	return ok(retval);
+    	retval.put("total_records", nbr_of_recs_deleted);
+		return ok(retval);
     }
     
     
