@@ -287,6 +287,8 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 store: 'CarrierPullStore',
                 bufferedRenderer: false,
                 sortableColumns: false,
+                enableColumnHide: false,
+                enableColumnMove: false,
                 tbar: [{
                     text: 'Delete',
                     handler: 'onDeleteCarrierPull'
