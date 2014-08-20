@@ -1,4 +1,25 @@
 /**
+ * The view model for carrier pull.
+ */
+Ext.define('CarrierPullViewModel', {
+    extend: 'Ext.app.ViewModel',
+
+    alias: 'viewmodel.CarrierPullViewModel', // connects to viewModel/type below
+
+    data: {
+        whse: 'test',
+        userId: ''
+    },
+
+    formulas: {
+        // We'll explain formulas in more detail soon.
+        name: function (get) {
+            var fn = get('firstName'), ln = get('lastName');
+            return (fn && ln) ? (fn + ' ' + ln) : (fn || ln || '');
+        }
+    }
+});
+/**
  * This class is the main view for the application. It is specified in app.js as the
  * "autoCreateViewport" property. That setting automatically applies the "viewport"
  * plugin to promote that instance of this class to the body element.
@@ -107,7 +128,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                ],
     controller: 'carrierpullctrl',
     viewModel: {
-        type: 'main'
+        type: 'CarrierPullViewModel'
     },
 
     layout: {
@@ -151,7 +172,9 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
         xtype: 'tabpanel',
         reference: 'mainTabs',
         cls: 'mainTabPanel',
-        title: '<h4>Carrier Pull Table</h4>',
+        bind: {
+        	title: '<h4>Carrier Pull Table ({whse})</h4>'
+        },
         items:[{
             title: 'Criteria',
             html: '',
@@ -343,16 +366,16 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     displayInfo: true,
                     displayMsg: 'Displaying items {0} - {1} of {2}',
                     emptyMsg: "No items to display",
-                    items:[
-                        '-', {
-                        text: 'Show Preview',
-                        //pressed: pluginExpanded,
-                        enableToggle: true,
-                        toggleHandler: function(btn, pressed) {
-                            var preview = Ext.getCmp('gv').getPlugin('preview');
-                            preview.toggleExpanded(pressed);
-                        }
-                    }]
+//                    items:[
+//                        '-', {
+//                        text: 'Show Preview',
+//                        //pressed: pluginExpanded,
+//                        enableToggle: true,
+//                        toggleHandler: function(btn, pressed) {
+//                            var preview = Ext.getCmp('gv').getPlugin('preview');
+//                            preview.toggleExpanded(pressed);
+//                        }
+//                    }]
                 }
                 
             }

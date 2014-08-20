@@ -41,6 +41,10 @@ import javax.persistence.criteria.Root;
 
 
 
+
+
+import org.w3c.dom.Document;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,6 +64,7 @@ import models.OutbdLoad;
 import models.RGHICarrierPull;
 import models.RGHICarrierPullPK;
 import models.ShipVia;
+import models.WebSession;
 import play.*;
 import play.mvc.*;
 import views.html.*;
@@ -70,9 +75,38 @@ import play.db.jpa.*;
 
 public class CarrierPull extends Controller {
 	
-	// @Transactional
+	@Transactional
     public static Result index() {
-    	
+    	/**
+   	  * When app first loads, get sessionid from url param,
+   	  * use it to look up session info (warehouse, userid)
+   	  * and store those in cookies.
+   	  */
+		 // Get session ID from request url
+	   	String sid = request().getQueryString("sessionid");
+	   	// Look up session in web_session table
+	   	TypedQuery<WebSession> query =
+	   	    JPA.em().createNamedQuery("WebSession.findById", WebSession.class);
+	   	query.setParameter("sessId", Long.parseLong(sid));
+	   	List<WebSession> results = query.getResultList();
+	   	
+	   	// If that session exists
+	   	if (results.size() == 1) {
+	   		WebSession sess = results.get(0);
+	   		session("user_id", sess.getLoginUserId());
+	   		
+	   		// Get the SESSION_XML
+	   		Document xml = play.libs.XML.fromString(sess.getSessionXml());
+	   		// Get whse and userid from xml
+	   		String whse = xml.getElementsByTagName("warehouse").item(0).getTextContent();
+	//   		session("whse",whse);
+	   		response().setCookie("warehouse", whse);
+	   		System.out.println("XML: "  + xml.getElementsByTagName("warehouse").item(0).getAttributes().getNamedItem("id"));
+	   	}
+	   	else {
+	   		System.out.println("Session not found.");
+	   	}
+	   	// Add session id to session cookie
 		return ok(index.render("RGH v0.1"));
 		
     }
@@ -92,17 +126,23 @@ public class CarrierPull extends Controller {
     	int limit = json.get("pageSize").asInt();
     	int page = json.get("page").asInt();
     	
+    	List<Predicate> predicateList = new ArrayList<Predicate>();
+    	
     	// Set up basic query on CartonHdr
     	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
     	CriteriaQuery<RGHICarrierPull> cq = cb.createQuery(RGHICarrierPull.class);
-    	List<Predicate> predicateList = new ArrayList<Predicate>();
-    	Root<RGHICarrierPull> hdr = cq.from(RGHICarrierPull.class);
-    	cq.select(hdr);
-    	//Predicate whereClause = cb.equal(cb.literal(1), 1);
-    	//cq.where(whereClause);
+    	Root<RGHICarrierPull> from = cq.from(RGHICarrierPull.class);
+    	CriteriaQuery<RGHICarrierPull> select = cq.select(from);
+    	
+    	
+    	// Prepare the predicate to limit to current warehouse, but don't apply to query yet
+    	String whse = request().cookie("warehouse").value();
+    	Predicate whse_pred = cb.equal(from.get("whse"), whse);
+    	predicateList.add(whse_pred);
     	
     	/**
-    	 * Examples of filter criteria
+    	 * Get any filter criteria from UI, construct
+    	 * predicates from them, but don't apply to query yet
     	 */
 
     	// Apply any search criteria (filters) from the UI
@@ -129,36 +169,34 @@ public class CarrierPull extends Controller {
     		// (searching for nulls may come later)
     		if (!val.equals("")){ 
     			// Add this to the where clause
-    			CarrierPull.evalSearchCriteria(predicateList, hdr, prop, val);
+    			CarrierPull.evalSearchCriteria(predicateList, from, prop, val);
     		}
     	}
     	
-    	// Add the predicates from the UI filters
+    	// Prepare the predicates to be added to the query
     	Predicate[] predicates = new Predicate[predicateList.size()];
         predicates=predicateList.toArray(predicates);
-        cq.where(predicates);
-        cq.orderBy(cb.asc(hdr.get("shipVia").get("shipVia")), cb.asc(hdr.get("shipToZip")));
     	
-    	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(cq);
+        /**
+         * Get the total count of records for this query.
+         */
+    	CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+    	countQuery.select(cb.count(from));  // add the count
+    	JPA.em().createQuery(countQuery);
+    	countQuery.where(predicates);
+    	Long total_rows = JPA.em().createQuery(countQuery).getSingleResult();
+    	retval.put("totalrows",total_rows);  // add total to the json
+    	
+    	/**
+    	 * Get the actual page of data.
+    	 */
+    	select.where(predicates);
+    	select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
+    	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(select);
     	records.setFirstResult((page-1)*limit);
     	records.setMaxResults(limit);
-
-    	// Execute query
     	List<RGHICarrierPull> lst = records.getResultList();
-//    	for (int i=0; i < lst.size(); i++) {
-//    		System.out.println("whse = " + lst.get(i).getWhse() + ", shipToZip = " + lst.get(i).getShiptoZip() + ", shipVia = " + lst.get(i).getShipVia().getShipVia());
-//    	}
     	retval.put("data", play.libs.Json.toJson(lst));
-    	
-    	// Get the record count
-    	CriteriaQuery<Long> cq_recCount = cb.createQuery(Long.class);
-    	Root<RGHICarrierPull> r = cq_recCount.from(RGHICarrierPull.class);
-    	cq_recCount.select(cb.count(r));  // add the count
-    	cq_recCount.where(predicates);      // add the filter criteria
-    	
-    	TypedQuery<Long> q = JPA.em().createQuery(cq_recCount);  // create a new query object
-    	Long total_rows = q.getSingleResult(); // get the count
-    	retval.put("totalrows",total_rows);  // add total to the json
     	
     	return ok(retval);
     }
@@ -330,7 +368,7 @@ public class CarrierPull extends Controller {
 		
 		query.setParameter("whse", "OH1"); //hardcoded for now
 		nbr_of_recs_deleted = query.executeUpdate();
-
+		
 		em.flush();
     	}
     	catch (Exception e) {

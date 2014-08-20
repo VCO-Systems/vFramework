@@ -3,8 +3,8 @@
 # ~~~~
 
 # Home page
-GET      /                          controllers.Application.index()
-GET      /carrierPullMaint          controllers.Application.index()
+GET      /                          controllers.CarrierPull.index()
+GET      /carrierPullMaint          controllers.CarrierPull.index()
 
 # RGH functions
 POST    /getCartons                 controllers.RGH.getCartons()

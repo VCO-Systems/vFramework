@@ -10,8 +10,14 @@
         <class>models.OutbdLoad</class>
         <class>models.RGHICarrierPull</class>
         <class>models.ShipVia</class>
+        <class>models.WebSession</class>
         <properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+            <!-- 
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/> 
+            <property name="hibernate.dialect" value="org.eclipse.persistence.platform.database.SQLServerPlatform"/>
+            -->
+            
+            <!--  <property name="eclipselink.logging.level" value="FINE"/> -->
         </properties>
     </persistence-unit>   
 </persistence>

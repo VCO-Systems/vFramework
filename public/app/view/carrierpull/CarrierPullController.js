@@ -20,8 +20,11 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     }],
     
     init: function() {
-    	// get session id from cookie
-//    	console.debug(Ext.util.Cookies.get("PLAY_SESSION"));
+    	// get warehouse name from cookie
+    	var s = Ext.util.Cookies.get("warehouse");
+    	// Store the warehouse in view model
+    	this.getViewModel().data.whse=s;
+    	
     	// Set up event listeners
     	this.control({
     		'tabpanel[cls=mainTabPanel]': {

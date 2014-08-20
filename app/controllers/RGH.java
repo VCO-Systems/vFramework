@@ -46,11 +46,9 @@ import play.db.jpa.*;
 
 public class RGH extends Controller {
 	
-	// @Transactional
+//	 @Transactional
     public static Result index() {
-    	//List<CartonHdr> op = CartonHdr.getAll();
-    	//return ok(index.render("Your new application is ready."));
-		
+    	 
 		return ok(index.render("RGH v0.1"));
 		
     }
