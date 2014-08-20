@@ -34,7 +34,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
 //    					this.onList();
     				}
     				
-    			}
+    			} 
     		},
     		'[xtype="form"] field': {
     			// On field change, call the onFieldChange function
@@ -330,7 +330,19 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	ed.cancelEdit();
     	// Create a model instance
         var r = Ext.create('vfw.view.carrierpull.CarrierPullModel', {
-            isNew: true
+            isNew: true,
+            whse: "",
+            shipToZip: "",
+            shipVia: "",
+            shipViaDesc: "",
+            pullTrlrCode: "",
+            pullTime: "",
+            pullTimeAMPM: "",
+            anyText1: "",
+            anyNbr1: "",
+            createDateTime: '',
+            modDateTime: "",
+            userId: ""
         });
         grid.getStore().insert(0, r);
         ed.startEdit(0, 0);
