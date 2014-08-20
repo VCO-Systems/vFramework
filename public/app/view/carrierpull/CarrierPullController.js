@@ -122,6 +122,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     			// Todo: remove filter that has been nullified
 //    			console.log('removing filter: ' + field.name);
     			store.removeFilter(filterToRemove);
+    			store.currentPage=1;
     		}
     		else {
     			// Update the filter (is this right, or does this make a dup?)
@@ -130,6 +131,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
+    			store.currentPage=1;
 //    			console.log('modifying existing filter: ' + field.name)
     		}
     	}
@@ -141,6 +143,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
+    			store.currentPage=1;
     			console.log('Adding filter for field: ' + field.name)
     		}
     	}
