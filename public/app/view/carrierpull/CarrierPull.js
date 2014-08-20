@@ -37,18 +37,14 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
 //        		grid.reconfigure(null, addModeColumns
 //        		);
         		// after grid.reconfigure(), grid loses its reference to this RowEditing plugin
-//        		console.debug("plugins", grid.plugins);
 //        		
         		// try to loop over the column objects
-//        		console.debug(context.grid.columns);
 //        		for (var idx = 0; idx < context.grid.getColumnModel().length; idx++ ) {
 //        			var column = context.grid.getColumnModel()[idx];
-//        			console.debug(column);
 ////        			column.editable=false;
 //        			column.setEditable(idx,false);
 //        		}
         		
-//        		console.debug(context.store.getAt(context.rowIdx).get('shipVia')); 
 //        		if (!context.record.phantom && context.column.dataIndex == 'shipVia') {
 //                    return false;
 //                }
@@ -64,7 +60,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		// to commit change in UI, close editor, and
         		// mark changed fields dirty
         		this.fireEvent('saveRecordEvent');
-//        		console.debug(editor.grid);
         		return true;
         	},
         	canceledit: function ( editor, context, eOpts ) {
@@ -82,7 +77,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         	},        	
         	edit: function(editor, e) {
         		var record = e.record;
-//        		console.debug(e);
         		// send the json to the server
         		Ext.Ajax.request({
         		    url: 'saveCarrierPull',
@@ -96,7 +90,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    scope:this,
         		    success: function(options, success, response) {
         		    	console.log('Successfully saved record to db.  Refreshing view.');
-//        		    	console.debug(editor);
         		    	var resp = Ext.util.JSON.decode(options.responseText);
         		    	if (resp.success=="false") {
         		    		var errorMsg = resp.message;
@@ -197,7 +190,6 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 							listeners: {
 								specialkey: function(field,e) {
 									if (e.getKey() == e.ENTER) {
-//										console.debug(field);
 									}
 								}
 							},
@@ -217,7 +209,6 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 									// VC: this is a valid way to listen to field udpates,
 									// however we're doing it in the controller
 //									change: function(field, newVal, oldVal) {
-//										console.debug(field);
 //									}
 								}
 							},

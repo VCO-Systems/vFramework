@@ -67,10 +67,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		},
     		'[xtype="grid"]': {
     			'saveRecordEvent': function(e) {
-//    				console.debug('BAM',e);
     			},
     			'beforeedit': function(editor,context,options) {
-//    				console.debug(context);
     				var record = context.record;
     				var grid   = context.grid;
     				if (!record.phantom) {  
@@ -91,8 +89,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     
     
     handleNode: function(node) {
-//		console.log(rec.getProperty() + " / " + ageFilter.getProperty());
-//		console.debug(rec);
 		if (rec.getProperty()==ageFilter.getProperty()) {
 			filterExists=true;
 		}
@@ -150,8 +146,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     },
     
     handleNode: function(node) {
-//		console.log(rec.getProperty() + " / " + ageFilter.getProperty());
-//		console.debug(rec);
 		if (rec.getProperty()==ageFilter.getProperty()) {
 			filterExists=true;
 		}
@@ -172,9 +166,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	
     	var st = this.lookupReference('mainGrid').getStore();
     	
-//    	console.debug('loading store: ' , st);
     	st.load({callback: function(records,options,success) {
-//    		console.debug(records,options);
     	}});
     	this.lookupReference('mainTabs').setActiveTab(1);  // Switch to the 'List' tab to display data
     },
@@ -307,7 +299,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     },
     
     onDeleteAllRecordsResult: function(result) {
-//    	console.debug(result);
     },
     
     /**
@@ -318,9 +309,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	var selections = grid.getSelectionModel().getSelection();
     	if (selections.length == 1) {
 //    		var editManager = this.getPlugin('rowEditor');
-//        	console.debug(editManager);
         	var ed = grid.editingPlugin;
-//        	console.debug(ed)
     		ed.startEdit(selections[0]);
     	}
     	else {
