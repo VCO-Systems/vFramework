@@ -351,6 +351,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
                     xtype: 'pagingtoolbar',
+                    reference: 'pager',
 //                    store: Ext.data.StoreManager.lookup('carrierPullStore'),
                 	store: 'CarrierPullStore',
                     pageSize: 25,

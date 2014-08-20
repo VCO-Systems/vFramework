@@ -222,15 +222,23 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		var store = this.lookupReference('mainGrid').getStore();
     		var selectedRecords = this.lookupReference('mainGrid').getSelectionModel().getSelection();
     		store.remove(selectedRecords);
+    		
     		var recordsLeftThisPage = store.getCount();
     		if (recordsLeftThisPage==0) {
     			var currentPage = store.currentPage;
     			if (currentPage>1) {
     				store.currentPage=store.currentPage-1;
-    				store.load();
+//    				store.load();
     			}
     		}
-    		this.lookupReference('mainGrid').getView().refresh();
+    		store.load();
+//    		this.lookupReference('mainGrid').getView().refresh();
+//    		var pager = this.lookupReference('pager');
+//    		if (pager) {
+////    			pager.unbind(store);
+////    		    pager.bind(store);
+//    			store.setCount(store.getCount()-selectedRecords.length);
+//    		}
     	}
     	else if (resp.success=="false") {
     		var errorMsg = resp.message;
