@@ -31,7 +31,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     			tabchange: function(tabPanel,newTab,oldTab,eOpts) {
     				// When focus changes to the 'List tab, update the grid's data
     				if (newTab.title=="Data"){
-    					this.onList();
+//    					this.onList();
     				}
     				
     			}
