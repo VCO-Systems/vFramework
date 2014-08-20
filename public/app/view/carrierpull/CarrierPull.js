@@ -103,7 +103,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    		errorMsg=errorMsg.replace(/\n/g,"<br/>");  // Replace newlines with HTML line break
         		    		Ext.MessageBox.alert('ERROR (addedit failed)', errorMsg);
         		    	}
-        		    	Ext.MessageBox.alert('ERROR (addedit failed)', errorMsg);
+//        		    	Ext.MessageBox.alert('ERROR (addedit failed)', errorMsg);
         		    	editor.grid.getStore().load();
         		    },                                    
         		    failure: function(){

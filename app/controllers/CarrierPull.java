@@ -93,7 +93,7 @@ public class CarrierPull extends Controller {
 	   	// If that session exists
 	   	if (results.size() == 1) {
 	   		WebSession sess = results.get(0);
-	   		session("user_id", sess.getLoginUserId());
+	   		response().setCookie("user_id", sess.getLoginUserId());
 	   		
 	   		// Get the SESSION_XML
 	   		Document xml = play.libs.XML.fromString(sess.getSessionXml());
@@ -411,9 +411,10 @@ public class CarrierPull extends Controller {
 	    		// Set Default fields
 	    		recEntity.setCreateDateTime(new Date());
 	    		recEntity.setModDateTime(new Date());
+	    		recEntity.setUserId(request().cookie("user_id").value());
 	    		
 	    		// Set the Primary Key Values
-	    		recEntity.setWhse("OH1");
+	    		recEntity.setWhse(request().cookie("warehouse").value());
 	    		recEntity.setShipToZip(recJson.get("shipToZip").asText());
 	    		
 	    		//Get the ShipVia Object
@@ -443,7 +444,7 @@ public class CarrierPull extends Controller {
 	        	if (recJson.get("anyText1")!=null) {
 	        		recEntity.setAnyText1(recJson.get("anyText1").asText());
 	        	}
-	        	if (recJson.get("anyNbr1")!=null) {
+	        	if (recJson.get("anyNbr1")!=null && recJson.get("anyNbr1").asText()!="") {
 	        		recEntity.setAnyNbr1(recJson.get("anyNbr1").asLong());
 	        	}
 	    		    		
@@ -468,12 +469,13 @@ public class CarrierPull extends Controller {
 	    		
 	    		query.setParameter("zip", recJson.get("shipToZip").asText());
 	    		query.setParameter("via", recJson.get("shipVia").asText());
-	    		query.setParameter("whse", "OH1");
+	    		query.setParameter("whse", request().cookie("warehouse").value());
 	    		RGHICarrierPull rghiCarrierPull = (RGHICarrierPull)query.getSingleResult();
 	    		
 	    		if (rghiCarrierPull != null) {  // we found the record to update in db
 	    			// Set Default fields
 	    			rghiCarrierPull.setModDateTime(new Date());
+	    			rghiCarrierPull.setUserId(request().cookie("user_id").value());
 	    			
 	    			
 	    			//Set the Optional Values
@@ -489,7 +491,7 @@ public class CarrierPull extends Controller {
 	            	if (recJson.get("anyText1")!=null) {
 	            		rghiCarrierPull.setAnyText1(recJson.get("anyText1").asText());
 	            	}
-	            	if (recJson.get("anyNbr1")!=null) {
+	            	if (recJson.get("anyNbr1")!=null && recJson.get("anyNbr1").asText()!="") {
 	            		rghiCarrierPull.setAnyNbr1(recJson.get("anyNbr1").asLong());
 	            	}
 	    			
