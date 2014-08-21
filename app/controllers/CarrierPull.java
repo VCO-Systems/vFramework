@@ -43,6 +43,9 @@ import javax.persistence.criteria.Root;
 
 
 
+
+
+import org.apache.http.cookie.Cookie;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -82,8 +85,18 @@ public class CarrierPull extends Controller {
    	  * use it to look up session info (warehouse, userid)
    	  * and store those in cookies.
    	  */
+		// Clear cookies from previous session
+//		response().discardCookie("user_id");
+//		response().discardCookie("warehouse");
+//		response().setCookie("warehouse","");
+//		request().
+//		session().clear();
+		
+		
+		
 		 // Get session ID from request url
 	   	String sid = request().getQueryString("sessionid");
+	   	System.out.println("Looking up sessionid: " + sid);
 	   	// Look up session in web_session table
 	   	TypedQuery<WebSession> query =
 	   	    JPA.em().createNamedQuery("WebSession.findById", WebSession.class);
@@ -93,14 +106,29 @@ public class CarrierPull extends Controller {
 	   	// If that session exists
 	   	if (results.size() == 1) {
 	   		WebSession sess = results.get(0);
-	   		response().setCookie("user_id", sess.getLoginUserId());
+//	   		response().setCookie("user_id","");
+	   		
+	   		Iterator<play.mvc.Http.Cookie> cooks = response().cookies().iterator();
+			while(cooks.hasNext()) {
+				play.mvc.Http.Cookie c = cooks.next();
+				System.out.println("Cookie before setting: " + c.name() + " / " + c.value());
+				if (c.name().equals("user_id")) {
+//					c.value()="jf";
+				}
+			}
+			
+	   		System.out.println("setting user_id to: " + sess.getLoginUserId());
+	   		response().setCookie("user_id", sess.getLoginUserId(),null);
 	   		
 	   		// Get the SESSION_XML
 	   		Document xml = play.libs.XML.fromString(sess.getSessionXml());
 	   		// Get whse and userid from xml
 	   		String whse = xml.getElementsByTagName("warehouse").item(0).getTextContent();
 	//   		session("whse",whse);
-	   		response().setCookie("warehouse", whse);
+//	   		response().discardCookie("warehouse");
+	   		System.out.println("setting cookies: " + whse + " / " + sess.getLoginUserId());
+	   		response().setCookie("warehouse", whse,null);
+	   		
 	   		System.out.println("XML: "  + xml.getElementsByTagName("warehouse").item(0).getAttributes().getNamedItem("id"));
 	   	}
 	   	else {

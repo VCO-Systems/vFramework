@@ -36,7 +36,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     			// Pressing ENTER on any criteria field triggers search
     			specialkey: function(field,e) {
     				if (e.getKey() == e.ENTER) {
-    					console.log("ENTER");
+//    					console.log("ENTER");
     					this.onList();
     				}
     			}
@@ -65,7 +65,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	if (filterExists) {
     		if (!newVal) {  // an existing filter has been set to null/empty
     			// Todo: remove filter that has been nullified
-    			console.log('removing filter: ' + field.name);
+//    			console.log('removing filter: ' + field.name);
     			store.removeFilter(filterToRemove);
     		}
     		else {
@@ -75,7 +75,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
-    			console.log('modifying existing filter: ' + field.name)
+//    			console.log('modifying existing filter: ' + field.name)
     		}
     	}
     	else {  // filter does not exist on store
@@ -86,7 +86,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
-    			console.log('Adding filter for field: ' + field.name)
+//    			console.log('Adding filter for field: ' + field.name)
     		}
     	}
     },
@@ -144,7 +144,7 @@ Ext.define('vfw.view.carton.CartonInquiryController', {
     		    writer: "json",
     		    scope:this,
     		    success: this.received,                                    
-    		    failure: function(){console.log('failure');}
+    		    failure: function(){}
     		});
     	}
     	else {

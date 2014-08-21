@@ -39,7 +39,7 @@ Ext.define('vfw.view.main.MainController', {
     	else {
     		Ext.Msg.alert('Information', 'Please enter search criteria');
     	}
-    	console.log(barcode,desc);
+//    	console.log(barcode,desc);
     	// Ext.Msg.confirm('Confirm', 'Are you sure?', 'onConfirm', this);
     	
     	// Tell the grid to load its data

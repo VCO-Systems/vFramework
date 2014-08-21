@@ -7,7 +7,7 @@ Ext.define('CarrierPullViewModel', {
     alias: 'viewmodel.CarrierPullViewModel', // connects to viewModel/type below
 
     data: {
-        whse: 'test',
+        whse: '',
         userId: ''
     },
 
@@ -52,7 +52,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		
         	},
         	validateedit: function ( editor, context, eOpts ) {
-        		console.log('validateedit()');
+//        		console.log('validateedit()');
         		
         		// To revert changes to row: editor.cancelEdit();
         		
@@ -63,7 +63,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		return true;
         	},
         	canceledit: function ( editor, context, eOpts ) {
-        		console.log('canceledit()');
+//        		console.log('canceledit()');
         		editor.grid.getStore().each(function(record)
         		{
         			if (record.phantom)
@@ -89,7 +89,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    writer: "json",
         		    scope:this,
         		    success: function(options, success, response) {
-        		    	console.log('Successfully saved record to db.  Refreshing view.');
+//        		    	console.log('Successfully saved record to db.  Refreshing view.');
         		    	var resp = Ext.util.JSON.decode(options.responseText);
         		    	if (resp.success=="false") {
         		    		var errorMsg = resp.message;
@@ -100,7 +100,7 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    	editor.grid.getStore().load();
         		    },                                    
         		    failure: function(){
-        		    	console.log('failure');
+//        		    	console.log('failure');
         		    	
         		    	}
         		});
@@ -157,7 +157,12 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 				            {text : 'Delete all records...'}
 				        ]
 			    	}
-		        } // menu
+		        }, // menu
+		        {
+		        	xtype: 'button',
+		            text: 'Switch Warehouse',
+		            handler: 'onUpdateWarehouse',
+		        }
           ] } // buttongroup
         ] // tbar
     },{

@@ -20,6 +20,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     }],
     
     init: function() {
+    	// Clear any cached warehouse id
+    	this.getViewModel().data.whse='';
     	// get warehouse name from cookie
     	var s = Ext.util.Cookies.get("warehouse");
     	// Store the warehouse in view model
@@ -44,7 +46,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     			// Pressing ENTER on any criteria field triggers search
     			specialkey: function(field,e) {
     				if (e.getKey() == e.ENTER) {
-    					console.log("ENTER");
+//    					console.log("ENTER");
     					this.onList();
     				}
     			}
@@ -140,7 +142,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    	});
     			store.addFilter(newFilter);
     			store.currentPage=1;
-    			console.log('Adding filter for field: ' + field.name)
+//    			console.log('Adding filter for field: ' + field.name)
     		}
     	}
     },
@@ -151,6 +153,12 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
 		}
 	
     	
+    },
+    
+    onUpdateWarehouse: function() {
+    	Ext.util.Cookies.clear("warehouse");
+    	Ext.util.Cookies.clear("user_id");
+    	window.location.reload();
     },
     
     onList: function () {
@@ -202,7 +210,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		    writer: "json",
     		    scope:this,
     		    success: this.onDeleteCarrierPullResult,                                    
-    		    failure: function(){console.log('failure');}
+    		    failure: function(){}
     		});
     	}
     	else {
