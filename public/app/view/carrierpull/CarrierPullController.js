@@ -155,12 +155,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	
     },
     
-    onUpdateWarehouse: function() {
-    	Ext.util.Cookies.clear("warehouse");
-    	Ext.util.Cookies.clear("user_id");
-    	window.location.reload();
-    },
-    
     onList: function () {
 //    	var barcode=this.lookupReference('fldBarcode').getValue();
 //    	var desc   =this.lookupReference('fldStyle').getValue();
@@ -329,7 +323,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     		ed.startEdit(selections[0]);
     	}
     	else {
-    		Ext.MessageBox.alert("WARNING", "Please select exactly one row for editing.")
+    		Ext.MessageBox.alert("ERROR", "Please select exactly one row for editing.")
     	}
     	
     },

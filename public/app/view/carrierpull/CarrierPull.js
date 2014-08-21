@@ -157,12 +157,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 				            {text : 'Delete all records...'}
 				        ]
 			    	}
-		        }, // menu
-		        {
-		        	xtype: 'button',
-		            text: 'Switch Warehouse',
-		            handler: 'onUpdateWarehouse',
-		        }
+		        } // menu
           ] } // buttongroup
         ] // tbar
     },{
@@ -330,7 +325,8 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 selType: 'checkboxmodel',
                 selModel: {
                 	checkOnly: true,
-                	injectCheckbox: 0
+                	injectCheckbox: 0,
+                	mode: 'SIMPLE'
                 },
                 //fieldLabel: 'Ship Via'
                 columns: [
