@@ -17,6 +17,7 @@ POST    /deleteCarrierPull          controllers.CarrierPull.deleteCarrierPull()
 GET     /deleteAllCarrierPull       controllers.CarrierPull.deleteAllCarrierPullForWarehouse()
 POST    /saveCarrierPull            controllers.CarrierPull.saveCarrierPull()
 POST    /uploadCSV                  controllers.CarrierPull.uploadCSV()
+GET     /exportCSV                  controllers.CarrierPull.exportCSV()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

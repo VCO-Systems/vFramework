@@ -591,15 +591,15 @@ public class CarrierPull extends Controller {
 		
 		if (uploadedCSV != null) {
 			String fileName = uploadedCSV.getFilename();
-			retval.put("filename", fileName);
 			String contentType = uploadedCSV.getContentType();
+			retval.put("filename", fileName);
 			
 			// Process the CSV
 			File file = uploadedCSV.getFile();
 			BufferedReader in = new BufferedReader(new FileReader(file));
 			
 			try {
-				while (in.ready()) {
+				while (in.ready()) {  // Process each line of CSV
 					String s = in.readLine();
 					linesProcessed++;
 				}
@@ -608,16 +608,37 @@ public class CarrierPull extends Controller {
 				
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();retval.put("success", "true");
+				// Log error, and report back to UI
+				e.printStackTrace();
+				retval.put("success", "false");
+				retval.put("message", e.getMessage());
 			}
+			
+			// Prepare the response
 			retval.put("linesProcessed", linesProcessed);
 			response().setContentType("text/html");
+			
+			// Send success msg to ui
 			return ok(retval);
 		} else {
-			flash("error", "Missing file");
+			// Send error msg to UI
+			retval.put("success", "false");
+			retval.put("message", "Server did not receive valid CSV file to process.");
 			return ok(retval);
-			// return redirect(routes.Application.index());
 		}
 	}
+	
+	public static Result exportCSV() {
+		String downloadFilename="test.csv";
+		
+		// Construct CSV contents using StringBuilder
+		StringBuilder csv = new StringBuilder();
+		csv.append("col1,col2,col3\n");
+		csv.append("1,a,b\n");
+		
+		// Prepare the response
+		response().setContentType("text/csv");
+		response().setHeader("Content-Disposition", "attachment;filename="+downloadFilename);
+		return ok(csv.toString()); 
+		}
 }

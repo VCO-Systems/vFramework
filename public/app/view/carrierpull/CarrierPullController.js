@@ -318,7 +318,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
      * User has pressed the Export button.
      */
     onExport: function() {
-    	
+    	window.open("exportCSV");
     },
     /**
      * User has pressed "Delete all records..."
