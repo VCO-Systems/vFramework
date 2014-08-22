@@ -1,5 +1,9 @@
 package controllers;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -22,6 +26,12 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+
+
+
+
+
 
 
 
@@ -70,6 +80,8 @@ import models.ShipVia;
 import models.WebSession;
 import play.*;
 import play.mvc.*;
+import play.mvc.BodyParser.MultipartFormData;
+import play.mvc.Http.MultipartFormData.FilePart;
 import views.html.*;
 import play.api.libs.json.Json;
 import play.api.libs.json.Writes;
@@ -564,4 +576,48 @@ public class CarrierPull extends Controller {
     	return ok(retval);
     }
     
+    /**
+     * User has uploaded a CSV file from the "Import" UI option.
+     */
+    
+	public static Result uploadCSV() throws FileNotFoundException {
+		ObjectNode retval = play.libs.Json.newObject();
+		int linesProcessed=0;
+		
+		// Get the CSV file from the uploaded form
+		play.mvc.Http.MultipartFormData body = request().body()
+				.asMultipartFormData();
+		FilePart uploadedCSV = body.getFile("document");
+		
+		if (uploadedCSV != null) {
+			String fileName = uploadedCSV.getFilename();
+			retval.put("filename", fileName);
+			String contentType = uploadedCSV.getContentType();
+			
+			// Process the CSV
+			File file = uploadedCSV.getFile();
+			BufferedReader in = new BufferedReader(new FileReader(file));
+			
+			try {
+				while (in.ready()) {
+					String s = in.readLine();
+					linesProcessed++;
+				}
+				in.close();
+				retval.put("success", "true");
+				
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();retval.put("success", "true");
+			}
+			retval.put("linesProcessed", linesProcessed);
+			response().setContentType("text/html");
+			return ok(retval);
+		} else {
+			flash("error", "Missing file");
+			return ok(retval);
+			// return redirect(routes.Application.index());
+		}
+	}
 }

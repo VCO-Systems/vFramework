@@ -1,6 +1,6 @@
 name := "VCO"
 
-version := "POC-v1"
+version := "POC-v5"
 
 libraryDependencies ++= Seq(
   javaJdbc,

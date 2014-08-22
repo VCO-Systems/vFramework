@@ -29,3 +29,12 @@ the bottom border of the fieldset.
     background: -moz-linear-gradient(#FFFFFF,#F7F7C5); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#FFFFFF,#F7F7C5); /* Standard syntax */
 }
+
+/**
+* Hide the textinput portion of the ExtJS
+* file upload control, so only the button shows
+
+div.x-form-file-wrap .x-form-text-wrap {
+	display: none;
+}
+**/

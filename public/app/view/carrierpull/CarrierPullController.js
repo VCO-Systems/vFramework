@@ -1,4 +1,60 @@
 /**
+ * The popup form for uploading a file.
+ */
+var uploadWindow = new Ext.Window({
+    title: 'Import CSV',
+    layout: 'fit',
+    floating: true,
+    autoScroll: false,
+    y: 60,
+    width: 350,
+    height: 250,
+    bodyPadding: '10 10 10 10',
+    modal: true,
+    closeAction: 'hide',
+    style: "background-color: #FFF",
+    items: [{
+    	xtype: 'label',
+    	text: 'Please select a .CSV file to upload.',
+    	style: 'background-color: #FFF'
+    },
+    {
+    	xtype: 'form',
+    	frame: false,
+	    
+	    items: [{
+	        xtype: 'filefield',
+	        name: 'document',
+	        fieldLabel: 'File',
+	        labelWidth: 50,
+	        msgTarget: 'side',
+	        allowBlank: false,
+	        fieldStyle: "display: none",
+	        anchor: '100%',
+//	        hideLabel: true,
+	        buttonText: 'Select File',
+	        listeners: {
+	        	change: function(thiss,value,eOpts) {
+	        		var form = this.up('form').getForm();
+	        		if(form.isValid()){
+	                    form.submit({
+	                        url: 'uploadCSV',
+	                        waitMsg: 'Uploading your photo...',
+	                        success: function(fp, o) {
+	                            Ext.Msg.alert('Success', 'Your file "' + o.result.filename + '" has been uploaded.  Total lines processed: ' + o.result.linesProcessed);
+	                            uploadWindow.hide();
+	                        }
+	                    });
+	                }
+	        	}
+			}
+	    }]
+    
+    }
+	]
+});
+
+/**
  * This class is the main view for the application. It is specified in app.js as the
  * "autoCreateViewport" property. That setting automatically applies the "viewport"
  * plugin to promote that instance of this class to the body element.
@@ -46,7 +102,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     			// Pressing ENTER on any criteria field triggers search
     			specialkey: function(field,e) {
     				if (e.getKey() == e.ENTER) {
-//    					console.log("ENTER");
     					this.onList();
     				}
     			}
@@ -99,7 +154,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     },
     
     onFieldChange: function(field,newVal,oldVal) {
-//    	console.log('[[OnFieldChange]] Field [' + field.name + "] changed to: " + newVal);
     	var store = this.lookupReference('mainGrid').getStore();
     	
 		// See if this filter already exists for the store
@@ -118,19 +172,17 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	if (filterExists) {
     		if (!newVal) {  // an existing filter has been set to null/empty
     			// Todo: remove filter that has been nullified
-//    			console.log('removing filter: ' + field.name);
     			store.removeFilter(filterToRemove);
     			store.currentPage=1;
     		}
     		else {
-    			// Update the filter (is this right, or does this make a dup?)
+    			// Update the filter
     			var newFilter = new Ext.util.Filter({
     	    	    property: field.name,
     	    	    value   : newVal
     	    	});
     			store.addFilter(newFilter);
     			store.currentPage=1;
-//    			console.log('modifying existing filter: ' + field.name)
     		}
     	}
     	else {  // filter does not exist on store
@@ -142,7 +194,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	    	});
     			store.addFilter(newFilter);
     			store.currentPage=1;
-//    			console.log('Adding filter for field: ' + field.name)
     		}
     	}
     },
@@ -164,7 +215,6 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
 //    	else {
 //    		Ext.Msg.alert('Information', 'Please enter search criteria');
 //    	}
-//    	console.log(barcode,desc);
     	
     	var st = this.lookupReference('mainGrid').getStore();
     	
@@ -261,7 +311,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
      * User has pressed the Import button.
      */
     onImport: function() {
-    	
+    	uploadWindow.show();
     },
     
     /**

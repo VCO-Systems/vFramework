@@ -19,6 +19,10 @@ Ext.define('CarrierPullViewModel', {
         }
     }
 });
+
+
+
+
 /**
  * This class is the main view for the application. It is specified in app.js as the
  * "autoCreateViewport" property. That setting automatically applies the "viewport"
@@ -32,7 +36,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         pluginId: 'rowEditingPlugin',
         listeners: {
         	beforeedit: function(editor,context,opts) {
-//        		console.log('before edit');
         		var grid = context.grid;
 //        		grid.reconfigure(null, addModeColumns
 //        		);
@@ -52,7 +55,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		
         	},
         	validateedit: function ( editor, context, eOpts ) {
-//        		console.log('validateedit()');
         		
         		// To revert changes to row: editor.cancelEdit();
         		
@@ -63,7 +65,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		return true;
         	},
         	canceledit: function ( editor, context, eOpts ) {
-//        		console.log('canceledit()');
         		editor.grid.getStore().each(function(record)
         		{
         			if (record.phantom)
@@ -89,7 +90,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    writer: "json",
         		    scope:this,
         		    success: function(options, success, response) {
-//        		    	console.log('Successfully saved record to db.  Refreshing view.');
         		    	var resp = Ext.util.JSON.decode(options.responseText);
         		    	if (resp.success=="false") {
         		    		var errorMsg = resp.message;
@@ -100,7 +100,6 @@ var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         		    	editor.grid.getStore().load();
         		    },                                    
         		    failure: function(){
-//        		    	console.log('failure');
         		    	
         		    	}
         		});
@@ -151,13 +150,14 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 				        xtype : 'menu',
 				        
 				        items:[
-		                    {text: "Import", disabled: true},
-		                    {text: "Export", disabled: true},
+		                    {text: "Import"},
+		                    {text: "Export"},
 		                    {xtype: 'menuseparator'},
 				            {text : 'Delete all records...'}
 				        ]
 			    	}
 		        } // menu
+		        
           ] } // buttongroup
         ] // tbar
     },{
@@ -232,9 +232,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //										// VC: this is a valid way to listen to field udpates,
 //										// however we're doing it in the controller
 //										change: function(self, newValue, oldValue, eOpts) {
-//											console.log(newValue);
 //											if(!self.getValue() || self.getValue().length==0) {
-//												console.log('attempting to clear combobox');
 //												self.reset();
 //											}
 //										},
@@ -265,7 +263,8 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 						}  // end fieldset
 					  ] // form items,
                     }  // end form
-                  ] // Criteria tab items
+                  
+                    ] // Criteria tab items
         	
         },
         {
@@ -317,7 +316,6 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //                    pluginId: 'rowEditor'
 //                    	listeners: {
 //    	                	beforeedit: function(editor, e, opts) {
-//    	                		console.log('beforeedit')
 //    	                	}
 //    	                }
 //                }, // grid plugins
