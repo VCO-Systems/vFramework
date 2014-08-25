@@ -21,7 +21,7 @@ var uploadWindow = new Ext.Window({
     {
     	xtype: 'form',
     	frame: false,
-	    
+	    bodyStyle: 'background-color: #FFF',
 	    items: [{
 	        xtype: 'filefield',
 	        name: 'document',

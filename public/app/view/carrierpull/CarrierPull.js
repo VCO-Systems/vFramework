@@ -141,14 +141,13 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 	            {
 		        	xtype: 'button',
 		            text: 'List',
-		            handler: 'onList',
+		            handler: 'onList'
 		        },
 		        {   
 		        	text: 'Actions',
 		        	menu: 
 		            {
 				        xtype : 'menu',
-				        
 				        items:[
 		                    {text: "Import"},
 		                    {text: "Export"},
@@ -192,7 +191,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 									if (e.getKey() == e.ENTER) {
 									}
 								}
-							},
+							}
 						},
 						defaultType: 'textfield',
 						items: [ {
@@ -259,7 +258,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 								  name: 'RGHICarrierPull.pullTrlrCode',
 								  allowBlank: true
 								}
-						    ],
+						    ]
 						}  // end fieldset
 					  ] // form items,
                     }  // end form
@@ -319,13 +318,10 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //    	                	}
 //    	                }
 //                }, // grid plugins
-	                
-                selType: 'checkboxmodel',
-                selModel: {
-                	checkOnly: true,
-                	injectCheckbox: 0,
-                	mode: 'SIMPLE'
-                },
+                selModel: Ext.create('Ext.selection.CheckboxModel', {
+                	mode: 'SIMPLE',
+                	allowDeselect: true
+                }),
                 //fieldLabel: 'Ship Via'
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false,editor: {  name: 'RGHICarrierPull.Add.shipVia',
@@ -358,7 +354,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     pageSize: 25,
                     displayInfo: true,
                     displayMsg: 'Displaying items {0} - {1} of {2}',
-                    emptyMsg: "No items to display",
+                    emptyMsg: "No items to display"
 //                    items:[
 //                        '-', {
 //                        text: 'Show Preview',
