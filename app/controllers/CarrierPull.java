@@ -55,6 +55,7 @@ import javax.persistence.criteria.Root;
 
 
 
+
 import org.apache.http.cookie.Cookie;
 import org.w3c.dom.Document;
 
@@ -108,6 +109,7 @@ public class CarrierPull extends Controller {
 		
 		 // Get session ID from request url
 	   	String sid = request().getQueryString("sessionid");
+	   	sid = "194798";
 	   	System.out.println("Looking up sessionid: " + sid);
 	   	// Look up session in web_session table
 	   	TypedQuery<WebSession> query =
@@ -578,40 +580,138 @@ public class CarrierPull extends Controller {
     
     /**
      * User has uploaded a CSV file from the "Import" UI option.
+     * @throws Exception 
      */
     
-	public static Result uploadCSV() throws FileNotFoundException {
+    @Transactional
+	public static Result uploadCSV() throws Exception {
 		ObjectNode retval = play.libs.Json.newObject();
 		int linesProcessed=0;
+		
+		EntityManager em = JPA.em();
+
+		String whse = request().cookie("warehouse").value();
+		String userId = request().cookie("user_id").value();
+		
+		System.out.println("Whse = "+ whse);
+		System.out.println("User = "+ userId);
 		
 		// Get the CSV file from the uploaded form
 		play.mvc.Http.MultipartFormData body = request().body()
 				.asMultipartFormData();
 		FilePart uploadedCSV = body.getFile("document");
 		
-		if (uploadedCSV != null) {
+		
+		if (uploadedCSV != null) 
+		{
+
 			String fileName = uploadedCSV.getFilename();
-			String contentType = uploadedCSV.getContentType();
 			retval.put("filename", fileName);
 			
-			// Process the CSV
 			File file = uploadedCSV.getFile();
 			BufferedReader in = new BufferedReader(new FileReader(file));
 			
-			try {
-				while (in.ready()) {  // Process each line of CSV
-					String s = in.readLine();
-					linesProcessed++;
-				}
-				in.close();
-				retval.put("success", "true");
+			try 
+			{
+
+				    String[] columns;
+
+				    String shipToZip = "";
+			    	String shipVia = "";
+			    	String pullTrlrCode = "";
+			    	String pullTime = "";
+			    	String pullTimeAMPM = "";
+			    	String anyText1 = "";
+			    	long anyNumber1 = 0;
+			    	
+
+				    while (in.ready()) 
+				    {  
+
+					    shipToZip = "";
+				    	shipVia = "";
+				    	pullTrlrCode = "";
+				    	pullTime = "";
+				    	pullTimeAMPM = "";
+				    	anyText1 = "";
+				    	anyNumber1 = 0;
+				    	
+				    	String s = in.readLine();
+				    	columns = s.split(",");
+				    	
+			    		if (!columns[0].equals(whse))
+			    		{
+			    			System.out.println("Whse - " + columns[0] + " is not same as User's Whse - " + whse);
+			    			System.out.println(s);
+			    			continue;
+			    		}
+
+			    		for (int i = 0; i < columns.length; i++)
+			    		{
+			    			if (i == 0)
+			    				whse = columns[i];
+			    			else if (i == 1)
+						    	shipToZip = columns[i];
+			    			else if (i == 2)
+			    				shipVia = columns[i];
+			    			else if (i == 3)
+			    				pullTrlrCode = columns[i];
+			    			else if (i == 4)
+			    				pullTime = columns[i];
+			    			else if (i == 5)
+			    				pullTimeAMPM = columns[i];
+			    			else if (i == 6)
+			    				anyText1 = columns[i];
+			    			else if (i == 7)
+			    				anyNumber1 = Long.parseLong(columns[i]);
+			    			
+			    		}
+				    	
+				    	RGHICarrierPull rcp = loadRGHICarrierPull(whse, shipToZip, shipVia);
+				    	if (rcp == null)
+				    	{
+				    		rcp = createRGHICarrierPull
+						    		(
+						    		   whse,
+						    		   shipToZip,
+						    		   shipVia,
+						    		   pullTrlrCode,
+						    		   pullTime,
+						    		   pullTimeAMPM,
+						    		   anyText1,
+						    		   anyNumber1,
+						    		   userId
+						    		);
+				    	}
+				    	else
+				    	{
+				    		rcp.setPullTrlrCode(pullTrlrCode);
+				    		rcp.setPullTime(pullTime);
+				    		rcp.setPullTimeAMPM(pullTimeAMPM);
+				    		rcp.setAnyText1(anyText1);
+				    		rcp.setAnyNbr1(anyNumber1);
+				    		rcp.setModDateTime(new Date());
+				    		
+				    	}
+				    	
+				    	em.persist(rcp);
+				    	
+				    	linesProcessed++;
+				    }
+				
+				    in.close();
+				    retval.put("success", "true");
 				
 
-			} catch (Exception e) {
-				// Log error, and report back to UI
+			} 
+			catch (Exception e) 
+			{
+
+				in.close();
 				e.printStackTrace();
 				retval.put("success", "false");
 				retval.put("message", e.getMessage());
+				
 			}
 			
 			// Prepare the response
@@ -620,7 +720,9 @@ public class CarrierPull extends Controller {
 			
 			// Send success msg to ui
 			return ok(retval);
-		} else {
+		} 
+		else 
+		{
 			// Send error msg to UI
 			retval.put("success", "false");
 			retval.put("message", "Server did not receive valid CSV file to process.");
@@ -641,4 +743,105 @@ public class CarrierPull extends Controller {
 		response().setHeader("Content-Disposition", "attachment;filename="+downloadFilename);
 		return ok(csv.toString()); 
 		}
+
+
+	private static RGHICarrierPull loadRGHICarrierPull 
+	(
+	   String whse,
+	   String shipToZip,
+	   String shipVia
+	)
+	throws Exception
+	{
+		RGHICarrierPull rcp = null;
+		try
+		{
+			String q = "Select c FROM RGHICarrierPull c WHERE c.shipVia.shipVia = :shipVia AND c.shipToZip = :shipToZip AND c.whse = :whse";
+			TypedQuery<RGHICarrierPull> query = JPA.em().createQuery(q, RGHICarrierPull.class);
+			
+			query.setParameter("shipToZip", shipToZip);
+			query.setParameter("shipVia", shipVia);
+			query.setParameter("whse", whse);
+			rcp = (RGHICarrierPull)query.getSingleResult();
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception in loadRGHICarrierPull - " + e.toString());
+			//throw();
+		}
+		
+		return rcp;
+	}
+	
+	private static RGHICarrierPull createRGHICarrierPull
+	(
+	   String whse,
+	   String shipToZip,
+	   String shipVia,
+	   String pullTrlrCode,
+	   String pullTime,
+	   String pullTimeAMPM,
+	   String anyText1,
+	   long anyNumber1,
+	   String userId
+	)
+	throws Exception
+	{
+		RGHICarrierPull rcp = new RGHICarrierPull();
+
+		try
+		{
+    		
+    		rcp.setWhse(whse);
+    		rcp.setShipToZip(shipToZip);
+    		rcp.setShipVia(loadShipVia(shipVia));
+    		rcp.setPullTrlrCode(pullTrlrCode);
+    		rcp.setPullTime(pullTime);
+    		rcp.setPullTimeAMPM(pullTimeAMPM);
+    		rcp.setAnyText1(anyText1);
+    		rcp.setAnyNbr1(anyNumber1);
+    		rcp.setUserId(userId);
+    		rcp.setCreateDateTime(new Date());
+    		rcp.setModDateTime(new Date());
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception in createRGHICarrierPull - " + e.toString());
+		}
+		
+		return rcp;
+	}
+
+	private static ShipVia loadShipVia
+	(
+	   String shipVia
+	)
+	{
+
+		ShipVia sv = null;
+		
+		try
+		{
+        	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+        	CriteriaQuery<ShipVia> cq = cb.createQuery(ShipVia.class);
+        	Root<ShipVia> r = cq.from(ShipVia.class);
+        	cq.select(r);
+        	cq.where(cb.equal(r.get("shipVia"), shipVia));
+        	
+        	TypedQuery<ShipVia> query = JPA.em().createQuery(cq);
+        	sv = query.getSingleResult();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception in loadShipVia - " + e.toString());
+		}
+		
+		return sv;	
+		
+	}
+	
+	
 }
+
