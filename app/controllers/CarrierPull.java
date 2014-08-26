@@ -590,19 +590,21 @@ public class CarrierPull extends Controller {
 		// Initialize vars
     	ObjectNode retval = play.libs.Json.newObject();
 		int rowsProcessed=0,rowsImported=0,rowsFailed=0;
-		
+		Boolean abortJob=false;
+		String[] importColumnNames;
 		List<String> errorMessages = new ArrayList<String>();
+		
+		// Note: these vars are hard-coded in Java for now, but can be moved to config file
+		List<String> expectedColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1");
+		List<String> requiredColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA");
+		
 		EntityManager em = JPA.em();
 		
 		// Look up current user's warehouse/userid from session
 		String whse = request().cookie("warehouse").value();
 		String userId = request().cookie("user_id").value();
 		
-		System.out.println("Preparing to do bulk import for: " + whse + ", " + userId);
-		
-		// These columns are required, in this order
-		List<String> requiredColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1");
-		String[] importColumnNames;
+		System.out.println("Preparing to do bulk import for: " + userId + " (" + whse + ").");
 		
 		// Get the CSV file from the uploaded form
 		play.mvc.Http.MultipartFormData body = request().body()
@@ -627,7 +629,7 @@ public class CarrierPull extends Controller {
 			try 
 			{
 				/**
-				 * Verify the first row (column names)
+				 * Verify the column headers (ie: the first row of CSV must contain column names)
 				 * - first row must contain column names
 				 * - all required columns must be present (and no extra columns allowed)
 				 * - must be in the correct order
@@ -637,26 +639,26 @@ public class CarrierPull extends Controller {
 				Boolean columnsOk=true;
 				
 				// The number of column must be correct
-				if (importColumnNames.length != requiredColumns.size()) {
-					errorMessages.add("ERROR - Import aborted:  Expected " + requiredColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
+				if (importColumnNames.length != expectedColumns.size()) {
+					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
 					columnsOk=false;
 				}
 				
-				// Loop over the required columns, comparing to cols from the import file
-				Iterator colsIt = requiredColumns.iterator();
-				for (int colIdx=0; colIdx<requiredColumns.size(); colIdx++) {
-					String requiredColName = requiredColumns.get(colIdx);
+				// Loop over the required columns, comparing to cols from the import file,
+				// and make sure they have the same name and position
+				Iterator colsIt = expectedColumns.iterator();
+				for (int colIdx=0; colIdx<expectedColumns.size(); colIdx++) {
+					String requiredColName = expectedColumns.get(colIdx);
 					String thisColName = importColumnNames[colIdx];
 					if (!thisColName.equals(requiredColName)) {
 						columnsOk=false;
-						errorMessages.add("ERROR - Import aborted: Expected column " + requiredColName + ", found column " + thisColName + ".");
+						errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected column " + requiredColName + ", found column " + thisColName + ".");
 						retval.put("success", "false");
 						break;
 					}
 				}
 				
-				if (!columnsOk) {
-					logRGHErrors(errorMessages);
+				if (columnsOk != true) {
 					retval.put("success", "false");
 				}
 				
@@ -665,8 +667,78 @@ public class CarrierPull extends Controller {
 				 * process the rows of data.
 				 */
 				
-				if (retval.get("success").equals("true")) {
-					
+				rowloop:
+				if (columnsOk) {
+					String rowAsString;
+					while((rowAsString = in.readLine()) != null) {
+						Boolean rowImported=true;
+						String[] rowValuesFromCSV = rowAsString.split(",");
+						
+						// Validation:  no more that 10,000 rows allowed in CSV
+						if ((rowsProcessed+1) > 10000) {
+							String emsg = "IMPORT ERROR: Aborting job at row " + (rowsProcessed+1) + ".  Reason: exceeded maximum rows for import (10,000)";
+							errorMessages.add(emsg);
+							abortJob=true; // don't process any more rows
+							retval.put("success", "false");
+							retval.put("message", emsg);
+							rowsFailed++;
+							break rowloop;
+						}
+						
+						// Iterate over the required column names
+						// Validation:  make sure required columns do not have null values
+						for (Iterator<String> reqIter = requiredColumns.iterator(); reqIter.hasNext();) {
+							String requiredColName = reqIter.next();
+							int matchingColIdx = expectedColumns.indexOf(requiredColName);
+							if (rowValuesFromCSV[matchingColIdx].toString().length() == 0) {
+								errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) + ".  Reason: column " 
+										+ requiredColName + " must not be blank.");
+								rowImported=false;
+//								rowsFailed++;
+							}
+							
+							// Validation:  whse for each row must match user's current warehouse
+							if ((requiredColName.equals("WHSE")) && !(rowValuesFromCSV[matchingColIdx].toString().equals(whse))) {
+//								System.out.println("skip row " + (rowsProcessed+1) + " - invalid warehouse: " + rowValuesFromCSV[matchingColIdx].toString());
+								errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) + ".  Reason: column " 
+										+ requiredColName + " does not match logged in user's warehouse (" + whse + ")");
+								rowImported=false;
+//								rowsFailed++;
+							}
+							
+							// Validation:  zip must be 5-9 characters, numeric only
+							String thisZip;
+							if ((requiredColName.equals("SHIPTO_ZIP")) ) {
+								thisZip = rowValuesFromCSV[matchingColIdx].toString();
+								if ((thisZip.length()>=5) && (thisZip.length()<=9)) {
+									try {
+										int i = Integer.parseInt(thisZip);
+									}
+									catch (NumberFormatException e)  {
+										// Non-numeric value given in ZIP field
+										rowImported=false;
+										errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) 
+												+ ".  Reason: zip (" + thisZip +  ") may only contain numbers");
+									}
+								}
+								else {
+									rowImported=false;
+									errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) 
+											+ ".  Reason: zip (" + thisZip +  ") must be 5-9 characters");
+								}
+							}
+						}
+						
+						// Increment the row counters, as appropriate
+						if (rowImported) {
+							rowsImported++;
+						}
+						else {
+							rowsFailed++;
+						}
+						
+						rowsProcessed++;
+					}  // end: processing row of csv file
 				}
 				
 				
@@ -676,15 +748,20 @@ public class CarrierPull extends Controller {
 				in.close();
 				e.printStackTrace();
 				errorMessages.add(e.getMessage());
-				logRGHErrors(errorMessages);
 				retval.put("success", "false");
 				retval.put("message", e.getMessage());
 			}
 			
+			// Clean up vars
 			in.close();
+			
+			// Log any errors
+			logRGHErrors(errorMessages);
+			
 			// Prepare the response
 			retval.put("rowsImported", rowsImported);
 			retval.put("rowsFailed", rowsFailed);
+			retval.put("rowsProcessed", rowsProcessed);
 			response().setContentType("text/html");
 			
 			// Send success msg to ui
@@ -965,7 +1042,7 @@ public class CarrierPull extends Controller {
 	 */
 	
 	@Transactional
-    public static Result logRGHErrors(List<String> errorMessages) {
+    public static void logRGHErrors(List<String> errorMessages) {
 		ObjectNode retval = play.libs.Json.newObject();
     	
 		// Log each of the errors
@@ -974,7 +1051,7 @@ public class CarrierPull extends Controller {
 			String msg = (String)it.next();
 			System.out.println(msg);
 		}
-		return ok(retval);
+		return;
 		
     }
 	

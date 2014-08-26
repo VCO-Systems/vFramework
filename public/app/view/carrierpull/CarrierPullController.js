@@ -37,22 +37,28 @@ var uploadWindow = new Ext.Window({
 	        	change: function(thiss,value,eOpts) {
 	        		var form = this.up('form').getForm();
 	        		if(form.isValid()){
+	        			uploadWindow.hide();
 	                    form.submit({
 	                        url: 'uploadCSV',
-	                        waitMsg: 'Uploading your file...',
+	                        waitMsg: 'Server is processing your upload...',
 	                        success: function(fp, o) {
 	                        	if(o.result.success == "true") {
-	                        		Ext.Msg.alert('Success', 'Your file "' + o.result.filename + '" was imported successfully.  Rows imported: ' + o.result.rowsImported);
+	                        		Ext.Msg.alert('Success', 'Your file (' + o.result.filename 
+	                        				+ ') was imported successfully.  '
+	                        				+ '<br />Rows imported: ' + o.result.rowsImported
+	                        				+ '<br />Rows skipped: ' + o.result.rowsFailed
+	                        		);
 	                        	}
 	                        	else {
 	                        		Ext.Msg.alert('Error', 
 	                        				"Your file '" + o.result.filename + "' encountered one or more errors."
+	                        				+ "<br />" + o.result.message
 	                        				+ "<br/>Rows imported: " + o.result.rowsImported + "." 
 	                        				+ "<br />Rows with problems: " + o.result.rowsFailed
 	                        				+ "<br />See logs for more details.");
 	                        	}
 	                            
-	                            uploadWindow.hide();
+	                            
 	                        }
 	                    });
 	                }
