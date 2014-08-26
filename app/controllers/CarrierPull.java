@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +27,8 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+
 
 
 
@@ -583,17 +586,132 @@ public class CarrierPull extends Controller {
      */
     
     @Transactional
+	public static Result uploadCSV2() throws Exception {
+		// Initialize vars
+    	ObjectNode retval = play.libs.Json.newObject();
+		int rowsProcessed=0,rowsImported=0,rowsFailed=0;
+		
+		List<String> errorMessages = new ArrayList<String>();
+		EntityManager em = JPA.em();
+		
+		// Look up current user's warehouse/userid from session
+		String whse = request().cookie("warehouse").value();
+		String userId = request().cookie("user_id").value();
+		
+		System.out.println("Preparing to do bulk import for: " + whse + ", " + userId);
+		
+		// These columns are required, in this order
+		List<String> requiredColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1");
+		String[] importColumnNames;
+		
+		// Get the CSV file from the uploaded form
+		play.mvc.Http.MultipartFormData body = request().body()
+				.asMultipartFormData();
+		FilePart uploadedCSV = body.getFile("document");
+		
+		// Set default values for return JSON
+		retval.put("success", "true");
+		retval.put("rowsImported", rowsImported);
+		retval.put("rowsFailed", rowsFailed);
+		
+		if (uploadedCSV != null) 
+		{
+			// Get the uploaded filename for logging purposes
+			String fileName = uploadedCSV.getFilename();
+			retval.put("filename", fileName);
+			
+			// Prepare to iterate over the import file
+			File file = uploadedCSV.getFile();
+			BufferedReader in = new BufferedReader(new FileReader(file));
+			
+			try 
+			{
+				/**
+				 * Verify the first row (column names)
+				 * - first row must contain column names
+				 * - all required columns must be present (and no extra columns allowed)
+				 * - must be in the correct order
+				 */
+				String s = in.readLine();
+				importColumnNames = s.split(",");
+				Boolean columnsOk=true;
+				
+				// The number of column must be correct
+				if (importColumnNames.length != requiredColumns.size()) {
+					errorMessages.add("ERROR - Import aborted:  Expected " + requiredColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
+					columnsOk=false;
+				}
+				
+				// Loop over the required columns, comparing to cols from the import file
+				Iterator colsIt = requiredColumns.iterator();
+				for (int colIdx=0; colIdx<requiredColumns.size(); colIdx++) {
+					String requiredColName = requiredColumns.get(colIdx);
+					String thisColName = importColumnNames[colIdx];
+					if (!thisColName.equals(requiredColName)) {
+						columnsOk=false;
+						errorMessages.add("ERROR - Import aborted: Expected column " + requiredColName + ", found column " + thisColName + ".");
+						retval.put("success", "false");
+						break;
+					}
+				}
+				
+				if (!columnsOk) {
+					logRGHErrors(errorMessages);
+					retval.put("success", "false");
+				}
+				
+				/**
+				 * If we passed the "column header" validations,
+				 * process the rows of data.
+				 */
+				
+				if (retval.get("success").equals("true")) {
+					
+				}
+				
+				
+				
+			}
+			catch(Exception e) {
+				in.close();
+				e.printStackTrace();
+				errorMessages.add(e.getMessage());
+				logRGHErrors(errorMessages);
+				retval.put("success", "false");
+				retval.put("message", e.getMessage());
+			}
+			
+			in.close();
+			// Prepare the response
+			retval.put("rowsImported", rowsImported);
+			retval.put("rowsFailed", rowsFailed);
+			response().setContentType("text/html");
+			
+			// Send success msg to ui
+			return ok(retval);
+		}
+		return ok(retval);
+    }
+    
+    /**
+     * User has uploaded a CSV file from the "Import" UI option.
+     * @throws Exception 
+     */
+    
+    @Transactional
 	public static Result uploadCSV() throws Exception {
 		ObjectNode retval = play.libs.Json.newObject();
 		int linesProcessed=0;
+		
+		// These columns are required, in this order
+		List<String> colNames = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1");
 		
 		EntityManager em = JPA.em();
 
 		String whse = request().cookie("warehouse").value();
 		String userId = request().cookie("user_id").value();
 		
-		System.out.println("Whse = "+ whse);
-		System.out.println("User = "+ userId);
+		System.out.println("Preparing to do bulk import for: " + whse + ", " + userId);
 		
 		// Get the CSV file from the uploaded form
 		play.mvc.Http.MultipartFormData body = request().body()
@@ -840,6 +958,25 @@ public class CarrierPull extends Controller {
 		return sv;	
 		
 	}
+	
+	/**
+	 * Receive a List<String> of error messages, and log them 
+	 * to the MSG_LOG table.
+	 */
+	
+	@Transactional
+    public static Result logRGHErrors(List<String> errorMessages) {
+		ObjectNode retval = play.libs.Json.newObject();
+    	
+		// Log each of the errors
+		Iterator it = errorMessages.iterator();
+		while (it.hasNext()) {
+			String msg = (String)it.next();
+			System.out.println(msg);
+		}
+		return ok(retval);
+		
+    }
 	
 	
 }

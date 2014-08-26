@@ -16,7 +16,7 @@ GET     /getShipVias                controllers.CarrierPull.getShipVias()
 POST    /deleteCarrierPull          controllers.CarrierPull.deleteCarrierPull()
 GET     /deleteAllCarrierPull       controllers.CarrierPull.deleteAllCarrierPullForWarehouse()
 POST    /saveCarrierPull            controllers.CarrierPull.saveCarrierPull()
-POST    /uploadCSV                  controllers.CarrierPull.uploadCSV()
+POST    /uploadCSV                  controllers.CarrierPull.uploadCSV2()
 GET     /exportCSV                  controllers.CarrierPull.exportCSV()
 
 # Map static resources from the /public folder to the /assets URL path
