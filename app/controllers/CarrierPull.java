@@ -624,86 +624,86 @@ public class CarrierPull extends Controller {
 			
 			// Prepare to iterate over the import file
 			File file = uploadedCSV.getFile();
-			BufferedReader in = new BufferedReader(new FileReader(file));
+			BufferedReader csvReader = new BufferedReader(new FileReader(file));
 			
 			try 
 			{
 				/**
-				 * Verify the column headers (ie: the first row of CSV must contain column names)
+				 * Verify the column headers (the first row of CSV which must contain column names)
 				 * - first row must contain column names
 				 * - all required columns must be present (and no extra columns allowed)
 				 * - must be in the correct order
 				 */
-				String s = in.readLine();
+				String s = csvReader.readLine();
 				importColumnNames = s.split(",");
-				Boolean columnsOk=true;
+				Boolean importColumnsOK=true;
 				
 				// The number of column must be correct
 				if (importColumnNames.length != expectedColumns.size()) {
 					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
-					columnsOk=false;
+					importColumnsOK=false;
 				}
 				
 				// Loop over the required columns, comparing to cols from the import file,
 				// and make sure they have the same name and position
-				Iterator colsIt = expectedColumns.iterator();
+				Iterator expectedColumnsIterator = expectedColumns.iterator();
 				for (int colIdx=0; colIdx<expectedColumns.size(); colIdx++) {
 					String requiredColName = expectedColumns.get(colIdx);
 					String thisColName = importColumnNames[colIdx];
 					if (!thisColName.equals(requiredColName)) {
-						columnsOk=false;
+						importColumnsOK=false;
 						errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected column " + requiredColName + ", found column " + thisColName + ".");
 						retval.put("success", "false");
-						break;
 					}
 				}
 				
-				if (columnsOk != true) {
+				if (importColumnsOK != true) {
 					retval.put("success", "false");
+					retval.put("message", errorMessages.get(errorMessages.size()-1));
 				}
 				
 				/**
-				 * If we passed the "column header" validations,
-				 * process the rows of data.
+				 * If the "column header" validations succeeded,
+				 * begin processing the data rows.
 				 */
 				
-				rowloop:
-				if (columnsOk) {
+				rowloop:  // Break here for validations that need to abort the entire import job
+				if (importColumnsOK) {
 					String rowAsString;
-					while((rowAsString = in.readLine()) != null) {
+					while((rowAsString = csvReader.readLine()) != null) {
 						Boolean rowImported=true;
 						String[] rowValuesFromCSV = rowAsString.split(",");
 						
 						// Validation:  no more that 10,000 rows allowed in CSV
 						if ((rowsProcessed+1) > 10000) {
-							String emsg = "IMPORT ERROR: Aborting job at row " + (rowsProcessed+1) + ".  Reason: exceeded maximum rows for import (10,000)";
+							String emsg = "IMPORT ERROR: Aborting job at row " + (rowsProcessed+1) 
+									+ ".  Reason: exceeded maximum rows for import (10,000)";
 							errorMessages.add(emsg);
 							abortJob=true; // don't process any more rows
 							retval.put("success", "false");
 							retval.put("message", emsg);
-							rowsFailed++;
+							// Since we're breaking out of the row loop here,
+							// increment rowsFailed so the count in logs will be right
+							rowsFailed++;  
 							break rowloop;
 						}
 						
-						// Iterate over the required column names
+						
 						// Validation:  make sure required columns do not have null values
-						for (Iterator<String> reqIter = requiredColumns.iterator(); reqIter.hasNext();) {
+						for (Iterator<String> reqIter = requiredColumns.iterator(); reqIter.hasNext();) { // Iterate over the required column names
 							String requiredColName = reqIter.next();
 							int matchingColIdx = expectedColumns.indexOf(requiredColName);
 							if (rowValuesFromCSV[matchingColIdx].toString().length() == 0) {
 								errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) + ".  Reason: column " 
 										+ requiredColName + " must not be blank.");
 								rowImported=false;
-//								rowsFailed++;
 							}
 							
 							// Validation:  whse for each row must match user's current warehouse
 							if ((requiredColName.equals("WHSE")) && !(rowValuesFromCSV[matchingColIdx].toString().equals(whse))) {
-//								System.out.println("skip row " + (rowsProcessed+1) + " - invalid warehouse: " + rowValuesFromCSV[matchingColIdx].toString());
 								errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) + ".  Reason: column " 
 										+ requiredColName + " does not match logged in user's warehouse (" + whse + ")");
 								rowImported=false;
-//								rowsFailed++;
 							}
 							
 							// Validation:  zip must be 5-9 characters, numeric only
@@ -729,7 +729,8 @@ public class CarrierPull extends Controller {
 							}
 						}
 						
-						// Increment the row counters, as appropriate
+						// Finished processing this row.
+						// Increment the row counters, as appropriate.
 						if (rowImported) {
 							rowsImported++;
 						}
@@ -740,12 +741,9 @@ public class CarrierPull extends Controller {
 						rowsProcessed++;
 					}  // end: processing row of csv file
 				}
-				
-				
-				
 			}
 			catch(Exception e) {
-				in.close();
+				csvReader.close();
 				e.printStackTrace();
 				errorMessages.add(e.getMessage());
 				retval.put("success", "false");
@@ -753,7 +751,7 @@ public class CarrierPull extends Controller {
 			}
 			
 			// Clean up vars
-			in.close();
+			csvReader.close();
 			
 			// Log any errors
 			logRGHErrors(errorMessages);
