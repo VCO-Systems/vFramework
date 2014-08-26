@@ -109,7 +109,6 @@ public class CarrierPull extends Controller {
 		
 		 // Get session ID from request url
 	   	String sid = request().getQueryString("sessionid");
-	   	sid = "194798";
 	   	System.out.println("Looking up sessionid: " + sid);
 	   	// Look up session in web_session table
 	   	TypedQuery<WebSession> query =
@@ -149,7 +148,7 @@ public class CarrierPull extends Controller {
 	   		System.out.println("Session not found.");
 	   	}
 	   	// Add session id to session cookie
-		return ok(index.render("RGH v0.1"));
+		return ok(index.render(""));
 		
     }
   
