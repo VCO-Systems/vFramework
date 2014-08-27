@@ -22,8 +22,6 @@ Ext.define('CarrierPullViewModel', {
 });
 
 
-
-
 /**
  * This class is the main view for the application. It is specified in app.js as the
  * "autoCreateViewport" property. That setting automatically applies the "viewport"
@@ -216,7 +214,9 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 							items: [
 								{ fieldLabel: 'Ship to Zip',
 								  name: 'RGHICarrierPull.shipToZip',
-								  allowBlank: true
+								  allowBlank: true,
+								  maxLength:11,
+								  enforceMaxLength: true
 								},
 								{ fieldLabel: 'Ship Via',
 								  name: 'RGHICarrierPull.shipVia',
@@ -258,7 +258,9 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 								
 								{ fieldLabel: 'Pull Trailer Code',
 								  name: 'RGHICarrierPull.pullTrlrCode',
-								  allowBlank: true
+								  allowBlank: true,
+								  maxLength: 8,
+								  enforceMaxLength: true,
 								}
 						    ]
 						}  // end fieldset
@@ -325,6 +327,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                   	mode: 'SIMPLE',
                   	allowDeselect: true
                   }),
+//                  modelValidation: true,
                 //fieldLabel: 'Ship Via'
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false,editor: {  name: 'RGHICarrierPull.Add.shipVia',
@@ -338,11 +341,48 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 																											  valueField : 'shipVia',
 																											  store : 'ShipViaStore'} },
                     { text: 'Ship Via Description',  dataIndex: 'shipViaDesc', header: 'Ship Via Description', sortable: false, width: 200 },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code',editor: {allowBlank: true}, sortable: false  },
-                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', editor: {allowBlank: true}, sortable: false },
-                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM', editor: {allowBlank: true}, sortable: false },
-                    { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: false,editor: {allowBlank: false}  },
-                    { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: false, editor: {allowBlank: true}  },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code'
+                    	,editor: {
+                    		allowBlank: true,
+                    		validator: function(value) {
+                    			if (value.length>8) return 'max length: 8 characters';
+                    			return true;
+                    		}
+                    	}, sortable: false  },
+                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', 
+                    		editor: {
+                    			allowBlank: true,
+                    			validator: function(value) {
+                    				if (value.length>5) return 'max length: 5 characters';
+                        			return true;
+                    			}}, sortable: false 
+                    			},
+                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM'
+                    	, editor: {
+                    		allowBlank: true,
+                    		validator: function(value) {
+                				if (value.length>2) return 'max length: 2 characters';
+                    			return true;
+                			}
+                    	}, sortable: false },
+                    { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: false
+                		,editor: {
+                			validator: function(value) {
+                				if (value.length>11) return 'max length: 11 characters';
+                    			return true;
+                			}
+                    		,allowBlank: false
+                		}
+                    	
+                    },
+                    { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: false
+                    	, editor: {
+                    		validator: function(value) {
+                				if (value.length>10) return 'max length: 10 characters';
+                    			return true;
+                			}
+                    	}  
+                    },
                     { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: false, editor: {allowBlank: true}  },
                     { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: false, width: 100  },
                     { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: false, width: 100  },
