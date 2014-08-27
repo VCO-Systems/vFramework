@@ -1,3 +1,4 @@
+
 /**
  * The view model for carrier pull.
  */
@@ -32,6 +33,7 @@ Ext.define('CarrierPullViewModel', {
 
 var rowEditing = Ext.create('Ext.grid.plugin.RowEditing', {
         clicksToMoveEditor: 2,
+        clicksToEdit: 2,
         autoCancel: true,
         pluginId: 'rowEditingPlugin',
         listeners: {
@@ -318,10 +320,11 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //    	                	}
 //    	                }
 //                }, // grid plugins
-                selModel: Ext.create('Ext.selection.CheckboxModel', {
-                	mode: 'SIMPLE',
-                	allowDeselect: true
-                }),
+//                  selModel: Ext.create('Ext.selection.CheckboxModel', {
+                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
+                  	mode: 'SIMPLE',
+                  	allowDeselect: true
+                  }),
                 //fieldLabel: 'Ship Via'
                 columns: [
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false,editor: {  name: 'RGHICarrierPull.Add.shipVia',

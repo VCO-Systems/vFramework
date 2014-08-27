@@ -11,7 +11,8 @@ Ext.application({
     //autoCreateViewport: 'vfw.view.main.Main',
 //    autoCreateViewport: 'vfw.view.carton.CartonInquiry',
     autoCreateViewport: 'vfw.view.carrierpull.CarrierPull',
-    appFolder: '/assets/app'
+    appFolder: '/assets/app',
+    requires: ['vfw.patch.ExtJs501Patch'] // Overrides and bug fixes for ExtJS 5.0.1
     
 	
     //-------------------------------------------------------------------------
