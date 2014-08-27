@@ -596,6 +596,7 @@ public class CarrierPull extends Controller {
 		
 		// Note: these vars are hard-coded in Java for now, but can be moved to config file
 		List<String> expectedColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1");
+		List<String> columnNamesJava = Arrays.asList("whse","shipToZip" ,"shipVia", "pullTrlrCode",  "pullTime", "pullTimeAMPM",  "anyText1","anyNbr1");
 		List<String> requiredColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA");
 		
 		EntityManager em = JPA.em();
@@ -672,7 +673,7 @@ public class CarrierPull extends Controller {
 					String rowAsString;
 					while((rowAsString = csvReader.readLine()) != null) {
 						Boolean rowImported=true;
-						String[] rowValuesFromCSV = rowAsString.split(",");
+						String[] rowValuesFromCSV = rowAsString.split(",",-1);
 						
 						// Validation:  no more that 10,000 rows allowed in CSV
 						if ((rowsProcessed+1) > 10000) {
@@ -682,7 +683,7 @@ public class CarrierPull extends Controller {
 							abortJob=true; // don't process any more rows
 							retval.put("success", "false");
 							retval.put("message", emsg);
-							// Since we're breaking out of the row loop here,
+							// Since we're breaking out of the row loop here (ie: aborting the job),
 							// increment rowsFailed so the count in logs will be right
 							rowsFailed++;  
 							break rowloop;
@@ -729,6 +730,66 @@ public class CarrierPull extends Controller {
 							}
 						}
 						
+						/** 
+						 * All row validations have passed.  Persist this row.
+						 */
+						
+						// convert this row's values into json
+						ObjectNode newRecJSON = play.libs.Json.newObject();
+						Iterator javaColumnsIterator = columnNamesJava.iterator();
+						int numColsThisRow=rowValuesFromCSV.length;
+						for (int javaColIdx=0; javaColumnsIterator.hasNext();javaColIdx++) {
+							String javaColName = (String)javaColumnsIterator.next();
+							// If this value exists in the row
+							if ((javaColIdx < numColsThisRow)) {
+								// Write this key/value pair to the JSON
+								newRecJSON.put(javaColName, rowValuesFromCSV[javaColIdx]);
+							}
+						}
+						
+						// See if this record exists in db
+						RGHICarrierPull rcp = loadRGHICarrierPull(
+								newRecJSON.get("whse").asText()
+								, newRecJSON.get("shipToZip").asText()
+								, newRecJSON.get("shipVia").asText());
+						// Found this record in db (update it)
+						if (rcp!=null) {  
+							System.out.println("\tUpdating existing record in db:  " + newRecJSON.toString());
+							// Set values from the JSON
+							rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
+							rcp.setPullTime(newRecJSON.get("pullTime").asText());
+							rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
+							rcp.setAnyText1(newRecJSON.get("anyText1").asText());
+							rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
+							// Set static values
+							rcp.setModDateTime(new Date());
+							rcp.setUserId(userId);
+						}
+						// didn't find this record in db (create it)
+						else { 
+							System.out.println("\tInserting new record:  " + newRecJSON.toString());
+							// Set values from the JSON
+							rcp = new RGHICarrierPull();
+							// set PK fields
+							rcp.setWhse(newRecJSON.get("whse").asText());
+							rcp.setShipToZip(newRecJSON.get("shipToZip").asText());
+							ShipVia sv = loadShipVia(newRecJSON.get("shipVia").asText());
+							rcp.setShipVia(sv);
+							// set optional fields
+							rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
+							rcp.setPullTime(newRecJSON.get("pullTime").asText());
+							rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
+							rcp.setAnyText1(newRecJSON.get("anyText1").asText());
+							rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
+							// Set static values
+							rcp.setCreateDateTime(new Date());
+							rcp.setModDateTime(new Date());
+							rcp.setUserId(userId);
+						}
+						
+						// Save the record to db
+						JPA.em().persist(rcp);
+						
 						// Finished processing this row.
 						// Increment the row counters, as appropriate.
 						if (rowImported) {
@@ -737,7 +798,6 @@ public class CarrierPull extends Controller {
 						else {
 							rowsFailed++;
 						}
-						
 						rowsProcessed++;
 					}  // end: processing row of csv file
 				}
