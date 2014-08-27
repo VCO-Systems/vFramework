@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -20,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.persistence.Tuple;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -58,6 +60,11 @@ import javax.persistence.criteria.Root;
 
 
 
+
+
+
+
+import javax.persistence.criteria.Selection;
 
 import org.apache.http.cookie.Cookie;
 import org.w3c.dom.Document;
@@ -982,18 +989,145 @@ public class CarrierPull extends Controller {
 		}
 	}
 	
+    @Transactional
 	public static Result exportCSV() {
-		String downloadFilename="test.csv";
+    	System.out.println("In exportCSV");
+		Date curr_date_time = new Date();
+		SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhh24mmss");
+		String downloadFilename = RGHICarrierPull.class.getSimpleName() + "_" + ft.format(curr_date_time) + ".csv";
 		
+		// Note: these vars are hard-coded in Java for now, but can be moved to config file
+		List<String> exportColumns = Arrays.asList("WHSE","SHIPTO_ZIP","SHIP_VIA","PULL_TRLR_CODE","PULL_TIME","PULL_TIME_AMPM","ANYTEXT1","ANYNBR1","CREATE_DATE_TIME","MOD_DATE_TIME","USER_ID");
+		List<String> exportColumnNamesJava = Arrays.asList("whse", "shipToZip", "shipVia", "pullTrlrCode", "pullTime", "pullTimeAMPM", "anyText1", "anyNbr1", "createDateTime", "modDateTime", "userId");
+		
+		List<Predicate> predicateList = new ArrayList<Predicate>();
+    	
+    	// Set up basic query on CartonHdr
+    	CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+    	CriteriaQuery<RGHICarrierPull> cq = cb.createQuery(RGHICarrierPull.class);
+    	Root from = cq.from(RGHICarrierPull.class);
+    	CriteriaQuery<RGHICarrierPull> select = cq.select(from);
+    	
+//    	List<Selection> selectList = new ArrayList<Selection>();
+//    	Iterator exportColumnNamesIterator = exportColumnNamesJava.iterator();
+//		for (int colIdx=0; colIdx<exportColumnNamesJava.size(); colIdx++) {
+//			String exportColName = exportColumnNamesJava.get(colIdx);
+//			cq.multiselect(from.get(exportColName));
+//		}
+    	
+    	
+    	// Prepare the predicate to limit to current warehouse, but don't apply to query yet
+    	String whse = request().cookie("warehouse").value();
+    	System.out.println("In exportCSV: whse = " + whse);
+    	Predicate whse_pred = cb.equal(from.get("whse"), whse);
+    	predicateList.add(whse_pred);
+    	
+    	// Check the criteria
+    	String shipToZip = request().getQueryString("RGHICarrierPull.shipToZip");
+    	System.out.println("In exportCSV: shipToZip = " + shipToZip);
+    	if ((shipToZip != null) && (shipToZip.length() > 0)) {
+	    	Predicate shipToZip_pred = null;
+	    	shipToZip_pred = cb.like(from.get("shipToZip").as(String.class), shipToZip + "%");
+	    	predicateList.add(shipToZip_pred);
+    	}
+		
+    	String shipVia = request().getQueryString("RGHICarrierPull.shipVia");
+    	System.out.println("In exportCSV: shipVia = " + shipVia);
+    	if ((shipVia != null) && (shipVia.length() > 0)) {
+	    	Predicate shipVia_pred = null;
+	    	shipVia_pred = cb.like(from.get("shipVia").get("shipVia").as(String.class), shipVia + "%");
+	    	predicateList.add(shipVia_pred);
+    	}
+    	
+    	String pullTrlrCode = request().getQueryString("RGHICarrierPull.pullTrlrCode");
+    	System.out.println("In exportCSV: pullTrlrCode = " + pullTrlrCode);
+    	if ((pullTrlrCode != null) && (pullTrlrCode.length() > 0)) {
+	    	Predicate pullTrlrCode_pred = null;
+	    	pullTrlrCode_pred = cb.like(from.get("pullTrlrCode").as(String.class), pullTrlrCode + "%");
+	    	predicateList.add(pullTrlrCode_pred);
+    	}
+    	
+    	// Prepare the predicates to be added to the query
+    	Predicate[] predicates = new Predicate[predicateList.size()];
+        predicates=predicateList.toArray(predicates);
+        select.where(predicates);
+        
+        //OrderBy Criteria
+        select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
+        
+    	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(select);
+    	List<RGHICarrierPull> lst = records.getResultList();
+    	
+    	int totalRecordsToExport = 10000;
+    	if (lst.size() < 10000) {
+    		totalRecordsToExport = lst.size();
+    	}
+    	
+    	StringBuilder sb = new StringBuilder();
+    	for (int i=0; i < totalRecordsToExport; i++) {
+    		sb.append("\"" + lst.get(i).getWhse() + "\"");
+    		sb.append("," + "\"" + lst.get(i).getShipToZip() + "\"");
+    		sb.append("," + "\"" + lst.get(i).getShipVia().getShipVia() + "\"");
+    		if (lst.get(i).getPullTrlrCode() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getPullTrlrCode() + "\"");
+    		}
+    		if (lst.get(i).getPullTime() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getPullTime() + "\"");
+    		}
+    		if (lst.get(i).getPullTimeAMPM() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getPullTimeAMPM() + "\"");
+    		}
+    		if (lst.get(i).getAnyText1() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getAnyText1() + "\"");
+    		}
+    		if (lst.get(i).getAnyNbr1() == null) {
+    			sb.append(",");
+    		}
+    		else {
+    			sb.append("," + lst.get(i).getAnyNbr1().toString());
+    		}
+    		if (lst.get(i).getCreateDateTime() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getCreateDateTime() + "\"");
+    		}
+    		if (lst.get(i).getModDateTime() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getModDateTime() + "\"");
+    		}
+    		if(lst.get(i).getUserId() == null) {
+    			sb.append("," + "\"" + "\"");
+    		}
+    		else {
+    			sb.append("," + "\"" + lst.get(i).getUserId() + "\"");
+    		}
+    		sb.append("\r\n");
+    	}
+    	
 		// Construct CSV contents using StringBuilder
-		StringBuilder csv = new StringBuilder();
-		csv.append("col1,col2,col3\n");
-		csv.append("1,a,b\n");
+//		StringBuilder csv = new StringBuilder();
+//		csv.append("col1,col2,col3\r\n");
+//		csv.append("1,a,b\r\n");
 		
 		// Prepare the response
 		response().setContentType("text/csv");
 		response().setHeader("Content-Disposition", "attachment;filename="+downloadFilename);
-		return ok(csv.toString()); 
+		return ok(sb.toString()); 
 		}
 
 
