@@ -334,7 +334,37 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
      * User has pressed the Export button.
      */
     onExport: function() {
-    	window.open("exportCSV");
+    	
+    	var store = this.lookupReference('mainGrid').getStore();
+    	
+    	
+    	// Only do export if there are currently rows in the grid
+    	var numGridItems = store.getTotalCount();
+    	if (numGridItems>0) {
+    		var filters = store.getFilters().items;
+    		var filtersToEncode={};
+	    	var filtersAdded=false;
+	    	
+	    	for  (var filterIdx=0; filterIdx<filters.length;filterIdx++) {
+	    		var filter=filters[filterIdx];
+	    		filtersToEncode[filter._property]=filter._value;
+	    		filtersAdded=true;
+	    	}
+	    	var encodedFilters = Ext.Object.toQueryString(filtersToEncode);
+	    	if (filtersAdded) {
+	    		var fullUrl = "exportCSV?" + encodedFilters;
+	    	}
+	    	else {
+	    		var fullUrl = "exportCSV";
+	    	}
+	    	window.open(fullUrl);
+    	}
+    	else {
+    		// No rows in the grid.  Do not request the export
+    		Ext.MessageBox.alert("ERROR", "Nothing to export in the grid.");
+    	}
+    	
+	    	
     },
     /**
      * User has pressed "Delete all records..."
