@@ -358,13 +358,13 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
 	    	if (sorts.length>0) {
 		    	var sortColumns="",sortDirections="";
 		    	for (var sorterIdx=0;sorterIdx<sorts.length;sorterIdx++) {
-		    		var sorter=sorts[sorterIdx].config;
+		    		var sorter=sorts[sorterIdx];
 		    		if (sorterIdx > 0) {
 		    			sortColumns += ",";
 		    			sortDirections += ",";
 		    		}
-		    		sortColumns += sorter.property;
-		    		sortDirections += sorter.direction;
+		    		sortColumns += sorter._property;
+		    		sortDirections += sorter._direction;
 		    	}
 		    	// Add the sort information to the object to be encoded
 		    	filtersToEncode["sortColumns"] = sortColumns;
