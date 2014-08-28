@@ -4,7 +4,7 @@
 USE master;
 GO
 CREATE TABLE RGH.dbo.Ship_Via
-	(SHIP_VIA int(9) NOT NULL,
+	(SHIP_VIA varchar(4) NOT NULL,
 	 SHIP_VIA_DESC varchar(40) NULL,
 	 CARR_ID varchar(4) NULL,
 	 SERV_TYPE varchar(4) NULL,
