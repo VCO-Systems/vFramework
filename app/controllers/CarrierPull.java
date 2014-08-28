@@ -557,7 +557,12 @@ public class CarrierPull extends Controller {
     			System.out.println("VCO Add Exception : " + e.toString());
     			success = false;
     			retval.put("success", "false");
-        		retval.put("message", e.toString());
+    			if (e.toString().contains("Error Code: 2627")) {
+    				retval.put("message", "Duplicate Values not allowed. \nWhse = " + request().cookie("warehouse").value() + ", shipVia = " + recJson.get("shipVia").asText() + ", shipToZip = " + recJson.get("shipToZip").asText() + " already exists!");
+    			}
+    			else {
+    				retval.put("message", e.toString());
+    			}
         		return ok(retval);
     		}
     	}
