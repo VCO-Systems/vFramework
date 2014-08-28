@@ -598,7 +598,7 @@ public class CarrierPull extends Controller {
     	ObjectNode retval = play.libs.Json.newObject();
 		int rowsProcessed=0,rowsImported=0,rowsFailed=0;
 		Boolean abortJob=false;
-		String[] importColumnNames;
+		String[] importColumnNames = null;
 		List<String> errorMessages = new ArrayList<String>();
 		
 		// Note: these vars are hard-coded in Java for now, but can be moved to config file
@@ -643,11 +643,19 @@ public class CarrierPull extends Controller {
 				 * - must be in the correct order
 				 */
 				String s = csvReader.readLine();
-				importColumnNames = s.split(",");
+				if ((s != null) && (s.trim().length() > 0)) {
+					importColumnNames = s.split(",");
+				}
 				Boolean importColumnsOK=true;
 				
 				// The number of column must be correct
-				if (importColumnNames.length != expectedColumns.size()) {
+				if (importColumnNames == null) {
+					retval.put("success", "false");
+					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found 0.  Columns:  " + s);
+					importColumnsOK=false;
+				}
+				else if ((importColumnNames.length != expectedColumns.size())) {
+					retval.put("success", "false");
 					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
 					importColumnsOK=false;
 				}
@@ -657,7 +665,10 @@ public class CarrierPull extends Controller {
 				Iterator expectedColumnsIterator = expectedColumns.iterator();
 				for (int colIdx=0; colIdx<expectedColumns.size(); colIdx++) {
 					String requiredColName = expectedColumns.get(colIdx);
-					String thisColName = importColumnNames[colIdx];
+					String thisColName = "";
+					if ((importColumnNames != null) && (importColumnNames.length > colIdx)) {
+						thisColName = importColumnNames[colIdx];
+					}
 					if (!thisColName.equals(requiredColName)) {
 						importColumnsOK=false;
 						errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected column " + requiredColName + ", found column " + thisColName + ".");
@@ -680,7 +691,11 @@ public class CarrierPull extends Controller {
 					String rowAsString;
 					while((rowAsString = csvReader.readLine()) != null) {
 						Boolean rowImported=true;
-						String[] rowValuesFromCSV = rowAsString.split(",",-1);
+						//Skip empty lines
+						if (rowAsString.trim().equals("")) {
+							continue;
+						}
+						String[] rowValuesFromCSV = rowAsString.trim().split(",",-1);
 						
 						// Validation:  no more that 10,000 rows allowed in CSV
 						if ((rowsProcessed+1) > 10000) {
@@ -692,10 +707,16 @@ public class CarrierPull extends Controller {
 							retval.put("message", emsg);
 							// Since we're breaking out of the row loop here (ie: aborting the job),
 							// increment rowsFailed so the count in logs will be right
-							rowsFailed++;  
+							//rowsFailed++;  
 							break rowloop;
 						}
 						
+						// Validation: Check that the number of values after splitting is at least the same as columns expected
+						if (rowValuesFromCSV.length < expectedColumns.size()) {
+							errorMessages.add("IMPORT ERROR: skipping row " + (rowsProcessed+1) + ".  Reason: Number of values provided is less than expected " 
+									+ "provided : " + rowValuesFromCSV.length + " expected : " + expectedColumns.size());
+							rowImported=false;
+						}
 						
 						// Validation:  make sure required columns do not have null values
 						for (Iterator<String> reqIter = requiredColumns.iterator(); reqIter.hasNext();) { // Iterate over the required column names
@@ -740,62 +761,63 @@ public class CarrierPull extends Controller {
 						/** 
 						 * All row validations have passed.  Persist this row.
 						 */
-						
-						// convert this row's values into json
-						ObjectNode newRecJSON = play.libs.Json.newObject();
-						Iterator javaColumnsIterator = columnNamesJava.iterator();
-						int numColsThisRow=rowValuesFromCSV.length;
-						for (int javaColIdx=0; javaColumnsIterator.hasNext();javaColIdx++) {
-							String javaColName = (String)javaColumnsIterator.next();
-							// If this value exists in the row
-							if ((javaColIdx < numColsThisRow)) {
-								// Write this key/value pair to the JSON
-								newRecJSON.put(javaColName, rowValuesFromCSV[javaColIdx]);
+						if (rowImported) {
+							// convert this row's values into json
+							ObjectNode newRecJSON = play.libs.Json.newObject();
+							Iterator javaColumnsIterator = columnNamesJava.iterator();
+							int numColsThisRow=rowValuesFromCSV.length;
+							for (int javaColIdx=0; javaColumnsIterator.hasNext();javaColIdx++) {
+								String javaColName = (String)javaColumnsIterator.next();
+								// If this value exists in the row
+								if ((javaColIdx < numColsThisRow)) {
+									// Write this key/value pair to the JSON
+									newRecJSON.put(javaColName, rowValuesFromCSV[javaColIdx]);
+								}
 							}
+							
+							// See if this record exists in db
+							RGHICarrierPull rcp = loadRGHICarrierPull(
+									newRecJSON.get("whse").asText()
+									, newRecJSON.get("shipToZip").asText()
+									, newRecJSON.get("shipVia").asText());
+							// Found this record in db (update it)
+							if (rcp!=null) {  
+								System.out.println("\tUpdating existing record in db:  " + newRecJSON.toString());
+								// Set values from the JSON
+								rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
+								rcp.setPullTime(newRecJSON.get("pullTime").asText());
+								rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
+								rcp.setAnyText1(newRecJSON.get("anyText1").asText());
+								rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
+								// Set static values
+								rcp.setModDateTime(new Date());
+								rcp.setUserId(userId);
+							}
+							// didn't find this record in db (create it)
+							else { 
+								System.out.println("\tInserting new record:  " + newRecJSON.toString());
+								// Set values from the JSON
+								rcp = new RGHICarrierPull();
+								// set PK fields
+								rcp.setWhse(newRecJSON.get("whse").asText());
+								rcp.setShipToZip(newRecJSON.get("shipToZip").asText());
+								ShipVia sv = loadShipVia(newRecJSON.get("shipVia").asText());
+								rcp.setShipVia(sv);
+								// set optional fields
+								rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
+								rcp.setPullTime(newRecJSON.get("pullTime").asText());
+								rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
+								rcp.setAnyText1(newRecJSON.get("anyText1").asText());
+								rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
+								// Set static values
+								rcp.setCreateDateTime(new Date());
+								rcp.setModDateTime(new Date());
+								rcp.setUserId(userId);
+							}
+							
+							// Save the record to db
+							JPA.em().persist(rcp);
 						}
-						
-						// See if this record exists in db
-						RGHICarrierPull rcp = loadRGHICarrierPull(
-								newRecJSON.get("whse").asText()
-								, newRecJSON.get("shipToZip").asText()
-								, newRecJSON.get("shipVia").asText());
-						// Found this record in db (update it)
-						if (rcp!=null) {  
-							System.out.println("\tUpdating existing record in db:  " + newRecJSON.toString());
-							// Set values from the JSON
-							rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
-							rcp.setPullTime(newRecJSON.get("pullTime").asText());
-							rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
-							rcp.setAnyText1(newRecJSON.get("anyText1").asText());
-							rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
-							// Set static values
-							rcp.setModDateTime(new Date());
-							rcp.setUserId(userId);
-						}
-						// didn't find this record in db (create it)
-						else { 
-							System.out.println("\tInserting new record:  " + newRecJSON.toString());
-							// Set values from the JSON
-							rcp = new RGHICarrierPull();
-							// set PK fields
-							rcp.setWhse(newRecJSON.get("whse").asText());
-							rcp.setShipToZip(newRecJSON.get("shipToZip").asText());
-							ShipVia sv = loadShipVia(newRecJSON.get("shipVia").asText());
-							rcp.setShipVia(sv);
-							// set optional fields
-							rcp.setPullTrlrCode(newRecJSON.get("pullTrlrCode").asText());
-							rcp.setPullTime(newRecJSON.get("pullTime").asText());
-							rcp.setPullTimeAMPM(newRecJSON.get("pullTimeAMPM").asText());
-							rcp.setAnyText1(newRecJSON.get("anyText1").asText());
-							rcp.setAnyNbr1(newRecJSON.get("anyNbr1").asLong());
-							// Set static values
-							rcp.setCreateDateTime(new Date());
-							rcp.setModDateTime(new Date());
-							rcp.setUserId(userId);
-						}
-						
-						// Save the record to db
-						JPA.em().persist(rcp);
 						
 						// Finished processing this row.
 						// Increment the row counters, as appropriate.
@@ -810,6 +832,7 @@ public class CarrierPull extends Controller {
 				}
 			}
 			catch(Exception e) {
+				System.out.println("Exception : " + e.getMessage());
 				csvReader.close();
 				e.printStackTrace();
 				errorMessages.add(e.getMessage());
@@ -1065,6 +1088,12 @@ public class CarrierPull extends Controller {
     	
     	StringBuilder sb = new StringBuilder();
     	for (int i=0; i < totalRecordsToExport; i++) {
+    		if (i == 0) {
+    			//put the column headers
+    			sb.append("\"WHSE\",\"SHIPTO_ZIP\",\"SHIP_VIA\",\"PULL_TRLR_CODE\",\"PULL_TIME\",\"PULL_TIME_AMPM\",\"ANYTEXT1\",\"ANYNBR1\",\"CREATE_DATE_TIME\",\"MOD_DATE_TIME\",\"USER_ID\"");
+    			sb.append("\r\n");
+    		}
+    		
     		sb.append("\"" + lst.get(i).getWhse() + "\"");
     		sb.append("," + "\"" + lst.get(i).getShipToZip() + "\"");
     		sb.append("," + "\"" + lst.get(i).getShipVia().getShipVia() + "\"");
