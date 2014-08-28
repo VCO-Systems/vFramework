@@ -360,6 +360,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     	
                     },
                     { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: true
+                    	,maxLength: 10, enforceMaxLength: true
                     	, editor: {
                     		validator: function(value) {
                 				if (value.length>10) return 'max length: 10 characters';
@@ -367,7 +368,17 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 			}
                     	}  
                     },
-                    { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: true, editor: {allowBlank: true}  },
+                    { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: true
+                    	, editor: {
+                    		allowBlank: true,
+                    		validator: function(value) {
+                    			if (value && (isNaN(value) || value.indexOf(".")!=-1)){
+                    				return 'Must be an integer value.';
+                    			}
+                    			return true;
+                    		}
+                    	}  
+                    },
                     { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: true, width: 100  },
                     { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: true, width: 100  },
                     { text: 'User Id',  dataIndex: 'userId',header: 'User Id', sortable: true  }
