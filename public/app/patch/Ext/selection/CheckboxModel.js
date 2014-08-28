@@ -6,7 +6,7 @@ Ext.define('vfw.patch.Ext.selection.CheckboxModel', {
      */
 	
     onHeaderClick: function(headerCt, header, e) {
-        console.log('onHeaderClick() override');
+//        console.log('onHeaderClick() override');
     	this.callParent(arguments);
     }
    

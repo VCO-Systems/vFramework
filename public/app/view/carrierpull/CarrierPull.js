@@ -304,28 +304,12 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     handler: 'onAddClick'
                 }
                 ], // tbar items
-                
-                
-//                selType: 'cellmodel',
-//                plugins: {
-//                    ptype: 'cellediting',
-//                    clicksToEdit: 1
-//                },
-               
-                  plugins: [rowEditing],
-//                plugins: {
-//                    ptype: 'rowediting',
-//                    clicksToEdit: 2,
-//                    pluginId: 'rowEditor'
-//                    	listeners: {
-//    	                	beforeedit: function(editor, e, opts) {
-//    	                	}
-//    	                }
-//                }, // grid plugins
-//                  selModel: Ext.create('Ext.selection.CheckboxModel', {
-                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
+//                  plugins: [rowEditing],
+//                
+                  selModel: Ext.create('Ext.selection.CheckboxModel', {
+//                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
                   	mode: 'SIMPLE',
-                  	allowDeselect: true
+                  	enableKeyNav: true
                   }),
 //                  modelValidation: true,
                 //fieldLabel: 'Ship Via'
@@ -348,7 +332,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     			if (value.length>8) return 'max length: 8 characters';
                     			return true;
                     		}
-                    	}, sortable: false  },
+                    	}},
                     { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', sortable: true,
                     		editor: {
                     			allowBlank: true,
