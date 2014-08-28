@@ -341,22 +341,47 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     	// Only do export if there are currently rows in the grid
     	var numGridItems = store.getTotalCount();
     	if (numGridItems>0) {
+    		// Build a list of filters
     		var filters = store.getFilters().items;
     		var filtersToEncode={};
 	    	var filtersAdded=false;
-	    	
 	    	for  (var filterIdx=0; filterIdx<filters.length;filterIdx++) {
 	    		var filter=filters[filterIdx];
 	    		filtersToEncode[filter._property]=filter._value;
 	    		filtersAdded=true;
 	    	}
+	    	
+	    	// Build a list of sort criteria like this:
+	    	// sortColumns=COLA,COLB
+	    	// sortDirections=ASC,DESC
+	    	var sorts = store.getSorters().items;
+	    	if (sorts.length>0) {
+		    	var sortColumns="",sortDirections="";
+		    	for (var sorterIdx=0;sorterIdx<sorts.length;sorterIdx++) {
+		    		var sorter=sorts[sorterIdx].config;
+		    		if (sorterIdx > 0) {
+		    			sortColumns += ",";
+		    			sortDirections += ",";
+		    		}
+		    		sortColumns += sorter.property;
+		    		sortDirections += sorter.direction;
+		    	}
+		    	// Add the sort information to the object to be encoded
+		    	filtersToEncode["sortColumns"] = sortColumns;
+		    	filtersToEncode["sortDirections"] = sortDirections;
+	    	}
+	    	
+	    	// Encode the filters and sort info
 	    	var encodedFilters = Ext.Object.toQueryString(filtersToEncode);
+	    	
+	    	// Build the URL
 	    	if (filtersAdded) {
 	    		var fullUrl = "exportCSV?" + encodedFilters;
 	    	}
 	    	else {
 	    		var fullUrl = "exportCSV";
 	    	}
+//	    	console.log(fullUrl);
 	    	window.open(fullUrl);
     	}
     	else {

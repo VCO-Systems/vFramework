@@ -330,7 +330,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 //                  modelValidation: true,
                 //fieldLabel: 'Ship Via'
                 columns: [
-                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: false,editor: {  name: 'RGHICarrierPull.Add.shipVia',
+                    { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: true,editor: {  name: 'RGHICarrierPull.Add.shipVia',
 																											  xtype: 'combobox',
 																											  queryMode: 'local', 
 																											  allowBlank: false,
@@ -340,8 +340,8 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
 																											  displayField : 'shipVia',
 																											  valueField : 'shipVia',
 																											  store : 'ShipViaStore'} },
-                    { text: 'Ship Via Description',  dataIndex: 'shipViaDesc', header: 'Ship Via Description', sortable: false, width: 200 },
-                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code'
+                    { text: 'Ship Via Description',  dataIndex: 'shipViaDesc', header: 'Ship Via Description', sortable: true, width: 200 },
+                    { text: 'Pull Trailer Code',  dataIndex: 'pullTrlrCode', header: 'Pull Trailer Code', sortable: true
                     	,editor: {
                     		allowBlank: true,
                     		validator: function(value) {
@@ -349,23 +349,23 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     			return true;
                     		}
                     	}, sortable: false  },
-                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', 
+                    { text: 'Pull Time',  dataIndex: 'pullTime', header: 'Pull Time', sortable: true,
                     		editor: {
                     			allowBlank: true,
                     			validator: function(value) {
                     				if (value.length>5) return 'max length: 5 characters';
                         			return true;
-                    			}}, sortable: false 
+                    			}}
                     			},
-                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM'
+                    { text: 'Pull Time AMPM',  dataIndex: 'pullTimeAMPM', header: 'Pull Time AM/PM', sortable: true 
                     	, editor: {
                     		allowBlank: true,
                     		validator: function(value) {
                 				if (value.length>2) return 'max length: 2 characters';
                     			return true;
                 			}
-                    	}, sortable: false },
-                    { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: false
+                    	}},
+                    { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: true
                 		,editor: {
                 			validator: function(value) {
                 				if (value.length>11) return 'max length: 11 characters';
@@ -375,7 +375,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 		}
                     	
                     },
-                    { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: false
+                    { text: 'Any Text1',  dataIndex: 'anyText1', header: 'Any Text1', sortable: true
                     	, editor: {
                     		validator: function(value) {
                 				if (value.length>10) return 'max length: 10 characters';
@@ -383,10 +383,10 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 			}
                     	}  
                     },
-                    { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: false, editor: {allowBlank: true}  },
-                    { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: false, width: 100  },
-                    { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: false, width: 100  },
-                    { text: 'User Id',  dataIndex: 'userId',header: 'User Id', sortable: false  }
+                    { text: 'Any Nbr1',  dataIndex: 'anyNbr1', header: 'Any Nbr1', sortable: true, editor: {allowBlank: true}  },
+                    { text: 'Create Date/Time',  dataIndex: 'createDateTime',header: 'Create Date/Time', sortable: true, width: 100  },
+                    { text: 'Mod Date/Time',  dataIndex: 'modDateTime',header: 'Mod Date/Time', sortable: true, width: 100  },
+                    { text: 'User Id',  dataIndex: 'userId',header: 'User Id', sortable: true  }
                 ],
              // paging bar on the bottom
                 bbar: { // Ext.create('Ext.toolbar.Paging', {  // PagingToolbar', {
