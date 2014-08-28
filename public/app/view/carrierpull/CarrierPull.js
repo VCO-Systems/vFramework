@@ -304,7 +304,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     handler: 'onAddClick'
                 }
                 ], // tbar items
-//                  plugins: [rowEditing],
+                  plugins: [rowEditing],
 //                
                   selModel: Ext.create('Ext.selection.CheckboxModel', {
 //                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
