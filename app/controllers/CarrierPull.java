@@ -238,11 +238,59 @@ public class CarrierPull extends Controller {
     	Long total_rows = JPA.em().createQuery(countQuery).getSingleResult();
     	retval.put("totalrows",total_rows);  // add total to the json
     	
+    	// Apply any sort criteria (filters) from the UI
+    	List<JsonNode> sort_criteria = json.findValues("sort");  // Json node called filters
+    	Iterator<JsonNode> sort_it = sort_criteria.iterator();  // Get ready to iterate them
+    	ArrayNode sortCriteriaEntries = new ObjectMapper().createArrayNode();  // Cast as ArrayNode TODO : VA : cant we just initialize this to NULL? why create a new object?
+    	while (sort_it.hasNext()) {
+    		// VC: For some reason, ExtJs is serializing this JSON array 
+    		// as a string, so instead of getting multiple values here we
+    		// get one string.  So we must take this first element, cast
+    		// it again from string to ArrayNode using Json, to get the actual elements.
+    		JsonNode node = sort_it.next();
+    		String node_string = node.asText();
+    		sortCriteriaEntries = (ArrayNode)play.libs.Json.parse(node_string);
+    	}
+    	// Process each of the sort criteria, and apply them to the query expression
+    	// (or not)
+    	if (sortCriteriaEntries.size() > 0) {
+	    	for (JsonNode sort:sortCriteriaEntries) {  // Now loop over them as JsonNode
+	    		// Example:  {'property':'shipVia', 'direction': 'asc'}
+	    		String prop = sort.get("property").asText();
+	    		String direction  = sort.get("direction").asText();
+	    		
+	    		if (direction.equalsIgnoreCase("asc")) {
+	    			if (prop.equalsIgnoreCase("shipVia")) {
+	    				select.orderBy(cb.asc(from.get(prop).get(prop)));
+	    			}
+	    			else if (prop.equalsIgnoreCase("shipViaDesc")) {
+	    				select.orderBy(cb.asc(from.get("shipVia").get(prop)));
+	    			}
+	    			else {
+	    				select.orderBy(cb.asc(from.get(prop)));
+	    			}
+	    		}
+	    		else if (direction.equalsIgnoreCase("desc")) {
+	    			if (prop.equalsIgnoreCase("shipVia")) {
+	    				select.orderBy(cb.desc(from.get(prop).get(prop)));
+	    			}
+	    			else if (prop.equalsIgnoreCase("shipViaDesc")) {
+	    				select.orderBy(cb.desc(from.get("shipVia").get(prop)));
+	    			}
+	    			else {
+	    				select.orderBy(cb.desc(from.get(prop)));
+	    			}
+	    		}
+	    	}
+    	}
+    	else {
+    		select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
+    	}
+    	
     	/**
     	 * Get the actual page of data.
     	 */
     	select.where(predicates);
-    	select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(select);
     	records.setFirstResult((page-1)*limit);
     	records.setMaxResults(limit);
@@ -1076,7 +1124,37 @@ public class CarrierPull extends Controller {
         select.where(predicates);
         
         //OrderBy Criteria
-        select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
+        String sortColumns = request().getQueryString("sortColumns");
+        String sortDirections = request().getQueryString("sortDirections");
+        System.out.println("sortColumns = " + sortColumns);
+        System.out.println("sortDirections = " + sortDirections);
+        if (sortColumns == null || sortColumns.trim().equals("")) {
+        	select.orderBy(cb.asc(from.get("shipVia").get("shipVia")), cb.asc(from.get("shipToZip")));
+        }
+        else {
+        	if (sortDirections.equalsIgnoreCase("asc")) {
+    			if (sortColumns.equalsIgnoreCase("shipVia")) {
+    				select.orderBy(cb.asc(from.get(sortColumns).get(sortColumns)));
+    			}
+    			else if (sortColumns.equalsIgnoreCase("shipViaDesc")) {
+    				select.orderBy(cb.asc(from.get("shipVia").get(sortColumns)));
+    			}
+    			else {
+    				select.orderBy(cb.asc(from.get(sortColumns)));
+    			}
+    		}
+    		else if (sortDirections.equalsIgnoreCase("desc")) {
+    			if (sortColumns.equalsIgnoreCase("shipVia")) {
+    				select.orderBy(cb.desc(from.get(sortColumns).get(sortColumns)));
+    			}
+    			else if (sortColumns.equalsIgnoreCase("shipViaDesc")) {
+    				select.orderBy(cb.desc(from.get("shipVia").get(sortColumns)));
+    			}
+    			else {
+    				select.orderBy(cb.desc(from.get(sortColumns)));
+    			}
+    		}
+        }
         
     	TypedQuery<RGHICarrierPull> records = JPA.em().createQuery(select);
     	List<RGHICarrierPull> lst = records.getResultList();
