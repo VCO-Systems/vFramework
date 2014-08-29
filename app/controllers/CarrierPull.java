@@ -713,19 +713,21 @@ public class CarrierPull extends Controller {
 					importColumnsOK=false;
 				}
 				
-				// Loop over the required columns, comparing to cols from the import file,
-				// and make sure they have the same name and position
-				Iterator expectedColumnsIterator = expectedColumns.iterator();
-				for (int colIdx=0; colIdx<expectedColumns.size(); colIdx++) {
-					String requiredColName = expectedColumns.get(colIdx);
-					String thisColName = "";
-					if ((importColumnNames != null) && (importColumnNames.length > colIdx)) {
-						thisColName = importColumnNames[colIdx];
-					}
-					if (!thisColName.equals(requiredColName)) {
-						importColumnsOK=false;
-						errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected column " + requiredColName + ", found column " + thisColName + ".");
-						retval.put("success", "false");
+				if (importColumnsOK) {
+					// Loop over the required columns, comparing to cols from the import file,
+					// and make sure they have the same name and position
+					Iterator expectedColumnsIterator = expectedColumns.iterator();
+					for (int colIdx=0; colIdx<expectedColumns.size(); colIdx++) {
+						String requiredColName = expectedColumns.get(colIdx);
+						String thisColName = "";
+						if ((importColumnNames != null) && (importColumnNames.length > colIdx)) {
+							thisColName = importColumnNames[colIdx];
+						}
+						if (!thisColName.equals(requiredColName)) {
+							importColumnsOK=false;
+							errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected column " + requiredColName + ", found column " + thisColName + ".");
+							retval.put("success", "false");
+						}
 					}
 				}
 				
