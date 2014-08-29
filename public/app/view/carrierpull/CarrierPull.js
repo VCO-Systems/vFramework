@@ -352,7 +352,7 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                     { text: 'Ship To Zip',  dataIndex: 'shipToZip', header: 'Ship To Zip', sortable: true
                 		,editor: {
                 			validator: function(value) {
-                				if (value.length>11) return 'max length: 11 characters';
+                				if ((value.length<5) ||(value.length>11)) return 'must be 5-11 characters';
                     			return true;
                 			}
                     		,allowBlank: false

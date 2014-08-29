@@ -704,12 +704,12 @@ public class CarrierPull extends Controller {
 				// The number of column must be correct
 				if (importColumnNames == null) {
 					retval.put("success", "false");
-					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found 0.  Columns:  " + s);
+					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found 0.  Columns:  " + s.replace("", ", "));
 					importColumnsOK=false;
 				}
 				else if ((importColumnNames.length != expectedColumns.size())) {
 					retval.put("success", "false");
-					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s);
+					errorMessages.add("IMPORT ERROR: Aborting job.  Reason: Expected " + expectedColumns.size() + " columns, found " + importColumnNames.length + ".  Columns:  " + s.replace(",", ", "));
 					importColumnsOK=false;
 				}
 				

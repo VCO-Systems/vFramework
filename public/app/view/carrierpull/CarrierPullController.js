@@ -50,12 +50,16 @@ var uploadWindow = new Ext.Window({
 	                        		);
 	                        	}
 	                        	else {
-	                        		Ext.Msg.alert('Error', 
-	                        				"Your file '" + o.result.filename + "' encountered one or more errors."
+	                        		Ext.Msg.alert({
+	                        			title: 'Error', 
+	                        			message: "Your file '" + o.result.filename + "' encountered one or more errors."
 	                        				+ "<br />" + o.result.message
 	                        				+ "<br/>Rows imported: " + o.result.rowsImported + "." 
 	                        				+ "<br />Rows with problems: " + o.result.rowsFailed
-	                        				+ "<br />See logs for more details.");
+	                        				+ "<br />See logs for more details."
+	                        			,shrinkWrap: 3
+	                        			,maxHeight: 400
+	                        		});
 	                        	}
 	                            
 	                            
