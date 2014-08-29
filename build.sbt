@@ -1,4 +1,4 @@
-name := "VCO"
+name := "RGH"
 
 version := "v1"
 
