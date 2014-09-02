@@ -1,6 +1,6 @@
 name := "RGH"
 
-version := "v1"
+version := "v1.0.1"
 
 libraryDependencies ++= Seq(
   javaJdbc,
