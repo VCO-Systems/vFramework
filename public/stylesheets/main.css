@@ -23,12 +23,17 @@ the bottom border of the fieldset.
 }
 
 .x-grid-item-alt {
-/* 	background-color: #F7F7C5; */
+    background-color: #F7F7C5; 
+/* 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#000000'); for IE */
 	background: -webkit-linear-gradient(#FFFFFF,#F7F7C5); /* For Safari 5.1 to 6.0 */
     background: -o-linear-gradient(#FFFFFF,#F7F7C5); /* For Opera 11.1 to 12.0 */
     background: -moz-linear-gradient(#FFFFFF,#F7F7C5); /* For Firefox 3.6 to 15 */
     background: linear-gradient(#FFFFFF,#F7F7C5); /* Standard syntax */
 }
+
+/* .x-grid-item.x-grid-item-alt.x-grid-item-selected { */
+/* 	background: #e0e0e0; */
+/* } */
 
 /**
 * Hide the textinput portion of the ExtJS
