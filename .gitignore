@@ -17,3 +17,5 @@ server.pid
 /.target
 /.apt_generated
 /conf/application.conf
+.settings/**
+.metadata

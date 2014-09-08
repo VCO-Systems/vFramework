@@ -3,6 +3,7 @@
   <classpathentry kind="src" path="test" output=".target"/>
   <classpathentry kind="lib" path=".\lib\eclipselink-2.5.2.jar"/>
   <classpathentry kind="lib" path=".\lib\javax.persistence-2.1.0-RC2.jar"/>
+  <classpathentry kind="lib" path=".\lib\jtds-1.3.1.jar"/>
   <classpathentry kind="lib" path=".\lib\ojdbc6.jar"/>
   <classpathentry kind="lib" path=".\lib\org.eclipse.persistence.antlr-2.5.2.jar"/>
   <classpathentry kind="lib" path=".\lib\org.eclipse.persistence.asm-2.5.2.jar"/>
