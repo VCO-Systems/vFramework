@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="build-rgh" name="Create build for RGH applications" >
+
+	<property name="basedir" location="C:\dev\workspaces\eclipse_workspace\vFramework" />
+	<property name="play.basedir" location="C:\dev\tools\play-2.2.3" />
+	<property name="staging" location="${basedir}\target\universal\stage" />
+	<property name="dir.deploy" location="C:\dev\temp\rgh-build-2" />
+
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-M-dd_h-m-s" />
+	</tstamp>
+	
+	<!-- To lower case -->
+	  <scriptdef language="javascript" name="lower">
+	    <attribute name="string" /> 
+	    <attribute name="to" />
+	    project.setProperty(attributes.get("to"),attributes.get("string").toLowerCase());
+	  </scriptdef>
+
+	<target name="build-rgh">
+		<!-- Initial Play build -->
+		<exec executable="cmd" dir="${basedir}\">
+			<arg value="/c" />
+			<arg value="${play.basedir}\play.bat" />
+			<arg value="compile" />
+			<arg value="stage" />
+		</exec>
+		<!-- Delete unnecessary files -->
+		<delete>
+			<fileset dir="${staging}\" includes="README.*,README" />
+		</delete>
+
+		<!-- get product name from build.sbt -->
+		<loadfile srcfile="${basedir}\build.sbt" property="product.name.upper">
+			<filterchain>
+				<!-- find line containing product -->
+				<linecontainsregexp negate="false" >
+					<regexp pattern='^name :='  />
+				</linecontainsregexp>
+				<replaceregex pattern='name := \"([a-zA-Z0-9]*)\"' replace="\1" />
+				<striplinebreaks/>
+				<trim />
+			</filterchain>
+		</loadfile>
+		<lower string="${product.name.upper}" to="product.name" />
+		<echo message="${product.name}" />
+		
+		<length string="${product.name}" property="length.foo" />
+		<echo message="${length.foo}"></echo>
+		
+		<!-- get product version from build.sbt -->
+		<loadfile srcfile="${basedir}/build.sbt" property="product.version">
+			<filterchain>
+				<!-- find line containing product -->
+				<linecontainsregexp negate="false">
+					<regexp pattern='^version :=' />
+				</linecontainsregexp>
+				<replaceregex pattern='version := "(.*)"' replace="\1"/>
+				<striplinebreaks/>
+			</filterchain>
+		</loadfile>
+		<echo message="${product.version}" />
+		<length string="${product.version}" property="version.length" />
+				<echo message="${version.length}"></echo>
+
+		<!-- Delete db settings from config file -->
+		<replaceregexp file="${staging}/conf/application.conf" match="^[#\s]*db.default(.*)" flags="gs" replace="" byline="true" />
+		
+		<!-- Replace default app.bat with one with hard-coded JDK location -->
+		<tempfile destdir="${dir.deploy}/" property="temp.file" prefix="run_script." deleteonexit="true">
+		</tempfile>
+		<concat destfile="${temp.file}" fixlastline="true">
+			<fileset dir="${basedir}/build/windows/" includes="appname.bat">
+			</fileset>
+		</concat>
+
+			<!-- read the "lines to keep" from generated .bat file -->
+			<loadfile srcfile="${staging}/bin/rgh.bat" property="cp">
+				<filterchain>
+					<linecontainsregexp negate="false">
+						<regexp pattern="^set(.)*APP_CLASSPATH(.)*" />
+					</linecontainsregexp>
+				</filterchain>
+			</loadfile>
+			<!-- replace the token with the actual classpath from build -->
+			<replace file="${temp.file}" token="@replace_classpath@" value="${cp}" />
+			<!-- replace rgh.bat with modified version -->
+			<move file="${temp.file}" tofile="${staging}/bin/rgh.bat" />
+			<delete file="${temp.file}" />
+		<!-- generate zip file -->
+		<zip destfile="${dir.deploy}/${product.name}-${product.version}.zip" basedir="${staging}/" zip64mode="always"/>
+ 	</target>
+
+	<target name="test">
+		<loadfile srcfile="${basedir}\build.sbt" property="product.name.upper">
+					<filterchain>
+						<!-- find line containing product -->
+						<linecontainsregexp negate="false" >
+							<regexp pattern='^name :='  />
+						</linecontainsregexp>
+						<replaceregex pattern='name := \"([a-zA-Z0-9]*)[\"\n\r]+' replace="\1" flags="s"/>
+						<striplinebreaks/>
+						<trim />
+					</filterchain>
+				</loadfile>
+				<lower string="${product.name.upper}" to="product.name" />
+				<echo message="${product.name}" />
+				
+				<length string="${product.name}" property="length.foo" />
+				<echo message="${length.foo}"></echo>
+	</target>
+	
+	<target name="help">
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="play.bat" />
+			<arg value="compile" />
+			<arg value="dist" />
+		</exec>
+	</target>
+
+</project>
+
+
+

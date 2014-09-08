@@ -62,6 +62,7 @@ set _JAVA_OPTS=%JAVA_OPTS%
 :run
  
 @replace_classpath@
+set "APP_MAIN_CLASS=play.core.server.NettyServer"
 
 rem TODO - figure out how to pass arguments....
 echo "%_JAVACMD%" %* %_JAVA_OPTS% %VCO_OPTS% -cp "%APP_CLASSPATH%" %APP_MAIN_CLASS% %CMDS% 
