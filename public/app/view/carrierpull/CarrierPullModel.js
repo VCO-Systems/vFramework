@@ -22,7 +22,8 @@ Ext.define('vfw.view.carrierpull.CarrierPullModel', {
              'createDateTime', 
              'modDateTime', 
              'userId', 
-             'isNew'
+             'isNew',
+             'isSelected'
             ]
 
     //TODO - add data, formulas and/or methods to support your view

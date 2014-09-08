@@ -160,6 +160,7 @@ Ext.define('vfw.view.carrierpull.CarrierPullController', {
     				}
     				
     			}
+    			
     		}
     	});
     },

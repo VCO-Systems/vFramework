@@ -277,7 +277,11 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 xtype: 'grid',
 //                title: 'SKU',
                 reference: 'mainGrid',
-                
+                listeners: {
+                	itemclick: function( view, record, item, index, e, eOpts ) {
+                		console.log(record.data.anyNbr1);
+                	}
+                },
 //                selModel: {
 //                	checkOnly: true,
 //                	injectCheckbox: 0
@@ -305,15 +309,32 @@ Ext.define('vfw.view.carrierpull.CarrierPull', {
                 }
                 ], // tbar items
                   plugins: [rowEditing],
+                  
 //                
-                  selModel: Ext.create('Ext.selection.CheckboxModel', {
-//                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
-                  	mode: 'SIMPLE',
-                  	enableKeyNav: true
-                  }),
+//                  selModel: Ext.create('Ext.selection.CheckboxModel', {
+////                  selModel: Ext.create('vfw.patch.Ext.selection.CheckboxModel', {
+//                  	mode: 'SIMPLE',
+//                  	enableKeyNav: true
+//                  }),
 //                  modelValidation: true,
                 //fieldLabel: 'Ship Via'
                 columns: [
+                    { xtype : 'checkcolumn', text : '', dataIndex : 'isSelected', stopSelection: false 
+                    	,listeners: {
+                    		'checkchange': function( thisItem, rowIndex, checked, eOpts ) {
+                				var grid = thisItem.ownerCt.grid;
+//                				grid.getSelectionModel().selectAll();
+                    			var selectedRows = grid.getStore().getRange(rowIndex,rowIndex);
+                				// Clear the dirty marker from the row
+                				Ext.each(selectedRows,function(item) {
+                					item.commit();
+                					console.log('setting row ' + rowIndex + " as selected");
+                					grid.getSelectionModel().select(item,true); 
+                				});
+                				// Mark this row as selected
+//                				console.log(grid.selModel);
+                			}
+                    	}},
                     { text: 'Ship Via',  dataIndex: 'shipVia', header: 'Ship Via', sortable: true,editor: {  name: 'RGHICarrierPull.Add.shipVia',
 																											  xtype: 'combobox',
 																											  queryMode: 'local', 
